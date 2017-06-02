@@ -1,0 +1,1077 @@
+\documentclass[a4paper, titlepage]{article}
+
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}      
+\usepackage[francais]{babel}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{tikz}
+\usepackage{algorithm, algorithmic}
+%\usepackage{hyperref}
+\usepackage{array}
+\usepackage{cite}
+
+\newtheorem{theo}{Théorème}[section]
+\newtheorem{lemm}[theo]{Lemme}
+\newtheorem{prop}[theo]{Proposition}
+\newtheorem{coro}[theo]{Corollaire}
+\theoremstyle{definition}
+\newtheorem{defi}[theo]{Définition}
+\theoremstyle{remark}
+\newtheorem{rema}[theo]{Remarque}
+\newtheorem{exem}[theo]{Exemple}
+\newtheorem{appl}[theo]{Application}
+
+\def\N{\mathbb N}
+\def\A{\mathbb A}
+\def\Z{\mathbb Z}
+\def\Q{\mathbb Q}
+\def\R{\mathbb R}
+\def\C{\mathbb C}
+\def\K{\mathbb K}
+\def\F{\mathbb F}
+\def\O{\mathcal O}
+\def\gf{\operatorname{GF}}
+\def\frob{\operatorname{Frob}}
+\def\card{\operatorname{Card}}
+\def\car{\operatorname{car}}
+\def\id{\operatorname{id}}
+\def\mbf#1{\mathbf{#1}}
+\def\NP{\mathbb{NP}}
+\def\gen #1{\left\langle#1\right\rangle}
+\def\ceil #1{\left\lceil#1\right\rceil}
+\def\floor #1{\left\lfloor#1\right\rfloor}
+
+\floatname{algorithm}{Algorithme}
+\renewcommand{\algorithmicrequire}{\textbf{Entrée :}}
+\renewcommand{\algorithmicensure}{\textbf{Sortie :}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{si}}
+\renewcommand{\algorithmicthen}{\textbf{alors}}
+\renewcommand{\algorithmicelse}{\textbf{sinon}}
+\renewcommand{\algorithmicfor}{\textbf{pour}}
+\renewcommand{\algorithmicforall}{\textbf{pour tout}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{tant que}}
+\renewcommand{\algorithmicloop}{\textbf{boucle}}
+\renewcommand{\algorithmicrepeat}{\textbf{repéter}}
+\renewcommand{\algorithmicuntil}{\textbf{jusqu'à}}
+\renewcommand{\algorithmicprint}{\textbf{afficher}}
+\renewcommand{\algorithmicreturn}{\textbf{retourner}}
+\renewcommand{\algorithmictrue}{\textbf{vrai}}
+\renewcommand{\algorithmicfalse}{\textbf{faux}}
+
+\title{\'Etude du cryptosystème de Chor-Rivest}    
+\author{Rémi {\sc Clarisse}}        
+\date{Mai-Août 2017}       
+
+\begin{document}
+\centerline{\includegraphics[width=8cm,height=25mm]{logo-bordeaux.png} \hspace{1cm} \includegraphics[width=8cm,height=25mm]{logo-inria.png}}
+
+\vspace{1cm}
+
+\centerline{\large\bfseries Master 1 de Cryptologie et Sécurité Informatique}
+\centerline{\large\bfseries \'Equipe-projet GRACE}
+\centerline{\bfseries Stage estival 2017}
+
+\centerline{\rule{5cm}{2pt}}
+\begin{center}
+\vspace{4cm}
+
+{\Huge\bfseries \'Etude du cryptosystème de Chor-Rivest}
+ \vspace{1cm}
+
+{\large Rémi {\sc Clarisse}}
+
+\vspace{7,5cm}
+
+{\large Tuteurs: Daniel {\sc Augot} et Luca {\sc De Feo}}
+\end{center}
+\newpage
+
+\tableofcontents
+\newpage
+
+\section*{Introduction}
+
+En 1984, Benny Chor et Ronald L. Rivest ont proposé un cryptosystème \cite{chorRivest1988} à clé publique dont la sécurité repose sur un problème $\NP$-complet : le problème du sac à dos. Il a été cryptanalysé en 1998 par Serge Vaudenay.
+
+Nous nous proposons ici d'étudier ce cryptosystème.
+\newpage
+
+\section{Le problème du sac à dos}
+Le problème du sac à dos est le problème $\NP$-complet suivant :
+\begin{defi}[Problème du sac à dos]
+Soient $a_0$, $\dots$, $a_{n-1}$, $h$ et $S$ des entiers naturels. Le \textit{problème du sac à dos} est alors le problème de décision : existe-t-il $n$ entiers naturels $x_0$, $\dots$, $x_{n-1}$ de sorte que 
+$$\sum_{i = 0}^{n-1} x_ia_i = S \quad\text{ et }\quad \sum_{i = 0}^{n-1} x_i \leqslant h \quad ?$$
+$h$ est appelé le \textit{poids} du sac à dos.
+\end{defi}
+
+Un autre problème, toujours $\NP$-complet, demande seulement à ce que les $x_i$ soient $0$ ou $1$, sans se soucier du poids du sac : c'est le problème \textit{subset sum}.
+
+Les cryptosystèmes se basant sur un problème de sac à dos reposent sur le fait qu'il est difficile de trouver une solution à un tel problème, même quand il en existe une. 
+
+Dans de tels cryptosystèmes, l'utilisateur publie un ensemble $a_i$, tel que $0 \leqslant i \leqslant n-1$, et un poids $h$. Un message clair consiste alors en un vecteur d'entiers $\mbf m = (x_0, \dots, x_{n-1})$ dont le poids est inférieur à $h$. Le chiffré de $\mbf m$ est noté :
+$$E(\mbf m) = \sum_{i=0}^{n-1} x_ia_i.$$
+
+L'utilisateur choisi les éléments $a_i$ de telle façon à lui permettre de résoudre assez facilement l'instance du problème du sac à dos pour recouvrer le message clair à partir de $E(\mbf m)$. Il s'agit alors d'une \textit{trapdoor} : une instance à laquelle il est aisé de trouver une solution.
+
+Une propriété appréciée des cryptosystèmes de type sac à dos  est la facilité de chiffrement : il n'y a qu'à faire des additions. Vu que nous souhaitons coder un message via une instance de sac à dos, il serait préférable qu'il y ait une seule et unique solution au problème, pour pouvoir recouvrer le message de manière univoque.
+
+\subsection{Densité d'un sac à dos}
+Pour attaquer les cryptosystèmes reposant sur le problème du sac à dos, Jeffrey C. Lagarias et Andrew M. Odlyzko ont introduit la définition :
+\begin{defi}[Densité d'un sac à dos]
+La \textit{densité d'un sac à dos} est le rapport entre le nombre d'éléments dans le sac sur la taille binaire des ces éléments.
+\end{defi}
+Concrètement, si un sac à $n$ éléments, que ceux-ci sont positifs et que son élément le plus grand est $s \in \N^*$, alors la densité de ce sac à dos est $n/\log_2(s)$.
+
+Il s'avère qu'il existe une attaque sur les sac à dos à  densité faible ($< 0.94$). Elle a été proposée par J. Lagarias et A. Odlyzko en 1985, et utilise la réduction de réseaux, comme l'algorithme LLL.
+
+B. Chor et R. Rivest se sont donc inspirés du théorème de Bose-Chowla pour construire leur cryptosystème.
+
+\section{Le théorème Bose-Chowla}
+
+Donnons rapidement une définition pour rendre le propos plus clair :
+
+\begin{defi}[\textit{$h$-fold sum}]
+Soit $h$ un entier naturel. On appelle \textit{$h$-fold sum} d'une suite, la somme d'exactement $h$ termes de celle-ci, répétition possible.
+\end{defi}
+
+Nous nous posons alors la question : étant donné $n$ et $h$ deux entiers naturels, existe-t-il une suite d'entiers naturels $(a_0, \dots, a_{n-1})$ telle que toutes ces \textit{$h$-fold sums} soient distinctes ?
+
+Il est facilement de construire de telle suite si les $a_i$ croissent exponentiellement en $n$. Par exemple, la suite $(1, h, h^2, \dots, h^{n-1})$ à cette propriété (mais cela ne marche pas pour $h+1$ termes, puisque $h^2 + h\cdot1 = (h+1) \cdot h$). Cependant, le sac à dos associé a une  densité faible, le rendant vulnérable à l'attaque de J. Lagarias et A. Odlyzko.
+
+En 1962, Raj Chandra Bose et Sarvadaman Chowla ont trouvé une façon de construire une telle suite avec $1 \leqslant a_i \leqslant n^h-1$ pour tout ${0 \leqslant i \leqslant n-1}$. Cela permet d'instancier un sac à dos avec une densité acceptablement proche de $1$. Nous donnons ici une version modifiée du théorème, qui instruit sur l'inspiration du cryptosystème de Chor-Rivest.
+
+\begin{theo}[Théorème de Bose-Chowla]
+Soient $p$ un nombre premier et $h \geqslant 2$ un entier. Il existe une suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ d'entiers telle que : \begin{enumerate}
+\item pour tout $0 \leqslant i \leqslant p-1$, $$1 \leqslant a_i \leqslant p^h-1,$$
+\item si $(x_0, \dots, x_{p-1})$ et $(y_0, \dots, y_{p-1})$ sont deux vecteurs distincts d'entiers naturels de poids inférieur à $h$, alors 
+$$\sum_{i=0}^{p-1} x_ia_i \neq \sum_{i=0}^{p-1} y_ia_i.$$
+\end{enumerate}
+\end{theo}
+
+\begin{proof}
+Plaçons nous dans les corps finis $\gf(p)$ et $\gf(p^h)$, extension de degré $h$ de $\gf(p)$. Numérotons les éléments de $\gf(p) = \{\alpha_0, \dots, \alpha_{p-1} \}$. 
+
+Soit $t$ un élément de $\gf(p^h)$ algébrique de degré $h$ sur $\gf(p)$, i.e. le polynôme minimal de $t$ dans $\gf(p)[x]$  est de degré $h$. 
+
+Soit $g$ un élément primitif de $\gf(p^h)$, i.e. un élément générateur du groupe multiplicatif $\gf(p^h)^\times$, à savoir 
+$$\gf(p^h)^\times = \{ g^e : 0 \leqslant e \leqslant p^h-1 \}.$$
+
+Considérons l'ensemble des translatés de $t$ par un élément de $\gf(p)$, à savoir :
+$$t + \gf(p) = \{ t + \alpha_i : \alpha_i \in \gf(p) \}.$$
+Soit $a_i := \log_g(t + \alpha_i)$, où $\alpha_i \in \gf(p)$, le logarithme de $t+\alpha_i$ en base $g$ dans $\gf(p^h)$. Alors les $a_i$ sont tous des entiers de l'intervalle $[1, p^h -1]$ et, montrons par l'absurde que, toutes les \textit{$h$-fold sums} de la suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ sont distinctes. 
+
+Soient $(x_0, \dots, x_{p-1})$ et $(y_0, \dots, y_{p-1})$ deux vecteurs d'entiers naturels satisfaisant à :
+$$(x_0, \dots, x_{p-1}) \neq (y_0, \dots, y_{p-1}),$$
+$$\sum_{i=0}^{p-1}x_i \leqslant h, \qquad \sum_{i=0}^{p-1}y_i \leqslant h,$$
+$$\sum_{i=0}^{p-1}x_ia_i = \sum_{i=0}^{p-1}y_ia_i.$$
+Il s'en suit l'égalité dans $\gf(p^h)$ :
+$$g^{\sum x_ia_i} = g^{\sum y_ia_i},$$
+et donc :
+$$\prod_{i=0}^{p-1} {\left({g^{a_i}}\right)}^{x_i} = \prod_{i=0}^{p-1} {\left({g^{a_i}}\right)}^{y_i}.$$
+En utilisant l'égalité $g^{a_i} = t + \alpha_i$ et en ne considérant que les $x_i$ et $y_i$ non-nuls, nous obtenons :
+$$(t+\beta_1)^{x_{i_1}}(t+\beta_2)^{x_{i_2}} \cdots (t+\beta_l)^{x_{i_l}} = (t+\gamma_1)^{y_{j_1}}(t+\gamma_2)^{y_{j_2}} \cdots (t+\gamma_m)^{y_{j_m}},$$
+où $\{\beta_1, \dots, \beta_l \}$ et $\{ \gamma_1, \dots, \gamma_m\}$ sont deux sous-ensembles non-vides de $\gf(p)$ de cardinal au plus $h$. Les deux polynômes de part et d'autre de la dernière égalité, sont donc distincts, unitaires, de degré au plus $h$ et à coefficients dans $\gf(p)$. Ainsi, en faisant la différence de ces deux polynômes, nous obtenons que $t$ est racine d'un polynôme non-nul de degré au plus $h-1$ et dont les coefficients sont dans $\gf(p)$. Cela contredit le fait que $t$ est algébrique de degré $h$ sur $\gf(p)$.
+\end{proof}
+
+\begin{rema}
+D'après la preuve, il est clair que, pour $l\leqslant h$, les \textit{$l$-fold sums} de la suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ sont distinctes dans $\Z$, mais aussi modulo $p^h-1$.
+
+La supposition ``$p$ est un nombre premier'' peut être remplacée par ``$p$ est une puissance de nombre premier'', sans que cela n'affecte le théorème et sa preuve.
+
+Nous exposerons en section~\ref{logDiscret} diverses façon de calculer les logarithmes dans un corps fini.
+\end{rema}
+
+\section{Le cryptosystème Chor-Rivest}
+\subsection{Description}
+
+Soit $p^h$ une puissance de nombre premier. Considérons le corps fini $\gf(p^h)$ dont il est supposé que sa représentation est publique, i.e. il existe un polynôme unitaire $P(x)$ public de degré $h$ irréductible sur $\gf(p)$ et les éléments de $\gf(p^h)$ sont vus comme des polynômes modulo $P(x)$. Ainsi :
+$$\gf(p^h) = \frac{\gf(p)[x]}{(P(x))}.$$
+Notons $a = x \pmod{P(x)}$, la classe de $x$ modulo $P(x)$ dans $\gf(p^h)$, et choisissons $(1, a, a^2, \dots, a^{h-1})$ comme base du $\gf(p)$-espace vectoriel $\gf(p^h)$. Ainsi $\gf(p^h) = \gf(p)[a]$. Considérons aussi une numérotation publique $\alpha$ du sous-corps premier $\gf(p)$, i.e. $$\{\alpha_0,\dots, \alpha_{p-1}\} = \gf(p) \subset \gf(p^h).$$
+
+Les éléments, choisis aléatoirement, de la clé privée -- à garder secrète -- consistent en :
+\begin{itemize}
+\item un élément $t \in \gf(p^h)$ de degré algébrique $h$ sur $\gf(p)$ (nous notons $\mu(x) \in \gf(p)[x]$ le polynôme minimal de $t$ sur $\gf(p)$),
+\item un générateur $g$ du groupe $\gf(p^h)^\times$,
+\item un entier $d$ tel que $0 \leqslant d \leqslant p^h-2$,
+\item une permutation $\sigma$ de l'ensemble $\{0, \dots, p-1\}$.
+\end{itemize}
+
+La clé publique -- à être publiée -- est alors les :
+$$c_i = d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1},$$
+quel que soit $i$ tel que $0 \leqslant i \leqslant p-1$. 
+
+\'Etant donné qu'il faut calculer des logarithmes discrets pour fabriquer la clé publique, les paramètres choisis doivent permettre d'effectuer ces logarithmes facilement dans $\gf(p^h)$. B. Chor et R. Rivest ont suggéré de prendre un entier premier $p$ relativement petit et un exposant $h$ friable, de sorte que nous puissions appliquer l'algorithme de Pohlig-Hellman (voir section~\ref{logDiscret}). En l’occurrence, ils ont proposé de se placer dans les corps tels que $\gf(197^{24})$, $\gf(211^{24})$, $\gf(243^{24})$ et $\gf(256^{25})$.
+
+L'espace des messages est l'ensemble des chaînes de $p$-bits de poids de Hamming égal à $h$. C'est-à-dire que le message à chiffrer doit d'abord être encodé en une chaîne de bits $m = [m_0\cdots m_{p-1}]$ telle que $m_0+\dots + m_{p-1} = h$.
+
+L'espace des chiffrés est $\Z/(q-1)\Z$ et le chiffré de $m$ est :
+$$E(m) = \sum_{i=0}^{p-1} m_ic_i \pmod{q-1}.$$
+
+Pour déchiffrer, nous calculons :
+$$G(t) := g^{E(m) - hd}$$
+comme un polynôme en $t$ à coefficients dans $\gf(p)$ et de degré au plus $h-1$. Comme $g$ est primitif dans $\gf(p^h)$, i.e. l'ordre de $g$ est $q-1$, nous cherchons à déterminer $E(m) - hd$ modulo $q-1$ :
+
+\begin{align*}
+E(m) - hd &\equiv \left(\sum_{i=0}^{p-1} m_ic_i\right) - hd \pmod{q-1} \\
+&\equiv \left(\sum_{i=0}^{p-1} m_i\left(d + \log_g\left(t + \alpha_{\sigma(i)}\right)\right)\right) - hd \pmod{q-1} \\
+&\equiv \left(hd + \sum_{i=0}^{p-1} m_i\log_g\left(t + \alpha_{\sigma(i)}\right)\right) - hd \pmod{q-1} \\
+&\equiv  \sum_{i=0}^{p-1} m_i\log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{q-1} \\
+\end{align*}
+
+D'où, l'égalité dans $\gf(p^h)$ : 
+$$G(t) = g^{E(m) - hd} = \prod_{i=0}^{p-1} \left(t+\alpha_{\sigma(i)}\right)^{m_i} = \prod_{m_i = 1} \left(t+\alpha_{\sigma(i)}\right).$$
+L'élément $G(t)$ est exprimé dans la base $(1,t,t^2, \dots, t^{h-1})$ du $\gf(p)$-espace vectoriel $\gf(p^h)$, où $t = x \pmod{\mu(x)}$. Ainsi :
+$$G(x) \equiv \prod_{m_i = 1} \left(x+\alpha_{\sigma(i)}\right) \pmod{\mu(x)}.$$
+Il existe donc un polynôme $\lambda(x) \in \gf(p)[x]$ tel que : $$G(x) = \lambda(x) \mu(x) + \prod_{m_i = 1} \left(x+\alpha_{\sigma(i)}\right).$$
+En résonnant sur les degrés et du fait que $\mu(x)$ et $\prod \left(x+\alpha_{\sigma(i)}\right)^{m_i}$ soient unitaires, nous déduisons que $\lambda(x) = -1$, dont il découle l'égalité de polynômes :
+$$G(x) + \mu(x) = \prod_{m_i = 1} \left(x+\alpha_{\sigma(i)}\right).$$
+La factorisation de ce dernier permet de recouvrer le message $m$.
+
+\subsection{Exemple}
+Prenons $p := 17$ et $h := 6$, ainsi $p^h = 24\;137\;569$.
+\begin{verbatim}
+sage: p = 17
+sage: h = 6
+sage: q = p ** h
+\end{verbatim}
+Le corps fini $\gf(17^6)$ construit par \verb|Sage| est, en l’occurrence, 
+$$\frac{\F_{17}[x]}{(P(x))}, \text{ où } P(x) := x^6 + 2x^4 + 10 x^2 +3x +3\in  \F_{17}[x].$$
+\begin{verbatim}
+sage: K.<a> = FiniteField(q)
+sage: P = a.minimal_polynomial()
+\end{verbatim}
+La numérotation $\alpha$ du sous-corps premier choisie est :
+$$(\alpha_0, \dots, \alpha_{16}) = (2, 12, 4, 1, 0, 10, 7, 8, 15, 16, 3, 5, 13, 9, 11, 6, 14)$$
+\begin{verbatim}
+sage: alpha = [K(i) for i in range (p)]
+sage: shuffle (alpha)
+\end{verbatim}
+\subsubsection{Génération des clés}
+Nous prenons un élément $t\in\gf(17^6)$ de degré algébrique $6$ sur $\gf(17)$. Comme plus haut, nous notons $a = x \pmod{P(x)}$, le $t$ sélectionné est alors :
+$$t := 9a^5 + 16a^4 + 10a^3 + 3a^2 + 12a + 12,$$
+de polynôme minimal :
+$$\mu(x) := x^6 + 9x^5 + 8x^4 + 14x^3 + x^2 + 11x + 6\in\gf(17)[x].$$
+\begin{verbatim}    
+sage: while True :
+sage:     t = K.random_element()
+sage:     if t.minimal_polynomial().degree() == h :
+sage:         break
+sage: mu = t.minimal_polynomial()
+\end{verbatim}
+Ensuite, comme élément primitif de $\gf(17^6)$, nous prenons :
+$$g := 2a^5 + 5a^4 + 14a^3 + 2a^2 + 10a + 16.$$
+\begin{verbatim}    
+sage: while True :
+sage:     g = K.random_element()
+sage:     if g.multiplicative_order() == q - 1 :
+sage:         break
+\end{verbatim}
+L'entier $d$ est pris égal à $1\;530\;545$.
+\begin{verbatim}
+sage: d = randint (0, q - 2)
+\end{verbatim}
+Enfin, nous choisissons une permutation $\sigma$ de l'ensemble $\{0, \dots, 16\}$ :
+$$\sigma := (0,10,8,5,1,6,14)(2,3,9,16,13)(4,12,7,15)(11).$$
+\begin{verbatim}
+sage: s = Permutations([i for i in range (p)]).random_element()
+\end{verbatim}
+Nous avons fini de fabriquer la clé privée ! Reste à construire la clé publique :
+$$\begin{array}{r c l c r c l c r c l}
+c_0 &:=& 21\;667\;185 &&
+c_1 &:=& 3\;210\;064 &&
+c_2 &:=& 6\;070\;281 \\
+c_3 &:=& 3\;093\;929 &&
+c_4 &:=& 19\;945\;987 &&
+c_5 &:=& 294\;610 \\
+c_6 &:=& 4\;230\;580 &&
+c_7 &:=& 18\;951\;770 &&
+c_8 &:=& 7\;364\;695 \\
+c_9 &:=& 23\;348\;812 &&
+c_{10} &:=& 7\;918\;908 &&
+c_{11} &:=& 3\;562\;855 \\
+c_{12} &:=& 6\;735\;636 &&
+c_{13} &:=& 13\;077\;876 &&
+c_{14} &:=& 11\;303\;489 \\
+c_{15} &:=& 22\;106\;426 &&
+c_{16} &:=& 18\;193\;975 
+\end{array}$$
+\begin{verbatim}
+sage: c = [mod (d + log (t + alpha[s[i]], g), q - 1) 
+                                              for i in range (p)]
+\end{verbatim}
+
+\subsubsection{Chiffrement d'un message}
+Maintenant, donnons nous un message à chiffrer de longueur $17$ et de poids de Hamming $6$ :
+$$m := [m_0\cdots m_{16}] = [00100101100100100].$$
+\begin{verbatim}
+sage: m = [1 for i in range (h)] + [0 for i in range (p - h)]
+sage: shuffle (m)
+\end{verbatim}
+Chiffrons $m$ :
+$$e := 23\;410\;132.$$
+\begin{verbatim}
+sage: e = mod (sum ([m[i]*c[i] for i in range (p)]), q-1)
+\end{verbatim}
+
+\subsubsection{Déchiffrement du message}
+Nous souhaitons écrire $g^{e - hd}$ comme un polynôme en $t$. Or \verb|Sage| nous donne $g^{e - hd}$ comme polynôme en $a$ : $$g^{e - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
+Pour parvenir à exprimer $g$ comme nous le souhaitons, il faut effectuer un changement de base du $\gf(17)$-espace vectoriel $\gf(17^6)$ : passer de la base $\mathcal{A} := (1, a, a^2, \dots, a^{h-1})$ à la base $\mathcal{T} := (1, t, t^2, \dots, t^{h-1})$.
+La matrice de passage facile à calculer est celle qui passe de la base $\mathcal{T}$ à la base $\mathcal{A}$ : il suffit d'écrire dans \verb|Sage| les différentes puissances de $t$, et \verb|Sage| les exprime en fonction des puissances de $a$. Voici cette matrice :
+$$\left[\begin{array}{cccccc}
+1 & 12 & 7 & 11 & 14 & 0 \\
+0 & 12 & 9 & 12 & 6 & 12 \\
+0 & 3 & 8 & 3 & 7 & 12 \\
+0 & 10 & 0 & 15 & 15 & 14 \\
+0 & 16 & 4 & 0 & 13 & 3 \\
+0 & 9 & 15 & 10 & 5 & 6 \\
+\end{array}\right]$$
+Celle qui nous intéresse est son inverse, la matrice de passage de la base $\mathcal{A}$ à la base $\mathcal{T}$ :
+$$\left[\begin{array}{cccccc}
+1 & 5 & 10 & 12 & 15 & 11 \\
+0 & 8 & 8 & 0 & 11 & 5 \\
+0 & 13 & 13 & 9 & 5 & 1 \\
+0 & 9 & 10 & 3 & 11 & 9 \\
+0 & 12 & 6 & 2 & 16 & 8 \\
+0 & 7 & 16 & 2 & 13 & 11 \\
+\end{array}\right]$$
+\begin{verbatim}
+sage: V = K.vector_space()
+sage: M = Matrix (GF(p), 
+                      [V(t ** i) for i in range (h)]).transpose()
+sage: Minv = M.inverse()
+\end{verbatim}
+Comme $g^{e - hd}$ vaut dans la base $\mathcal{A}$ le vecteur $(1, 15, 9, 11, 0, 1)$, il est facile d'obtenir l'égalité : 
+$$g^{e - hd} = 10t^5 + 9t^4 + 12t^3 + 4t^2 + 10t + 3.$$
+Notons $G(x) := 10x^5 + 9x^4 + 12x^3 + 4x^2 + 10x + 3 \in \gf(17)[x]$.
+Ainsi le message est recouvré en factorisant le polynôme :
+$$G(x) + \mu(x) = x^6 + 2x^5 + 9x^3 + 5x^2 + 4x + 9,$$
+ce que nous faisons : 
+$$G(x) + \mu(x) = (x + 1)(x + 2)(x + 5)(x + 6)(x + 10)(x + 12)\in \gf(17)[x].$$ 
+Nous pouvons alors déterminer les $\alpha_i$ utilisés et nous savons alors que le bit $m_{\sigma^{-1}(i)}$ est à $1$, alors que les autres sont nuls.
+\begin{verbatim}
+sage: A.<x> = PolynomialRing (GF(p))
+sage: Q = A(list (Minv * V(g ** (e - h * d)))) + A(mu)
+sage: beta = [p - Q.roots()[i][0] for i in range (h)]
+\end{verbatim}
+Pour facilité l'explication, notons $\beta_i$, pour $i$ tel que $0\leqslant i \leqslant 5$, les éléments de $\gf(17)$ tels que $-\beta_i$ est racine de $G(x) + \mu(x)$, les $\beta_i$ étant tous distincts. Par exemple, $\beta_0 = 1$, $\beta_1 =2$, $\dots$, $\beta_5 = 12$. Ainsi, pour tout $i$ tel que $0\leqslant i \leqslant 5$, il faut déterminer l'indice $j$, où $0 \leqslant j \leqslant 16$, tel que $\alpha_j = \beta_i$, et alors nous déduisons qu'il y a un $1$ au $\sigma^{-1}(j)$ bit du message.
+
+Par exemple, pour $\beta_0 = 1$ : nous cherchons d'abord l'indice $j$ tel que $\alpha_j = 1$, à savoir $j = 3$. Puis nous déterminons $\sigma^{-1}(3) = 2$. Et nous avons bien $m_2 = 1$. Idem, pour $\beta_2 = 5$ : $\alpha_{11} = 5$, $\sigma^{-1}(11) = 11$ et nous constatons en effet que $m_{11} = 1$.
+\begin{verbatim}
+sage: sInv = [s.index(i) for i in range (p)]
+sage: message = [0 for i in range (p)]
+sage: for k in beta :
+sage:     message[sInv [alpha.index(k)]] = 1
+\end{verbatim}
+
+\subsection{Transformation des messages}
+
+Nous avons supposé que tous les messages chiffrés via le cryptosystème étaient de longueur $p$ et de poids $h$. Cependant, nous pouvons transformer un message binaire quelconque pour qu'il ait cette forme. 
+
+\'Etant donné un message binaire, découpons le en blocs de $\floor{\log_2\binom{p}{h}}$ bits. Chaque bloc est la représentation binaire d'un nombre $n$ tel que $0\leqslant n < \binom{p}{h}$. Pour faire correspondre ces nombres à des vecteurs binaires de poids $h$, nous utilisons l'ordre total induit par l'ordre lexicographique sur les vecteurs et l'ordre sur les entiers. Si $n$ est supérieur à $\binom{p-1}{h-1}$, le premier bit correspondant au vecteur est mis à $1$, sinon il est mis à $0$. Puis $p$ et $h$ sont actualisés, et nous itérons jusqu'à ce que les $p$ bits soient déterminés :
+
+\begin{algorithm}[H]
+\caption{Algorithme de transformation d'un bloc de message en vecteur}
+\begin{algorithmic}[1]
+\REQUIRE $p$, $h$ et un bloc $n$ du message d'origine tel que $0\leqslant n < \binom{p}{h}$
+\ENSURE un vecteur $y$ de taille $p$ et de poids $h$
+\FOR{$i$ allant de $1$ à $p$}
+	\IF{$n \geqslant \binom{p - i}{h}$}	
+		\STATE{$y_i \gets 1$}
+		\STATE{$n \gets n - \binom{p - i}{h-1}$}
+		\STATE{$h\gets h -1$}
+	\ELSE
+		\STATE{$y_i \gets 0$}
+	\ENDIF
+\ENDFOR
+\RETURN{$y$}
+\end{algorithmic}
+\end{algorithm}
+
+La transformation inverse est donnée par l'algorithme suivant :
+\begin{algorithm}[H]
+\caption{Algorithme de transformation d'un vecteur en bloc de message}
+\begin{algorithmic}[1]
+\REQUIRE $p$, $h$ et un vecteur $y$ de taille $p$ et de poids $h$
+\ENSURE un bloc $n$ du message d'origine
+\STATE{$n\gets 0$}
+\FOR{$i$ allant de $1$ à $p$}
+	\IF{$y_i = 1$}	
+		\STATE{$n \gets n + \binom{p - i}{h}$}
+		\STATE{$h\gets h -1$}
+	\ENDIF
+\ENDFOR
+\RETURN{$n$}
+\end{algorithmic}
+\end{algorithm}
+
+
+\section{Les attaques avec divulgation partielle de la clé privée}
+
+Nous examinons les attaques possibles proposées dans le papier de B. Chor et R. Rivest \cite[Section VII, A]{chorRivest1988} et dans celui de S. Vaudenay \cite[Section 4]{vaudenay2000}. Notons aussi que K. Huber \cite{huber1991} propose une attaque plus alambiquée lorsque l'élément primitif $g$ est connu.
+
+Commençons par une observation de Serge Vaudenay \cite[Section 3]{vaudenay2000}.
+
+\subsection{Symétrie dans la clé privée}\label{symetrieClePrivee}
+
+Dans le cryptosystème de Chor-Rivest, nous choisissons la clé privée de façon aléatoire puis, à partir de celle-ci, nous calculons la clé publique. Le système repose sur la difficulté de trouver une clé secrète à partir de la clé publique. Cependant, nous remarquons qu'il y a plusieurs clés privées \textit{équivalentes}, à savoir qu'il existe plusieurs jeux de clés privées qui donnent la même clé publique.
+
+Détaillons. Nous pouvons remplacer $t$ et $g$ par leur puissance $p$-ième, la clé publique reste inchangée car :
+$$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g^p}\left(\left(t + \alpha_{\sigma(i)}\right)^p\right) = \log_{g}\left(t + \alpha_{\sigma(i)}\right).$$
+Nous pouvons aussi remplacer $(t, \alpha_{\sigma})$ par $(t + u, \alpha_{\sigma} - u)$, pour tout $u \in \gf(p)$. Et enfin, nous pouvons remplacer $(t,d,\alpha_\sigma)$ par $(ut, d - \log_g(u), u\alpha_\sigma)$, quel que soit $u \in \gf(p)^\times$.
+Cela donne donc au moins $hp(p-1)$ clés privées équivalentes. Il s'agit alors de déterminer une de ces clés.
+
+\begin{rema}Ce qu'il faut garder à l'esprit est qu'il est possible de choisir -- d'imposer -- les valeurs de deux images de la permutation. \`A savoir, si $\sigma$ est la permutation originale du système, nous déterminons une clé privée équivalente dont la permutation est $\pi$ : pour $i \neq j$, nous construisons $\pi$ telle que
+$$\pi(0) = i,\quad \pi(1) = j,$$
+$$\forall k : 0\leqslant k \leqslant p-1, \quad 
+\alpha_{\pi(k)} = u\cdot\alpha_{\sigma(k)} - v,$$
+$$ \text{ où }\quad u = \frac{\alpha_i - \alpha_j}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p)^\times \quad \text{ et } \quad v =  \frac{\alpha_i\alpha_{\sigma(1)} - \alpha_j\alpha_{\sigma(0)}}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p).$$
+\end{rema}
+
+\subsection{Attaque due à B. Chor et R. Rivest ($g$ et $d$ connus)}
+Sachant $d$, nous pouvons calculer 
+$( b_0, \dots, b_{p-1}) := (c_0 -d, \dots, c_{p-1}-d )$.
+Soit $t' := g^{b_0}$, de sorte que :
+$$t' = g^{\log_g(t+\alpha_{\sigma(0)})} = t + \alpha_{\sigma(0)}.$$
+D'où $t-t' \in \gf(p)$, et 
+$$\{t + \alpha_i : \alpha_i \in \gf(p)\} = \{t' + \alpha_i : \alpha_i \in \gf(p)\}.$$
+Donc pour chaque $\alpha_i \in \gf(p)$, il existe un unique $\alpha_{\pi(i)} \in \gf(p)$ vérifiant 
+$$g^{b_{\pi(i)}} =  t' +\alpha_{i}.$$
+En utilisant $t'$, $g$, $\pi$ et $d$, l'attaquant peut faire le même déchiffrement que le destinataire légitime.
+
+\subsection{Attaque due à S. Vaudenay ($g$ connu)}
+
+Supposons que $\sigma(0) = i$ et $\sigma(1) = j$, par la symétrie dans la clé privée, nous savons qu'un choix arbitraire de $(i,j)$ convient. Calculons ensuite :
+$$g^{c_0-c_1} = \frac{t+\alpha_i}{t+\alpha_j},$$
+et nous pouvons alors déterminer $t$.
+
+\subsection{Attaque due à B. Chor et R. Rivest ($t$ et $d$ connus)}\label{attaqueTDconnus}
+
+Choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}(t+\alpha_i).$$
+En tant qu'ensembles, nous avons
+$$\{c_0 - d \dots, c_{p-1} -d\} = L\{b_0 \dots, b_{p-1}\},$$
+où l'égalité est modulo $p^h -1$. Les nombres $L$ et $p^h-1$ sont premiers entre eux et $L$ satisfait à l'égalité $g = g'^L$. Une fois que nous avons recouvré $L$, nous avons fini, car $g=g'^L$ et nous pouvons reconstruire $\sigma$, obtenant ainsi toutes les pièces de la clé privée.
+
+Si un des $b_i$, disons $b_0$, est premier avec $p^h-1$, alors $L$ est l'un des $$(d-c_j)b_0^{-1} \pmod{p^h-1},$$ pour un $0 \leqslant j \leqslant p-1$. Sinon, l'attaquant peut calculer $L$ modulo chaque facteur puissance de nombre premier et les combiner en utilisant le théorème des restes chinois.
+
+\subsection{Attaque due à O. Goldreich ($t$ connu)} \label{attaqueOG}
+
+\subsubsection{Telle que proposée par B. Chor et R. Rivest}
+
+Choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}(t+\alpha_i).$$
+En tant qu'ensembles, nous avons
+$$\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\} = L\{b_0 - b_0, b_1 - b_0, \dots, b_{p-1} - b_0\},$$
+où l'égalité est modulo $p^h -1$. Ensuite, nous procédons comme dans l'attaque précédente, sous-section~\ref{attaqueTDconnus}.
+
+\subsubsection{Telle que proposée par S. Vaudenay}
+Supposons que $\sigma(0) = i$ et $\sigma(1) = j$, par la symétrie dans la clé privée, nous savons qu'un choix arbitraire de $(i,j)$ convient. Choisissons $g'$ un élément primitif de $\gf(p^h)$. Calculons $\log_{g'}(t+\alpha_i)$ et $\log_{g'}(t+\alpha_j)$, et alors les équations :
+$$c_0 = d + \frac{\log_{g'}(t+\alpha_i)}{\log_{g'}(g)},$$
+$$c_1 = d + \frac{\log_{g'}(t+\alpha_j)}{\log_{g'}(g)},$$
+permettent de déterminer $d$ et $\log_{g'}(g)$. 
+
+\subsection{Attaque due à A. Odlyzko ($\sigma$ connue)}
+
+Il faut trouver une combinaison linéaire de la forme 
+$$\sum_{i=1}^{p-1} x_i\left(c_{\sigma^{-1}(i)}-c_{\sigma^{-1}(0)}\right) = 0,$$
+avec des entiers $x_i$ relativement petits. Cela peut être fait via l'algorithme LLL. Nous pouvons nous attendre à $|x_i| \leqslant B$, où $B \sim p^{h/(p-1)}$. 
+
+Soit $\alpha$ un élément primitif de $\gf(p^h)$ :
+\begin{align*}
+& \sum_{i=1}^{p-1} x_i\left(c_{\sigma^{-1}(i)}-c_{\sigma^{-1}(0)}\right) = 0 \\
+\Leftrightarrow & \prod_{i=1}^{p-1} \alpha^{x_i\left(c_{\sigma^{-1}(i)}-c_{\sigma^{-1}(0)}\right)} = 1 \\
+\Leftrightarrow & \prod_{i=1}^{p-1} \alpha^{x_i(\log_g(t-\alpha_i)-\log_g(t-\alpha_0))} = 1 \\
+\Leftrightarrow & \prod_{i=1}^{p-1} \alpha^{x_i\log_g(t-\alpha_i)} = \prod_{i=1}^{p-1} \alpha^{x_i\log_g(t-\alpha_0)}\\
+\Leftrightarrow & \prod_{i=1}^{p-1} (t-\alpha_i)^{x_i} = \prod_{i=1}^{p-1} (t-\alpha_0)^{x_i}\\
+\end{align*}
+Ainsi $t$ est racine du polynôme
+$$\prod_{i=1}^{p-1} (y-\alpha_i)^{x_i} - \prod_{i=1}^{p-1} (y-\alpha_0)^{x_i} \in \gf(p)[y],$$
+dont un algorithme comme celui de Rabin,  permet de trouver les racines.
+
+\section{L'attaque de Brickell}
+
+Dans le papier de B. Chor et R. Rivest \cite[Section VII, A.5]{chorRivest1988}, Ernest Brickell propose une attaque où rien de la clé privée n'est connu.
+
+Le but de cette attaque est de trouver une équation polynomiale de petit degré satisfaite par $g$. En utilisant un réseau bien choisi, il est possible de trouver des entiers $x_i$, la plus part nuls, tels que les deux équations
+$$\sum_{i=0}^{p-1} x_ic_i \equiv 0 \pmod{p^h-1},$$
+$$\sum_{i=0}^{p-1} x_i \equiv 0 \pmod{p^h-1},$$
+soient satisfaites. Notons $b_i := \log_{g}(t+\alpha_{\sigma(i)})$. La deuxième équation garantie :
+\begin{align*}
+g^{\sum_{i=0}^{p-1} x_ic_i} &= g^{\sum_{i=0}^{p-1} x_i(d+b_i)} \\
+&= g^{\sum_{i=0}^{p-1} x_ib_i} g^{d\sum_{i=0}^{p-1} x_i} \\
+&= g^{\sum_{i=0}^{p-1} x_ib_i} \\
+\end{align*}
+et donc par la première égalité :
+$$g^{\sum_{i=0}^{p-1} x_ib_i} = \prod_{i=0}^{p-1} \left(t + \alpha_{\sigma(i)}\right)^{x_i} = 1.$$ 
+
+Définissons, pour tout $0\leqslant i\leqslant p-1$, les entiers $x_i^+$ et $x_i^-$ par :
+$$x_i^+ := \left\{ \begin{array}{c l}
+x_i & \text{ si } x_i \geqslant 0,\\
+0 & \text{ sinon}.\\
+\end{array} \right.$$
+$$x_i^- := \left\{ \begin{array}{c l}
+-x_i & \text{ si } x_i \leqslant 0,\\
+0 & \text{ sinon}.\\
+\end{array} \right.$$
+Pour $\pi$ une permutation de l'ensemble $\{0, \dots, p-1\}$, soit $r_\pi(y) \in \gf(p)[y]$ le polynôme suivant :
+$$r_\pi(y) := \prod_{i=0}^{p-1} (y+\alpha_{\pi(i)})^{x_i^+} - \prod_{i=0}^{p-1} (y+\alpha_{\pi(i)})^{x_i^-}.$$
+Notons $\ell$ le nombre de $x_i$ non-nuls. Chaque application $\{ i : x_i \neq 0\} \rightarrow \gf(p)$ bijective donne un polynôme $r_\pi(y)$ différent. Seul le ``bon'' polynôme aura $t$ comme racine. Donc en moyenne il faut essayer $(1/2)(p!/(p-\ell)!)$ applications pour obtenir le bon polynôme. Pour chaque telle application, il faut trouver dans $\gf(p^h)$ les racines de $r_\pi(y)$, puis nous les testons grâce à l'attaque de O.~Goldreich exposée en sous-section~\ref{attaqueOG}.
+
+\begin{prop}
+Pour effectuer l'attaque de Ernest Brickell, il existe un algorithme de complexité $\O(p^{2\sqrt{h}}h^2\log_2(p))$ opérations arithmétiques dans $\gf(p)$.
+\end{prop}
+
+\section{La cryptanalyse de Vaudenay}
+
+Nous présentons ici l'attaque de Serge Vaudenay \cite{vaudenay2000}. Elle s'appuie sur la forte friabilité de $h$, i.e. sur l'existence de nombreux sous-corps de $\gf(p^h)$.
+
+Commençons par donner quelques outils pour l'explication de l'attaque.
+
+\begin{prop}\label{premierePropVaudenay}
+Pour tout facteur $r$ de $h$, il existe un générateur $g_{p^r}$ du groupe multiplicatif du sous-corps $\gf(p^r)$ de $\gf(p^h)$ et un polynôme $Q(x) \in \gf(p^r)[x]$ de degré $h/r$ et tel que $-t$ en est une racine, et pour tout $0\leqslant i \leqslant p-1$, nous avons :
+$$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
+\end{prop}
+
+\begin{proof}
+Soit 
+$$Q(x) = (g_{p^r})^d \prod_{i=0}^{h/r-1} \left(x+t^{p^{ri}}\right),
+\quad \text{ où } g_{p^r} := \prod_{i=0}^{h/r-1} g^{p^{ri}},$$
+$g_{p^r}$ peut être considérer comme la norme de $g$ considéré dans l'extension de corps $\gf(p^r) \subseteq \gf(p^h)$, ainsi $(g_{p^r})^{p^r} = g_{p^r}$ et $g_{p^r}$ est générateur de $\gf(p^r)^\times$ car $g$ est primitif dans $\gf(p^h)$. Nous remarquons que $Q\left(x^{p^r}\right) = Q(x)^{p^r}$, ainsi $Q(x) \in \gf(p^r)[x]$, en effet :
+\begin{align*}
+Q\left(x\right)^{p^r} &= (g_{p^r})^{dp^r} \prod_{i=0}^{h/r-1} \left(x+t^{p^{ri}}\right)^{p^r} \\
+&= (g_{p^r})^{d} \prod_{i=0}^{h/r-1} \left(x^{p^r} + t^{p^{ri}p^r}\right) \\
+&= (g_{p^r})^{d} \prod_{i=1}^{h/r} \left(x^{p^r} + t^{p^{ri}}\right) \\
+&= Q\left(x^{p^r}\right), \\
+\end{align*}
+car $t^{p^{r(h/r)}} = t^{p^h} = t = t^{p^0}$. Cela montre aussi que $Q(-t) = 0$. Nous avons aussi que $Q(x)$ est de degré $h/r$. Et enfin, pour $0\leqslant j \leqslant p-1$, calculons $(g_{p^r})^{c_i}$ :
+\begin{align*}
+(g_{p^r})^{c_j} &= \left(\prod_{i=0}^{h/r-1} g^{p^{ri}}\right)^{c_j}\\
+&= \prod_{i=0}^{h/r-1} \left(g^{c_j}\right)^{p^{ri}}\\
+&= \prod_{i=0}^{h/r-1} g^{dp^{ri}}\left(\alpha_{\sigma(j)} + t\right)^{p^{ri}}\\
+&= (g_{p^r})^d \prod_{i=0}^{h/r-1} \left(\alpha_{\sigma(j)} + t^{p^{ri}}\right)\\
+&= Q\left(\alpha_{\sigma(j)}\right) \\
+\end{align*}
+Cela conclut la démonstration de la proposition.
+\end{proof}
+
+Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(g_{p^r}, Q)$, et $g_{p^r}$ est donc essentiellement unique.
+
+\paragraph*{Notation :} Pour $r$ divisant $h$, notons $$g_{p^r} := g^{(p^h-1)/(p^r-1)}.$$
+
+\subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$ et $\sigma$}
+
+Supposons connus $g_{p^r} = g^{(p^h-1)/(p^r-1)}$, pour $r$ divisant $h$ (comme dans la proposition~\ref{premierePropVaudenay}), ainsi que la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (g_{p^r})^{c_i})}_i$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-t$. Nous résolvons l'attaque en testant l'opposé chaque racine grâce à l'attaque de O.~Goldreich exposée en sous-section~\ref{attaqueOG}.
+
+\subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$}
+
+Supposons connu l'élément $g_{p^r}$, la norme de l’élément primitif $g$ considéré dans l'extension $\gf(p^r) \subseteq \gf(p^h)$, comme dans la proposition~\ref{premierePropVaudenay}.
+
+Soient $(i_0, \dots, i_{h/r})$ une famille de $h/r + 1$ indices distincts entre $0$ et $p-1$. Par la proposition~\ref{premierePropVaudenay}, nous pouvons interpoler le polynôme $Q(x)$ en les $\alpha_{\sigma(i_j)}$ :
+\begin{align*}
+Q(x) &= \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(i_j)}\right) \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}} \\
+&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}, \\
+\end{align*} 
+ce qui mène aux égalités : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
+$$(\dagger) \qquad (g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}.$$
+
+En fait, nous pouvons même écrire : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
+$$(\ddagger) \qquad (g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}.$$
+En effet, soit $i$ parmi $i_0, \dots, i_{h/r}$ :
+$$(g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
+car $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}\right) = 1.$$
+Ainsi, nous avons l'égalité de polynôme :
+$$Q(x) - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
+car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque $x$ est substitué par $\alpha_{\sigma(i)}$, où $0\leqslant i \leqslant p-1$.
+
+\`A cause de la symétrie de la clé privée, indiquée en sous-section~\ref{symetrieClePrivee}, nous pouvons choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$. Un algorithme naïf pour trouver la permutation $\sigma$ est de chercher exhaustivement les valeurs  $\sigma(i_j)$ pour $j=0$ et $3\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
+
+\begin{algorithm}[H]
+\caption{Algorithme pour recouvrer $\sigma$ sachant $g_{p^r}$}
+\label{algoNaifgpr}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ et $g_{p^r}$
+\ENSURE une permutation $\sigma$ d'une clé privée équivalente
+\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
+\STATE{choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$ distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$\sigma(i_0), \sigma(i_3), \dots, \sigma(i_{h/r})$ distincts deux à deux} \label{algoNaifgprBoucle}
+	\STATE{$S \gets \left[\sigma(i_0), \sigma(i_3), \dots, \sigma(i_{h/r})\right]$}
+	\FORALL{$\ell \not\in S$} \label{algoNaifgprBoucle2}
+		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\sigma(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}} $$}
+		\IF{il existe $i$ tel que $\mathbf{res} = (g_{p^r})^{c_i}$ et $\sigma(i)$ n'est pas définie}
+			\STATE{$\sigma(i) \gets j$}
+			\STATE{$S \gets S + [\sigma(i)]$}
+		\ELSE
+			\STATE{continuer la boucle ligne~\ref{algoNaifgprBoucle}}
+		\ENDIF
+	\ENDFOR
+	\RETURN{$\sigma$}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+La complexité de cet algorithme est grossièrement $\O(rp^{h/r})$ opérations dans $\gf(p)$ : la boucle à la ligne~\ref{algoNaifgprBoucle2} fait en moyenne $\O(pr/h)$ itérations, chacune avec une complexité $\O(h)$, et il nous avons besoin de $\O(p^{h/r}-1)$ itérations de cette boucle.
+
+Quand $r$ est suffisamment grand, il existe un meilleur algorithme. En fait, si $r \geqslant h/r$, la famille $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$ est libre (voir plus loin). Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$, pour $0\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{i_0}} - (g_{p^r})^{c_{i_0}}, \quad (g_{p^r})^{c_{i_1}} - (g_{p^r})^{c_{i_0}},\quad \dots,\quad (g_{p^r})^{c_{i_{h/r}}} - (g_{p^r})^{c_{i_0}}.$$
+
+Notons $a_i^j$ le coefficient de $(g_{p^r})^{c_{i_{j}}} - (g_{p^r})^{c_{i_0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$. Par $(\ddagger)$, nous avons :
+\begin{align*}
+\frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}} \right)^{-1} \\
+&= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
+&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right) \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
+&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right) \left(\frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}} \right) \\
+\end{align*}
+
+Ainsi, il existe $u$ dans $\gf(p)$, indépendant de $i$, tel que 
+$$(\star) \qquad\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}}.$$
+En passant toute les valeurs de $u$ en revue, nous pouvons obtenir $\sigma(i)$ de l'équation $(\star)$. Cette remarque donne naissance à l'algorithme suivant :
+
+\begin{algorithm}[H]
+\caption{Algorithme pour recouvrer $\sigma$ sachant $g_{p^r}$ lorsque $r\geqslant \sqrt h$}
+\label{algogpr}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, $r\geqslant \sqrt h$ et $g_{p^r}$
+\ENSURE une permutation $\sigma$ d'une clé privée équivalente
+\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
+\STATE{pré-calculer la matrice de changement de bases de la base ``classique'' vers la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$}
+\STATE{choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$ distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$u$ dans $\gf(p)$} 
+	\FORALL{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq i_0, i_1, i_2$} 
+		\STATE{écrire $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$ dans la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$}
+		\STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
+		\STATE{trouver la valeur de $\sigma(i)$ grâce à $(\star)$}
+		
+	\ENDFOR
+	\IF{$\sigma$ est consistante}
+		\STATE{compléter $\sigma(i_0)$}
+		\RETURN{$\sigma$}
+	\ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Test pour trouver les $g^{(p^h-1)/(p^r-1)}$}
+
+\subsection{Sur l'usage de tous les $c_i$}
+
+Nous allons améliorer l'attaque précédente en utilisant la connaissance de tous les $c_i$. Nous allons nous servir du fait suivant :
+
+\begin{prop}
+Soit $Q(x)$ un polynôme de $\gf(p^r)[x]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e \leqslant (p-1)/d$. Nous avons $$\sum_{a \in \gf(p)} Q(a)^e = 0.$$
+\end{prop}
+
+Le lemme qui suit va permettre de démontrer cette proposition.
+
+\begin{lemm}
+Soit $k$ un entier tel que $1 \leqslant k \leqslant p-1$. Alors
+$$\sum_{a\in\gf(p)} a^i = 0.$$
+Ainsi, si $P(x) \in \gf(p^n)[x]$ est de degré inférieur à $p-1$, alors : $$\sum_{a\in\gf(p)} P(a) = 0.$$
+\end{lemm}
+
+\begin{proof}[Démonstration du lemme]
+Tout d'abord remarquons que $0 \in \gf(p)$ ne contribue pas à la somme, et ensuite, notons $g$ un élément primitif du corps $\gf(p)$. Alors
+$$\sum_{a\in\gf(p)} a^i = \sum_{j=0}^{p-2} g^i = \frac{g^{i(p-1)} - 1}{g^{i} - 1} = 0.$$
+\end{proof}
+
+\section{Le calcul de logarithmes dans un groupe}\label{logDiscret}
+
+\begin{defi}
+Soit $G$ un groupe noté multiplicativement. Le \textit{problème du logarithme discret} est : étant donné $g\in G$ et $h \in \gen{g}$, trouver $a$, tel que $h=g^a$.\end{defi}
+Nous notons alors $a=\log_g(h)$, et $g$ est appelé la base du logarithme $a$.
+
+
+\begin{exem}
+Considérons le problème du logarithme discret dans le groupe additif des entiers modulo $p$, où $p$ est un nombre premier. C'est-à-dire qu'étant donné $g \neq 0$ et $h$ dans $\Z/p\Z$, nous cherchons $a \in \Z$ tel que $ag = h$. Comme $\Z/p\Z$ est un corps, il suffit de prendre $a \equiv g^{-1}h \pmod{p}$. Nous pouvons déterminer $g^{-1}$ grâce à une identité de Bézout. Ainsi, résoudre ce cas de logarithme discret se fait en temps polynomial.
+\end{exem}
+
+\subsection{Recherche exhaustive}
+
+Soient $G$ un groupe, $g\in G$ et $h \in \gen{g}$. La façon la plus simple de résoudre ce problème du logarithme discret est de calculer à la suite les $g^a$ pour $0 \leqslant a < r$, où $r$ est l'ordre de $g$, et de comparer la valeur obtenue avec $h$. Cela s'effectue en au plus $r - 2$ opérations dans le groupe et $r$ comparaisons.
+
+\begin{algorithm}[H]
+\caption{Algorithme naïf : recherche exhaustive}
+\label{algoLogDiscretNaif}
+\begin{algorithmic}[1]
+\REQUIRE $g$ et $h \in \gen{g}$
+\ENSURE $a$ tel que $g^a = h$ et $1 \leqslant a \leqslant r$
+\STATE{$a\gets 1$}
+\STATE{$t\gets g$}
+\WHILE{$t \neq h$} 
+	\STATE{$a\gets a + 1$}
+	\STATE{$t\gets tg$} 
+\ENDWHILE
+\RETURN{$a$}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Méthode de Pohlig et Hellman}
+
+Soient $G$ un groupe, $g\in G$ et $h \in \gen{g}$. Supposons que $g$ est d'ordre $n$. \'Ecrivons $$n = \prod_{i=1}^r p_i^{\alpha_i},$$
+où les $p_i$ sont premiers et les $\alpha_i$ sont tels que $p_i$ ne divise pas $n/p_i^{\alpha_i}$.
+L'idée de la méthode de Stephen C. Pohlig et Martin E.Hellman \cite{pohligHellman1978} est de calculer $a$ modulo les puissances de premier $p_i^{\alpha_i}$ et de recouvrer la solution en utilisant le théorème des restes chinois.
+
+Pour cela, nous utilisons l'homomorphisme de groupes suivant, qui permet de réduire la recherche du logarithme discret aux sous-groupes d'ordre une puissance de nombre premier.
+
+\begin{lemm}
+Soient $G$ un groupe cyclique d'ordre $n$, $g$ un générateur de $G$, i.e. $G = \gen{g}$, et $q$ un diviseur de $n$. L'application $\varphi_q : x \mapsto x^{n/q}$ est un homomorphisme de groupes de $G$ dans l'unique sous-groupe de $G$ d'ordre $q$. Ainsi, si $h = g^a$, alors $$\varphi_q(h) = \varphi_q(g)^{a \bmod{q}}.$$
+\end{lemm}
+
+\begin{proof}
+Soit $H$ un sous-groupe de $G$ d'ordre $q$. Montrons que nous avons l'égalité $H = \gen{g^{n/q}}$. Le groupe engendré par $g^{n/q}$ est d'ordre $q$ car $g$ est d'ordre $n$, i.e. pour tout $1 \leqslant k \leqslant q-1$, l'élément $(g^{n/q})^k$ est distinct de l'élément neutre.
+Considérons, pour $\alpha$ un entier, $g^\alpha$ dans $H$ et distinct de l'élément neutre. Ainsi, $(g^\alpha)^{q}$ est l'élément neutre du groupe. Cela implique que l'ordre de $g$ divise l'entier $\alpha q$, ce qui est équivalent à $n/q$ divise $\alpha$. Donc, tout élément de $H$ est une puissance de $g^{n/q}$. Nous concluons grâce à la cardinalité des sous-groupes : l'unique sous-groupe de $G$ de cardinal $q$ est $H = \gen{g^{n/q}}$.
+
+Montrons que $\varphi_q$ est un homomorphisme de $G$ dans $H$. Tout élément de $G$ à la puissance $n/q$ est d'ordre divisant $q$. Ainsi, l'image de $G$ par $\varphi_q$ est incluse dans $H$. Et pour tous $\alpha$ et $\beta$ entiers :
+$$\varphi_q(g^\alpha g^\beta ) = \left(g^\alpha g^\beta \right)^{n/q} = \left(g^\alpha \right)^{n/q}\left(g^\beta \right)^{n/q} = \varphi_q(g^\alpha )\varphi_q(g^\beta ).$$
+Donc $\varphi_q$ est un homomorphisme du groupe $G$ dans le groupe $H$.
+
+Soit $a$ un entier. Notons $a = qb + r$ la division euclidienne de $a$ par $q$, en d'autres termes $r \equiv a \pmod{q}$. En sachant que $\varphi_q$ est un homomorphisme et que $\varphi_q(g)$ est d'ordre $q$, nous pouvons écrire :
+$$\varphi_q(g^a) = \varphi_q(g)^a = \varphi_q(g)^{qb + r} = \left({\varphi_q(g)^{q}}\right)^{b}\varphi_q(g)^{r} =\varphi_q(g)^{r} = \varphi_q(g)^{a \bmod{q}}.$$
+\end{proof}
+
+Dans les sous-groupes cycliques d'ordre une puissance de nombre premier, voici comment nous pouvons procéder : supposons que $g_0$ est d'ordre $p^\alpha$ et que $h_0 := g_0^a$, pour un entier. Nous pouvons écrire $a = a_0 + a_1 p + \cdots + a_{\alpha-1}p^{\alpha-1}$, où les $a_i$ sont tels que $0\leqslant a_i < p$. Soit $g_1 := g_0^{p^{\alpha-1}}$. \'Elever à la puissance $p^{\alpha-1}$ donne :
+$$h_0^{p^{\alpha-1}} = {(g_0^a)}^{p^{\alpha-1}} = {\left(g_0^{p^{\alpha-1}}\right)}^{a_0 + a_1 p + \cdots + a_{\alpha-1}p^{\alpha-1}} = \prod_{i=0}^{\alpha -1 } g^{a_ip^{\alpha-1+i}} = g_1^{a_0}.$$
+Nous pouvons ensuite déterminer $a_0$, en cherchant de manière exhaustive ou avec une autre méthode, voir sous-section~\ref{BSGS}.
+
+Pour avoir $a_1$, définissons $h_1 := h_0g_0^{-a_0}$ de sorte que
+$$h_1 = g_0^{a_1 p + \cdots + a_{\alpha-1}p^{\alpha-1}}.$$
+Puis, en élevant à la puissance $p^{\alpha-2}$ :
+$$h_1^{p^{\alpha-2}} = g_1^{a_1}.$$
+
+Pour obtenir $a_2$, nous posons $h_2 := h_1g_0^{-a_1l}$, et ainsi de suite pour les autres valeurs. Cela donne la solution modulo $p^\alpha$.
+
+Une fois que $a$ est connu pour tout $p^\alpha$ divisant $n$, nous pouvons reconstituer $a$ à l'aide du théorème des restes chinois.
+
+\begin{algorithm}[H]
+\caption{Algorithme de Pohlig-Hellman avec recherche exhaustive}
+\label{algoPohligHellman}
+\begin{algorithmic}[1]
+\REQUIRE $g$ d'ordre $n$, $h \in \gen{g}$ et ${(p_i,\alpha_i)}_{1\leqslant i \leqslant r}$ tel que $n = \prod p_i^{\alpha_i}$ et $p_i$ premier ne divisant pas $n/p_i^{\alpha_i}$
+\ENSURE $a$ tel que $g^a = h$
+\FOR{$i$ allant de $1$ à $r$}
+	\STATE{$a_i \gets 0$}
+	\FOR{$j$ allant de $1$ à $\alpha_i$}
+		\STATE{$g_0 \gets g^{n/p_i^j}$}
+		\STATE{$h_0 \gets g_0^{-a_i}h^{n/p_i^j}$}
+		\IF{$h_0 \neq 1$}
+			\STATE{$g_0 \gets g^{n/p_i}$}
+			\STATE{$b \gets 1$}
+			\STATE{$t \gets g_0$}
+			\WHILE{$h_0 \neq t$}
+				\STATE{$b\gets b+1$}
+				\STATE{$t \gets t g_0$}
+			\ENDWHILE
+			\STATE{$a_i \gets a_i + b p_i^{j-1}$}
+		\ENDIF
+	\ENDFOR
+\ENDFOR
+\STATE{calculer $a \equiv a_i \pmod{p_i^{\alpha_i}}$, pour $1\leqslant i \leqslant r$, grâce à l'isomorphisme du théorème des restes chinois}
+\RETURN{$a$}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{exem}
+Soit $p := 61$, $g := 7$ et $h := 25$. Mettons en \oe uvre l'algorithme Pohlig-Hellman pour trouver $a$ tel que $ g^a \equiv h \pmod{p}$. Notons que $\gf(61)^\times$ est d'ordre $2^2\cdot3\cdot5$. 
+
+Trouvons d'abord $a$ modulo $4$. Comme $(p-1)/4 = 15$, nous posons :
+$$g_0 := g^{15} \equiv 11 \pmod{61} \quad\text{ et }\quad h_0 := h^{15} \equiv 1 \pmod{61}.$$
+Pour obtenir de l'information modulo $2$, nous calculons :
+$$g_1 := g_0^{2} \equiv -1 \pmod{61} \quad\text{ et }\quad h_0^2 \equiv 1 \pmod{61}.$$
+Il s'en suit que $a \equiv 0 \pmod{2}$. Comme $a$ est nul modulo $2$, nous résolvons pour $b$ modulo $4$, l'équation modulaire $h_0 \equiv g_1^b \pmod{61}$, ce qui implique que $b$ est pair et ainsi $a \equiv 0 \pmod{4}$.
+
+Ensuite, calculons $a$ modulo $3$. Comme $(p-1)/3 = 20$, nous redéfinissons :
+$$g_0 := g^{20} \equiv 47 \pmod{61} \quad\text{ et }\quad h_0 := h^{20} \equiv 13 \pmod{61}.$$
+Résolvons pour $a$ modulo $3$, l'équation modulaire $h_0 \equiv g_0^a \pmod{61}$, ce qui donne $a \equiv 2 \pmod{3}.$
+
+Enfin, déterminons $a$ modulo $5$. Comme $(p-1)/5 = 12$, nous redéfinissons :
+$$g_0 := g^{12} \equiv 34 \pmod{61} \quad\text{ et }\quad h_0 := h^{34} \equiv 13 \pmod{61}.$$
+Dont nous obtenons $a \equiv 1 \pmod{5}.$
+
+Le théorème des restes chinois donne :
+$$a\equiv 2\cdot4\cdot5\cdot(4^{-1}\cdot5^{-1} \bmod{3}) + 4\cdot3\cdot(4^{-1}\cdot3^{-1} \bmod{5}) \pmod{60},$$
+ce qui fait $a = 2\cdot4\cdot5\cdot2 - 4\cdot3\cdot2 \equiv 56 \pmod{60}$, i.e. $7^{56} \equiv 25 \pmod{61}$.
+\end{exem}
+
+\begin{defi}[Entier $B$-friable]
+Un entier est dit \textit{$B$-friable} si tous ses diviseurs premiers sont inférieurs ou égaux à $B$.
+\end{defi}
+
+\begin{theo}
+Soit $g \in G$ d'ordre $n$. Soit $B\in\N$ tel que $n$ est $B$-friable. Alors l'algorithme de Pohlig-Hellman résout le problème du logarithme discret en $\O(\log(n)^2 + B\log(n))$ opérations dans le groupe.
+\end{theo}
+
+\`A cause de cette méthode, les nombres $B$-friables pour un petit $B$ n'opposent pas de difficulté majeure à la recherche de logarithmes discrets. Donc, en général, en cryptographie, il est préférable d'utiliser des éléments d'ordre un grand nombre premier.
+
+Dans leur papier, S. Pohlig et M. Hellman proposent d'utiliser des entiers premiers de la forme $2p + 1$ avec $p$ premier : dans la littérature, $2p + 1$ est appelé nombre premier sûr et $p$ est appelé nombre premier de Sophie Germain.
+
+\subsection{Méthode des baby-steps--giant-steps}
+\label{BSGS}
+
+Cet algorithme, souvent attribué à Shanks, est un incarnation du principe de \textit{time/memory tradeoff}. Supposons $g$ d'ordre un nombre premier $r$ et $h = g^a$ pour un certain $0 \leqslant a < r$. Soit $m := \ceil{\sqrt{r}}$. Il existe alors deux entiers $a_0$ et $a_1$ tels que $a = a_0 + a_1m$ et $0 \leqslant a_0, a_1 < m$. Il s'en suit :
+$$g^{a_0} = h{(g^{-m})}^{a_1},$$
+et cette observation mène à l'algorithme~\ref{algoBSGS}.
+
+Cependant, l'utilisation importante de l'espace mémoire pour les valeurs calculées par l'algorithme baby-step--giant-step devient rapidement prohibitif, car il requiert $\O(\sqrt{r}\log(r))$ bits de stockage (si les éléments du groupe sont représentables en mémoire en $\O(\log(r))$ bits).
+
+\begin{algorithm}[H]
+\caption{Algorithme baby-step--giant-step}
+\label{algoBSGS}
+\begin{algorithmic}[1]
+\REQUIRE $g$ d'ordre $r$, $h \in \gen{g}$
+\ENSURE $a$ tel que $g^a = h$
+\STATE{$m \gets \ceil{\sqrt{r}}$}
+\STATE{$L$ est une liste vide}
+\STATE{$x \gets 1$}
+\FOR[Calculs des \textit{baby-steps}]{$i$ allant de $0$ à $m$}
+	\STATE{$L \gets L + [x, i]$}
+	\STATE{$x \gets xg$}
+\ENDFOR
+\STATE{$u \gets g^{-m}$}
+\STATE{$y \gets h$}
+\STATE{$j \gets 0$}
+\WHILE[Calculs des \textit{giant-steps}]{$[y, \ast] \not \in L$}
+	\STATE{$y\gets yu$}
+	\STATE{$j\gets j+1$}
+\ENDWHILE
+\STATE{trouver $[x,i] \in L$ tel que $x=y$}
+\RETURN{$i+mj$}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theo}
+Soit $g \in G$ d'ordre $r$. Si les éléments du groupe sont représentables en mémoire en $\O(\log(r))$ bits et si les opérations dans le groupe se font en $\O(\log(r)^2)$ opérations binaires, alors l'algorithme baby-step--giant-step résout le problème du logarithme discret en $\O(\sqrt{r}\log(r)^2)$ opérations binaires.
+\end{theo}
+
+\section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
+
+\section{L'attaque Lagarias-Odlyzko sur les sacs à dos à densité faible}
+
+\newpage
+\appendix
+
+\section{Le b.a.-ba de la théorie des groupes}
+\begin{defi}[Groupe]
+
+\end{defi}
+
+\section{L'anatomie des corps}
+
+Nous souhaitons nous rafraîchir la mémoire sur la théorie des corps. Commençons par donner quelques définitions :
+
+\begin{defi}[Corps]
+Soit $(K,+_K,\cdot_K)$, où $K$ est un ensemble, $+_K : K \times K \rightarrow K$ et $\cdot_K: K \times K \rightarrow K$ sont deux lois de composition interne. Pour faire de $(K,+,\cdot)$ un \textit{corps}, ces deux lois doivent satisfaire aux conditions suivantes : \begin{enumerate}
+\item $(K,+_K)$ est un groupe abélien, dont l'élément neutre est noté $0_K$.
+\item $(K\backslash \{0_K\},\cdot_K)$ est un groupe abélien, dont l'élément neutre est noté $1_K$.
+\item La loi $\cdot_K$ se distribue sur la loi $+_K$.
+\end{enumerate}
+\end{defi}
+
+Pour alléger les notations, les ``$K$'' en indice seront omis -- mais cette écriture sera utilisée pour ôter le doute en cas d’ambigüité. De même, nous dirons ``Soit $K$ un corps'', au lieu de ``Soit $(K,+,\cdot)$ un corps'' -- les lois seront sous-entendues. La loi $+$ est appelée \textit{addition}, et la loi $\cdot$ est appelée \textit{multiplication}, et comme à l'accoutumée, le produit $a\cdot b$ sera noté $ab$.
+
+\begin{exem}
+Les complexes $\C$, les réels $\R$ et les rationnels $\Q$, munis des opérations usuels, sont des corps. Pour tout $p$ nombre premier, l'ensemble des classes d'équivalence $\Z/p\Z$, munis des opérations induites par celles de $\Z$, est un corps.
+\end{exem}
+
+\begin{rema}
+La définition implique que, quel que soit $a \in K$, $0\cdot a = 0$ et $-a = (-1)\cdot a$. De plus, pour tous $a$ et $b$ dans $K$, si $ab = 0$ alors $a$ ou $b$ est nul.
+\end{rema}
+
+\begin{exem}
+$\Z/n\Z$ n'est pas un corps, dès que $n$ est composé. En effet, soit $d$ un diviseur de $n$ distinct de $1$ et $n$. Alors la classe d'équivalence de $d$ dans $\Z/n\Z$ est un diviseur de zéro, donc $\Z/n\Z$ n'est pas intègre.
+\end{exem}
+
+\begin{defi}[Groupe multiplicatif d'un corps]
+Soit $K$ un corps. $(K\backslash\{0\},\cdot)$ est un groupe appelé \textit{groupe multiplicatif du corps $K$}, et il est noté $K^\times$.
+\end{defi}
+
+\subsection{Anneaux : homomorphismes et caractéristique}
+
+\begin{defi}[Homomorphisme d'anneaux]\label{defMorphismeAnneaux}
+Soient $A$ et $B$ deux anneaux. L'application $f: A \rightarrow B$ est un homomorphismes d'anneaux si : \begin{enumerate}
+\item $\forall (a,b) \in A^2: \quad f(a+b) = f(a) + f(b)$,
+\item $\forall (a,b) \in A^2: \quad f(ab) = f(a)f(b)$,
+\item $f(1_A) = 1_B$.
+\end{enumerate}
+\end{defi}
+
+\paragraph*{Notation :}
+Soit $A$ un anneau. Pour tous $a \in A$ et $n \in \Z$, notons
+$$na := \left\{\begin{array}{l}
+a + a + \cdots + a \; (n \text{ termes}) \text{ si } n > 0,\\
+0 \text{ si } n = 0,\\
+(-a) + (-a) + \cdots + (-a)\; (-n \text{ termes}) \text{ si } n < 0.\\
+\end{array}\right.$$
+
+\begin{prop}
+Soit $A$ un anneau. L'application $\phi_A : \Z \rightarrow A$ définie par $\phi_A(n) := n1_A$, est un homomorphisme d'anneaux dont le noyau est $c\Z$ avec $c\in \N$.
+\end{prop}
+
+\begin{proof}
+$\phi_A$ est bien un homomorphisme d'anneaux et le noyau $\phi_A$ est un idéal de $\Z$, donc de la forme $c\Z$ avec $c\in\N$.
+\end{proof}
+
+\begin{defi}[Caractéristique]
+Soit $A$ un anneau. La \textit{caractéristique} de l'anneau $A$, noté $\car(A)$, est l'entier $c\in\N$ tel que $\ker(\phi_A) = c\Z$.
+\end{defi}
+
+\begin{exem}
+$\car(\Z) = \car(\Q) =\car(\R) =\car(\C) = 0$. \\
+Pour $n$ entier, $\car(\Z/n\Z) = n$.
+\end{exem}
+
+\begin{prop}\label{caracIntegre}
+Si $A$ est un anneau intègre, alors sa caractéristique nulle ou est un nombre premier.
+\end{prop}
+
+\begin{proof}
+Si $\car(A) = pq$, avec $p$ et $q$ des entiers non-nuls distincts de $1$, alors les éléments $p1_A$ et $q1_A$ sont non-nuls de produit nul. Ainsi $A$ n'est pas intègre.
+\end{proof}
+
+\begin{exem}
+La réciproque est fausse : $\R\times\R$ est un anneau de caractéristique nulle alors qu'il n'est pas intègre.
+\end{exem}
+
+\subsection{Endomorphisme de Frobenius}
+
+\paragraph*{Rappel :} Soit $A$ un anneau. Si $a$ et $b$ sont deux éléments de $A$ qui commutent l'un à l'autre, i.e. $ab = ba$, alors pour $n \in \N$, la \textit{formule du binôme de Newton} donne :
+$$(a+b)^n = \sum_{k=0}^n \binom{n}{k} a^kb^{n-k},$$
+où $\binom{n}{k}$ est le nombre de combinaison de $k$ objets dans un ensembles à $n$ objets : $$\binom{n}{k} = \frac{n!}{k!(n-k)!}.$$
+
+\begin{prop}\label{propFrob}
+Soit $A$ un anneau commutatif de caractéristique un nombre premier $p$. L'application 
+$$\begin{array}{r r c l}
+ f :& A& \longrightarrow& A \\
+ & x& \longmapsto& x^p
+\end{array}$$
+est un endomorphisme de l'anneau $A$.
+\end{prop}
+
+\begin{proof}
+Soit $0 < k < p$. La formule 
+$$k\binom{p}{k} = p\binom{p-1}{k-1},$$
+et le lemme d'Euclide impliquent que $p$ divise $\binom{p}{k}$. Nous pouvons maintenant démontrer la proposition. Soit $(a,b) \in A^2$. Comme $A$ est commutatif, nous pouvons appliquer la formule du binôme de Newton :
+$$f(a+b)=(a+b)^p = \sum_{k=0}^p \binom{p}{k} a^kb^{p-k} = a^p + b^p=f(a)+f(b).$$
+De plus, $f(ab)=(ab)^p = a^pb^p=f(a)f(b)$, car $A$ est commutatif, et $f(1) = 1$. Donc $f$ est bien un endomorphisme de l'anneau $A$.
+\end{proof}
+
+\begin{exem}
+La proposition n'est plus vraie dès que la caractéristique de l'anneau est un nombre composé : plaçons nous dans $\Z/4\Z$, nous avons d'une part $(1 + 1)^4 = 2^4 = 0$ et d'autre part $1^4 + 1^4 = 1+1 = 2$. Alors que clairement $0\neq 2$ dans $\Z/4\Z$.
+\end{exem}
+
+\begin{defi}[Endomorphisme de Frobenius]
+Soit $A$ un anneau commutatif de caractéristique un nombre premier $p$. L'application $x \mapsto x^p$ est appelé l'\textit{endomorphisme de Frobenius} de l'anneau $A$. Il est noté $\frob_A$.
+\end{defi}
+
+\subsection{Sous-corps premiers}
+
+\begin{defi}[Sous-corps]
+Soit $L$ un corps. Une partie $K \subseteq L$ est un \textit{sous-corps} de $L$ si $K$ est un corps pour les opérations héritées de $L$.
+\end{defi}
+
+\begin{exem}
+$\Q$ est un sous-corps de $\R$ et $\R$ est un sous-corps de $\C$.
+\end{exem}
+
+\begin{defi}[Corps premier]
+$K$ est un \textit{corps premier} si $K$ est un corps ne contenant aucun sous-corps autre que lui-même.
+\end{defi}
+
+\begin{prop}
+Le corps $\Q$ est un corps premier et, pour tout nombre premier $p$, le corps $\Z/p\Z$ est un corps premier.
+\end{prop}
+
+\begin{defi}[Sous-corps premier]
+Soit $K$ un corps. Le sous-corps premier de $K$ est l'intersection de tous ses sous-corps.
+\end{defi}
+
+\begin{prop}
+Soient $K$ un corps et $P$ le sous-corps premier de $K$. Si $\car(K) = 0$ alors $P$ est isomorphe à $\Q$, et si $\car(K) \neq 0$ alors $p = \car(K)$ est un nombre premier et $P$ est isomorphe à $\Z/p\Z$.
+\end{prop}
+
+\subsection{Extensions de corps}
+
+\begin{defi}[Homomorphisme de corps]
+Un \textit{homomorphisme de corps} est un homomorphisme d'anneaux (voir définition~\ref{defMorphismeAnneaux}).
+\end{defi}
+
+\begin{prop}
+Un homomorphisme de corps est injectif.
+\end{prop}
+
+\begin{proof}
+Soient $K_A$ et $K_2$ deux corps et $f : K_1 \rightarrow K_2$ un homomorphismes de corps. Rappelons que les seuls idéaux d'un corps sont l'idéal nul et le corps tout entier. Le noyau $\ker(f)$ est un idéal de $K_1$, et par la remarque précédente, de deux chose l'une : soit $\ker(K_1) = K_1$, soit $\ker(K_1)=\{0_{K_1}\}$. Or comme $f$ est un homomorphisme d'anneaux, $f(1_{K_1}) = 1_{K_2} \neq 0_{K_2}$, cela implique donc $\ker(f) \neq K_1$. D'où $\ker(f) = \{0_{K_1}\}$ et $f$ est injective.
+\end{proof}
+
+\begin{defi}[Extension de corps]
+Soit $K$ un corps. Une \textit{extension} du corps $K$ est un couple $(L, \iota)$, où $L$ est un corps et $\iota$ est un homomorphisme de corps.
+\end{defi}
+
+Soit $(L, \iota)$ un extension du corps $K$. Comme $\iota$ est injective, nous pouvons identifier $K$ à son image $\iota(K)$ dans $L$. Dans la pratique, sauf risque de confusion, nous faisons systématiquement cette identification : nous disons alors que $L$ est une extension de $K$ si $K$ est un sous-corps de $L$, et nous le notons alors $K\subseteq L$. Il est alors évident que $K$ et $L$ ont la même caractéristique.
+
+\begin{prop}
+Soit $K \subseteq L$ une extension de corps. $L$ est un $K$-espace vectoriel. Une base du $K$-espace vectoriel $L$ est appelée une base de $L$ sur $K$.
+\end{prop}
+
+\begin{defi}[Degré d'une extension]
+Soit $K \subseteq L$ une extension de corps. Le \textit{degré de l'extension} $K \subseteq L$ est le cardinal, fini ou non, d'une base de $L$ sur $K$. Le degré est noté $[L:K] := \dim_K(L)$. Un extension de degré fini (resp. 2, 3) est dite finie (resp. quadratique, cubique).
+\end{defi}
+
+\begin{exem}
+L'extension de corps $\R \subseteq \C$ est une extension quadratique.
+\end{exem}
+
+\begin{defi}
+Soient $K\subseteq L$ un extension de corps et $S$ une partie de $L$. Notons $K[S]$ le sous-anneau de $L$ engendré par $K$ et $S$, et $K(S)$ le sous-corps de $L$ engendré par $K$ et $S$.
+\end{defi}
+
+\begin{defi}[Extension de type fini]
+L'extension $K \subseteq L$ est \textit{type fini} s'il existe une partie finie $S$ de $L$ telle que $L=K(S)$.
+\end{defi}
+
+\begin{defi}[Extension simple et élément primitif]
+L'extension $K \subseteq L$ est \textit{simple} s'il existe une partie $S$ de $L$ réduite à un élément telle que $L=K(S)$.
+Tout élément $x$ de $L$ vérifiant $L=K(x)$ est appelé un \textit{élément primitif} de l'extension.
+\end{defi}
+
+\begin{prop}
+Soient $K \subseteq L$ un extension de corps et $S$, $T$ deux parties de $L$, et $\mathcal F$ l'ensemble des parties finies de $S$. Alors :
+$$K( S \cup T) = K(S)(T) = K(T)(S), \quad K(S) = \bigcup_{U\in\mathcal F} K(U).$$
+\end{prop}
+
+\begin{defi}[Sous-extension de corps]
+Une \textit{sous-extension} d'une extension de corps $K\subseteq M$ est un corps $L$ tel que $K\subseteq L \subseteq M$. En d'autres termes, c'est un sous-corps de $M$ contenant $K$.
+\end{defi}
+
+\begin{theo}[Multiplicativité du degré]
+Soient $K\subseteq L \subseteq M$ des extensions de corps. \begin{enumerate}
+\item Soient ${(e_i)}_{i\in I}$ une base de $L$ sur $K$ et ${(f_j)}_{j\in J}$ une base de $M$ sur $L$. Alors la famille ${(e_if_j)}_{(i,j)\in I\times J}$ est une base de $M$ sur $K$.
+\item L'extension $K \subseteq M$ est finie si, et seulement si, les extensions $K\subseteq L$ et $L \subseteq M$ le sont. Si tel est le cas :
+$$[M:K] = [M:L][L:K].$$
+\end{enumerate}
+\end{theo}
+
+\begin{proof}
+Il suffit de montrer la première assertion. Soient ${(\lambda_{ij})}_{(i,j)\in I\times J}$ une famille presque nulles d'élément de $K$. Alors 
+$$\sum_{i,j} \lambda_{ij} e_i f_j = 0 \Rightarrow \sum_j \left( \sum_i\lambda_{ij}e_i\right) f_j = 0.$$
+Pour tout $(i,j) \in I\times J$, les éléments $\lambda_{ij}e_i$ sont dans $L$. Du fait que la famille ${(f_j)}_{j\in J}$ est libre sur $L$, nous déduisons :
+$$\sum_i\lambda_{ij}e_i = 0,$$
+quel que soit $j \in J$. Comme ${(e_i)}_{i\in I}$ est une base de $L$ sur $K$, les $\lambda_{ij}$ sont nuls pour tout $(i,j) \in I\times J$. Le reste se démontre aisément.
+\end{proof}
+
+\subsection{Corps finis}
+
+\begin{prop}
+Soit $K$ un corps de caractéristique $p > 0$ et notons $\frob$ l'endomorphisme de Frobenius de $K$. Si $K$ est fini alors $\frob$ est un automorphisme de $K$, et si $K = \F_p$ alors $\frob = \id_{\F_p}$.
+\end{prop}
+
+\begin{proof}
+Par la proposition~\ref{caracIntegre}, $p$ est un nombre premier et la proposition~\ref{propFrob} dit que $\frob$ est un endomorphisme de $K$. Comme tout morphisme de corps est injectif, si $K$ est fini alors $\frob$ est un automorphisme de $K$. Si $K = \F_p$, le petit théorème de Fermat donne $x^{p-1} = 1$ pour tout $x \in \F_p^\times$, donc $x^p =x$ quel que soit $x \in\F_p$.
+\end{proof}
+
+\section{La théorie de Kummer}
+
+\section{La théorie d'Artin-Schreier}
+
+\newpage
+\bibliographystyle{abbrv}
+\bibliography{mybib}
+
+\end{document}
