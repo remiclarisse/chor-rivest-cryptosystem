@@ -9,6 +9,7 @@
 %\usepackage{hyperref}
 \usepackage{array}
 \usepackage{cite}
+\usepackage{ulem}
 
 \newtheorem{theo}{Théorème}[section]
 \newtheorem{lemm}[theo]{Lemme}
@@ -459,10 +460,11 @@ Si un des $b_i$, disons $b_0$, est premier avec $p^h-1$, alors $L$ est l'un des 
 
 \subsubsection{Telle que proposée par B. Chor et R. Rivest}
 
-Choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}(t+\alpha_i).$$
-En tant qu'ensembles, nous avons
-$$\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\} = L\{b_0 - b_0, b_1 - b_0, \dots, b_{p-1} - b_0\},$$
-où l'égalité est modulo $p^h -1$. Ensuite, nous procédons comme dans l'attaque précédente, sous-section~\ref{attaqueTDconnus}.
+\xout{
+Choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons \\ $b_i := \log_{g'}(t+\alpha_i).$
+En tant qu'ensembles, nous avons \\
+$\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\} = L\{b_0 - b_0, b_1 - b_0, \dots, b_{p-1} - b_0\},$
+où l'égalité est modulo $p^h -1$. Ensuite, nous procédons comme dans l'attaque précédente, sous-section~\ref{attaqueTDconnus}.}
 
 \subsubsection{Telle que proposée par S. Vaudenay}
 Supposons que $\sigma(0) = i$ et $\sigma(1) = j$, par la symétrie dans la clé privée, nous savons qu'un choix arbitraire de $(i,j)$ convient. Choisissons $g'$ un élément primitif de $\gf(p^h)$. Calculons $\log_{g'}(t+\alpha_i)$ et $\log_{g'}(t+\alpha_j)$, et alors les équations :
@@ -674,6 +676,8 @@ $$\sum_{a\in\gf(p)} a^i = \sum_{j=0}^{p-2} g^i = \frac{g^{i(p-1)} - 1}{g^{i} - 1
 
 \section{Le calcul de logarithmes dans un groupe}\label{logDiscret}
 
+Les résultats proposés ici sont essentiellement tous issus de \cite[section 13 et 14, pp. 246 à 297]{galbraith2012}.
+
 \begin{defi}
 Soit $G$ un groupe noté multiplicativement. Le \textit{problème du logarithme discret} est : étant donné $g\in G$ et $h \in \gen{g}$, trouver $a$, tel que $h=g^a$.\end{defi}
 Nous notons alors $a=\log_g(h)$, et $g$ est appelé la base du logarithme $a$.
@@ -802,7 +806,7 @@ Soit $g \in G$ d'ordre $n$. Soit $B\in\N$ tel que $n$ est $B$-friable. Alors l'a
 
 Dans leur papier, S. Pohlig et M. Hellman proposent d'utiliser des entiers premiers de la forme $2p + 1$ avec $p$ premier : dans la littérature, $2p + 1$ est appelé nombre premier sûr et $p$ est appelé nombre premier de Sophie Germain.
 
-\subsection{Méthode des baby-steps--giant-steps}
+\subsection{Algorithme pas de bébé, pas de géant}
 \label{BSGS}
 
 Cet algorithme, souvent attribué à Shanks, est un incarnation du principe de \textit{time/memory tradeoff}. Supposons $g$ d'ordre un nombre premier $r$ et $h = g^a$ pour un certain $0 \leqslant a < r$. Soit $m := \ceil{\sqrt{r}}$. Il existe alors deux entiers $a_0$ et $a_1$ tels que $a = a_0 + a_1m$ et $0 \leqslant a_0, a_1 < m$. Il s'en suit :
@@ -839,6 +843,14 @@ Cependant, l'utilisation importante de l'espace mémoire pour les valeurs calcul
 \begin{theo}
 Soit $g \in G$ d'ordre $r$. Si les éléments du groupe sont représentables en mémoire en $\O(\log(r))$ bits et si les opérations dans le groupe se font en $\O(\log(r)^2)$ opérations binaires, alors l'algorithme baby-step--giant-step résout le problème du logarithme discret en $\O(\sqrt{r}\log(r)^2)$ opérations binaires.
 \end{theo}
+
+\subsection{Méthode rho de Pollard}
+
+Comme précédemment, supposons $g$ d'ordre un nombre premier $r$ et $h = g^a$ pour un certain $0 \leqslant a < r$. Le point de départ de cet algorithme est l'observation suivante : si nous trouvons $a_i$, $b_i$, $a_j$ et $b_j$ dans $\Z/r\Z$ tels que :
+$$(\star) \qquad g^{a_i}h^{b_i} = g^{a_j}h^{b_j}$$
+et $b_i \not\equiv b_j \pmod{r}$, alors nous pouvons résoudre le problème du logarithme discret comme suit : $$h = g^{(a_i-a_j)(b_j-b_i)^{-1}\bmod{r}}.$$
+
+L'idée simple est de générer un suite pseudo-aléatoire $x_i = g^{a_i}h^{b_i}$ d'éléments de $\gen{g}$ par itération d'une fonction convenable $f:\gen{g} \rightarrow  \gen{g}$. En d'autres termes, il faut choisir une valeur de départ $x_1$ et définir la suite par $x_{i+1}=f({x_i})$. Une telle suite $x_1, x_2, \dots$ est appelée une \textit{marche pseudo-aléatoire déterministe}. Comme $\gen{g}$ est fini, il y aura une collision $x_i = x_j$ pour certain $1 \leqslant i < j$, comme dans $(\star)$. Si les éléments dans la marche semblent être choisis uniformément et indépendants dans $\gen{g}$, alors par le paradoxe des anniversaires (théorème~\ref{paradoxeAnniversaire}), la valeur attendue pour $j$ est $\sqrt{\pi r / 2}$.
 
 \section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
 
@@ -1069,6 +1081,35 @@ Par la proposition~\ref{caracIntegre}, $p$ est un nombre premier et la propositi
 \section{La théorie de Kummer}
 
 \section{La théorie d'Artin-Schreier}
+
+\section{Le paradoxe des anniversaires}
+
+Le ``paradoxe des anniversaires'', comme expliqué dans \cite[sous-section 14.1]{galbraith2012} vient de l'application suivante : dans un ensemble aléatoire de 23 personnes ou plus, la probabilité que deux individus partagent le même anniversaire est supérieure à $0,5$.
+
+\begin{theo}\label{paradoxeAnniversaire}
+Soit $\mathcal S$ un ensemble à $n$ éléments. Si les éléments sont tirés de façon uniformément aléatoire de $\mathcal S$, alors le nombre attendu d'éléments à tirer avant d'avoir un tirage identique à un précédent est moins de $\sqrt{\pi n /2} + 2$.
+\end{theo}
+
+\begin{proof}
+Soit $X$ la variable aléatoire du nombre d'éléments choisis dans $\mathcal S$ (uniformément aléatoire) avant qu'un élément soit sélectionné deux fois. Après que $\ell$ éléments distincts aient été choisis, la probabilité que le suivant soit aussi distinct des précédents est $(1-\ell/n)$. D'où, la probabilité $\mathbb{P}(X > \ell)$ est donnée par :
+$$\mathbb{P}_{n,\ell} = 1\left(1-\frac{1}{n}\right)\left(1-\frac{2}{n}\right)\cdots\left(1-\frac{\ell-1}{n}\right).$$
+Remarquons que $\mathbb{P}_{n,\ell} = 0$ quand $ \ell \geqslant n$. Maintenant, servons nous du fait que $1-x \leqslant e^{-x}$ pour $ x \geqslant 0$ :
+$$\mathbb{P}_{n,\ell} \leqslant e^{-1/n}e^{-2/n}\cdots e^{-(\ell-1)/n} = e^{-\sum_{j=0}^{\ell -1} j/n} = e^{-(1/2)(\ell-1)\ell/n} \leqslant e^{-(\ell-1)^2/(2n)}$$
+Par définition, l'espérance mathématique de $X$ est :
+\begin{align*}
+\mathbb{E}(X) &= \sum_{\ell = 1}^\infty \ell \, \mathbb{P}(X=\ell) \\
+&= \sum_{\ell = 1}^\infty \ell \left(\mathbb{P}(X>\ell -1) - \mathbb{P}(X>\ell) \right)\\
+&= \sum_{\ell = 0}^\infty (\ell + 1 -\ell)\mathbb{P}(X>\ell)\\
+&= \sum_{\ell = 0}^\infty \mathbb{P}(X>\ell)\\
+&\leqslant 1 + \sum_{\ell = 0}^\infty e^{-(\ell-1)^2/(2n)}
+\end{align*}
+Nous estimons cette dernière série par l'intégrale :
+$$1 + \int_0^\infty e^{-x^2/(2n)}dx.$$
+Comme $x \mapsto e^{-x^2/(2n)}$ est décroissante et prend ses valeurs dans $[0,1]$, la différence entre la valeur de la série et la valeur de l'intégrale est au plus 1. Le changement de variable $u := x/\sqrt{2n}$ donne :
+$$1 + \int_0^\infty e^{-x^2/(2n)}dx = 1 + \sqrt{2n}\int_0^\infty e^{-u^2}du = 1 + \sqrt{2n}\frac{\sqrt{\pi}}{2}.$$
+D'où la valeur :
+$$\mathbb{E}(X) \leqslant \sqrt{\frac{\pi n}{2}} + 2.$$
+\end{proof}
 
 \newpage
 \bibliographystyle{abbrv}
