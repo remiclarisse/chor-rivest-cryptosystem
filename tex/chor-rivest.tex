@@ -35,6 +35,7 @@
 \def\frob{\operatorname{Frob}}
 \def\card{\operatorname{Card}}
 \def\car{\operatorname{car}}
+\def\pgcd{\operatorname{pgcd}}
 \def\id{\operatorname{id}}
 \def\mbf#1{\mathbf{#1}}
 \def\NP{\mathbb{NP}}
@@ -372,7 +373,7 @@ Nous avons supposé que tous les messages chiffrés via le cryptosystème étaie
 
 \'Etant donné un message binaire, découpons le en blocs de $\floor{\log_2\binom{p}{h}}$ bits. Chaque bloc est la représentation binaire d'un nombre $n$ tel que $0\leqslant n < \binom{p}{h}$. Pour faire correspondre ces nombres à des vecteurs binaires de poids $h$, nous utilisons l'ordre total induit par l'ordre lexicographique sur les vecteurs et l'ordre sur les entiers. Si $n$ est supérieur à $\binom{p-1}{h-1}$, le premier bit correspondant au vecteur est mis à $1$, sinon il est mis à $0$. Puis $p$ et $h$ sont actualisés, et nous itérons jusqu'à ce que les $p$ bits soient déterminés :
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Algorithme de transformation d'un bloc de message en vecteur}
 \begin{algorithmic}[1]
 \REQUIRE $p$, $h$ et un bloc $n$ du message d'origine tel que $0\leqslant n < \binom{p}{h}$
@@ -391,7 +392,7 @@ Nous avons supposé que tous les messages chiffrés via le cryptosystème étaie
 \end{algorithm}
 
 La transformation inverse est donnée par l'algorithme suivant :
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Algorithme de transformation d'un vecteur en bloc de message}
 \begin{algorithmic}[1]
 \REQUIRE $p$, $h$ et un vecteur $y$ de taille $p$ et de poids $h$
@@ -586,7 +587,7 @@ car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $
 
 \`A cause de la symétrie de la clé privée, indiquée en sous-section~\ref{symetrieClePrivee}, nous pouvons choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$. Un algorithme naïf pour trouver la permutation $\sigma$ est de chercher exhaustivement les valeurs  $\sigma(i_j)$ pour $j=0$ et $3\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Algorithme pour recouvrer $\sigma$ sachant $g_{p^r}$}
 \label{algoNaifgpr}
 \begin{algorithmic}[1]
@@ -626,7 +627,7 @@ Ainsi, il existe $u$ dans $\gf(p)$, indépendant de $i$, tel que
 $$(\star) \qquad\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}}.$$
 En passant toute les valeurs de $u$ en revue, nous pouvons obtenir $\sigma(i)$ de l'équation $(\star)$. Cette remarque donne naissance à l'algorithme suivant :
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Algorithme pour recouvrer $\sigma$ sachant $g_{p^r}$ lorsque $r\geqslant \sqrt h$}
 \label{algogpr}
 \begin{algorithmic}[1]
@@ -673,11 +674,11 @@ Tout d'abord remarquons que $0 \in \gf(p)$ ne contribue pas à la somme, et ensu
 $$\sum_{a\in\gf(p)} a^i = \sum_{j=0}^{p-2} g^i = \frac{g^{i(p-1)} - 1}{g^{i} - 1} = 0.$$
 \end{proof}
 
-\section{Le calcul de logarithmes dans un groupe}\label{logDiscret}
+\section{Le calcul de logarithmes dans un groupe abélien}\label{logDiscret}
 
-Les résultats proposés ici sont essentiellement tous issus de \cite[section 13 et 14, pp. 246 à 297]{galbraith2012}.
+Les résultats proposés ici sont essentiellement tous issus du manuel de Steven Galbraith \cite[section 13 et 14, pp. 246 à 297]{galbraith2012}.
 
-\begin{defi}
+\begin{defi}\label{defLogDiscret}
 Soit $G$ un groupe noté multiplicativement. Le \textit{problème du logarithme discret} est : étant donné $g\in G$ et $h \in \gen{g}$, trouver $a$, tel que $h=g^a$.\end{defi}
 Nous notons alors $a=\log_g(h)$, et $g$ est appelé la base du logarithme $a$.
 
@@ -690,7 +691,7 @@ Considérons le problème du logarithme discret dans le groupe additif des entie
 
 Soient $G$ un groupe, $g\in G$ et $h \in \gen{g}$. La façon la plus simple de résoudre ce problème du logarithme discret est de calculer à la suite les $g^a$ pour $0 \leqslant a < r$, où $r$ est l'ordre de $g$, et de comparer la valeur obtenue avec $h$. Cela s'effectue en au plus $r - 2$ opérations dans le groupe et $r$ comparaisons.
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Algorithme naïf : recherche exhaustive}
 \label{algoLogDiscretNaif}
 \begin{algorithmic}[1]
@@ -707,7 +708,7 @@ Soient $G$ un groupe, $g\in G$ et $h \in \gen{g}$. La façon la plus simple de r
 \end{algorithm}
 
 \subsection{Méthode de Pohlig et Hellman}
-
+\label{methodePohligHellman}
 Soient $G$ un groupe, $g\in G$ et $h \in \gen{g}$. Supposons que $g$ est d'ordre $n$. \'Ecrivons $$n = \prod_{i=1}^r p_i^{\alpha_i},$$
 où les $p_i$ sont premiers et les $\alpha_i$ sont tels que $p_i$ ne divise pas $n/p_i^{\alpha_i}$.
 L'idée de la méthode de Stephen C. Pohlig et Martin E.Hellman \cite{pohligHellman1978} est de calculer $a$ modulo les puissances de premier $p_i^{\alpha_i}$ et de recouvrer la solution en utilisant le théorème des restes chinois.
@@ -743,7 +744,7 @@ Pour obtenir $a_2$, nous posons $h_2 := h_1g_0^{-a_1l}$, et ainsi de suite pour 
 
 Une fois que $a$ est connu pour tout $p^\alpha$ divisant $n$, nous pouvons reconstituer $a$ à l'aide du théorème des restes chinois.
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Algorithme de Pohlig-Hellman avec recherche exhaustive}
 \label{algoPohligHellman}
 \begin{algorithmic}[1]
@@ -814,7 +815,7 @@ et cette observation mène à l'algorithme~\ref{algoBSGS}.
 
 Cependant, l'utilisation importante de l'espace mémoire pour les valeurs calculées par l'algorithme baby-step--giant-step devient rapidement prohibitif, car il requiert $\O(\sqrt{r}\log(r))$ bits de stockage (si les éléments du groupe sont représentables en mémoire en $\O(\log(r))$ bits).
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Algorithme baby-step--giant-step}
 \label{algoBSGS}
 \begin{algorithmic}[1]
@@ -847,17 +848,201 @@ Cependant, l'utilisation importante de l'espace mémoire pour les valeurs calcul
 Soit $g \in G$ d'ordre $r$. Si les éléments du groupe sont représentables en mémoire en $\O(\log(r))$ bits et si les opérations dans le groupe se font en $\O(\log(r)^2)$ opérations binaires, alors l'algorithme baby-step--giant-step résout le problème du logarithme discret en $\O(\sqrt{r}\log(r)^2)$ opérations binaires.
 \end{theo}
 
-\subsection{Méthode rho de Pollard}
+\section{La méthode rho de Pollard}
 
-Comme précédemment, $G = \gen{g}$ et supposons $g$ d'ordre un nombre premier $r$ et $h = g^a$ pour un certain $0 \leqslant a < r$. Le point de départ de cet algorithme est l'observation suivante : si nous trouvons $a_i$, $b_i$, $a_j$ et $b_j$ dans $\Z/r\Z$ tels que :
+Après une introduction succincte, nous expliquons le fonctionnement de la méthode rho de Pollard, qui a été conçue en 1978 par John Michael Pollard \cite{pollard1978}. Puis, nous étudierons les améliorations apportées par Edlyn Teske \cite{teske2001} en 2001 et Shi Bai et Richard Pierce Brent \cite{bai2008} en 2008. 
+
+Il est encouragé de consulter \cite[section 14, pp. 264]{galbraith2012}.
+
+\subsection{Discussion liminaire : partitionner, marcher, chercher}
+
+\paragraph*{Introduction :} La méthode rho permet, avec une forte probabilité, de résoudre le problème du logarithme discret -- définition~\ref{defLogDiscret} -- dans un groupe abélien. Elle se base sur des marches aléatoires : elle définit donc un algorithme non-déterministe, i.e. sur une même entrée, chaque exécution de l'algorithme peut avoir une issue distincte. Soit $G := \gen{g}$ et supposons $g$ d'ordre un nombre premier $r$ -- le cas ardu par Pohlig-Hellman -- et $h = g^a$ pour un certain $0 \leqslant a < r$. 
+
+\paragraph*{Notation :} Si $W$ est un ensemble et $w$ est un élément de $W$ choisi aléatoirement selon la distribution uniforme, alors nous notons $w \in_{\mathfrak{a}} W$.
+
+\paragraph*{Idée :} Observons que si nous trouvons $a_i$, $b_i$, $a_j$ et $b_j$ dans $\Z/r\Z$ tels que :
 $$(\star) \qquad g^{a_i}h^{b_i} = g^{a_j}h^{b_j}$$
 et $b_i \not\equiv b_j \pmod{r}$, alors nous pouvons résoudre le problème du logarithme discret comme suit : $$h = g^{(a_i-a_j)(b_j-b_i)^{-1}\bmod{r}}.$$
 
-L'idée simple est de générer un suite pseudo-aléatoire $x_i = g^{a_i}h^{b_i}$ d'éléments de $G$ par itération d'une fonction convenable $f:G \rightarrow  G$. En d'autres termes, il faut choisir une valeur de départ $x_1$ et définir la suite par $x_{i+1}=f({x_i})$. Une telle suite $x_1, x_2, \dots$ est appelée une \textit{marche pseudo-aléatoire déterministe}. Comme $G$ est fini, il y aura une collision $x_i = x_j$ pour certain $1 \leqslant i < j$, comme dans $(\star)$. Si les éléments dans la marche semblent être choisis uniformément et indépendants dans $G$, alors par le paradoxe des anniversaires (théorème~\ref{paradoxeAnniversaire}), la valeur attendue pour $j$ est $\sqrt{\pi r / 2}$.
+\paragraph*{Marche pseudo-aléatoire :} Pollard \cite{pollard1978} s'est inspiré de la théorie des marches aléatoires et a donc pensé à construire une suite pseudo-aléatoire $x_i = g^{a_i}h^{b_i}$ d'éléments de $G$ par itération d'une fonction convenable $f:G \rightarrow  G$, appelée \textit{fonction d'itération}. En d'autres termes, il choisit une valeur de départ $x_1$ et définit le reste de la suite par $x_{i+1}=f({x_i})$, pour $i \geqslant 1$. Une telle suite $x_1, x_2, \dots$ est appelée une \textit{marche pseudo-aléatoire déterministe}. 
 
-Pollard simule une fonction aléatoire de $G$ dans lui-même comme suit. La première étape est de partitionner $\gen{g}$ en $n_s$ ensembles (d’à peu près la même taille), de sorte que $G = \mathcal{S}_0 \cup  \mathcal{S}_1 \cup \dots \cup \mathcal{S}_{n_s-1}$. En pratique les valeurs typique de $n_s$ sont $32$, $256$ ou $2048$.
+Comme $G$ est fini, cette suite est \textit{ultimement périodique} : il existe deux entiers $\lambda \geqslant 1$ et $\mu \geqslant 0$ tels que les éléments $x_1, x_2, \dots, x_{\lambda + \mu -1}$ soient distincts deux à deux et $x_{k} = x_{\lambda + k}$ pour tout $k\geqslant \mu$. Nous appelons $\mu$ la \textit{pré-période de la suite} et $\lambda$ la \textit{période de la suite}. Sous l'hypothèse que $x_1 \in_\mathfrak{a} G$ et que $f$ est une fonction aléatoire, la valeur attendue de $\lambda$ et $\mu$ est proche de $$\sqrt{\frac{\pi r}{8}} \approx 0.627 \sqrt{r}.$$
 
-Les ensembles $\mathcal{S}_i$ sont définis en utilisant une \textit{fonction de sélection} $$S : G \rightarrow \{0, \dots, n_s -1 \},$$ par $\mathcal{S}_i = \{g \in G : S(g) = i\}$. Un exemple donner par Galbraith dans \cite{galbraith2012} est de prendre $S(g) = b(g) \pmod{n_s}$, où $b(g)$ la représentation binaire, unique, de l'élément $g$ et $b(g)$ peut alors être interprétée comme un entier naturel.
+\paragraph*{Collision :} Une pair $(x_i, x_j)$ est appelée \textit{collision} si $x_i = x_j$ et $1 \leqslant i < j$, comme dans $(\star)$. Si les éléments dans la marche sont choisis uniformément et indépendants dans $G$, alors par le paradoxe des anniversaires (théorème~\ref{paradoxeAnniversaire}), la valeur attendue pour $j$ est $$\sqrt{\frac{\pi r}{2}} \approx 1.253 \sqrt{r}.$$
+
+\paragraph*{Rho :} Comme l'image obtenue en ``dessinant'' les termes de ${(x_i)}_{i\geqslant 1}$, en commençant en bas et finissant par le cycle en haut, forme la lettre grecque $\rho$, une méthode utilisant une telle suite s'appelle une \textit{méthode rho}.
+
+\begin{figure}[h]
+\begin{center}
+\begin{tikzpicture}
+
+\coordinate (head0) at (0,-3) ;
+\coordinate (head1) at (-.4,-2.2) ;
+\coordinate (head2) at (-.6,-1) ;
+\coordinate (head3) at (-.2,.1) ;
+\coordinate (head4) at (.4,1) ;
+\coordinate (head5) at (1.2,1.6) ;
+\coordinate (tail0) at (3-1,1+1) ;
+\coordinate (tail1) at (3,1+1.414) ;
+\coordinate (tail2) at (3+1,1+1) ;
+\coordinate (tail3) at (3+1.414,1) ;
+\coordinate (tail4) at (3+1,1-1) ;
+\coordinate (tail5) at (3,1-1.414) ;
+\coordinate (tail6) at (3-1,1-1) ;
+\coordinate (tail7) at (3-1.414,1) ;
+\draw[thick] (head0) -- (head1) -- (head2) -- (head3) -- (head4) -- (head5) -- (tail0) -- (tail1) -- (tail2) -- (tail3) -- (tail4) -- (tail5) -- (tail6) -- (tail7) -- (tail0) ;
+\draw[thin, ->, >= stealth] (3,2) arc (90:-230:1) ;
+\draw[thin, >= stealth] (.5,-3) edge[out=135,in=210, ->] (1.2,1.1) ;
+\draw (head0) node {$\bullet$};
+\draw (head1) node {$\bullet$};
+\draw (head2) node {$\bullet$};
+\draw (head3) node {$\bullet$};
+\draw (head4) node {$\bullet$};
+\draw (head5) node {$\bullet$};
+\draw (tail0) node {$\bullet$};
+\draw (tail1) node {$\bullet$};
+\draw (tail2) node {$\bullet$};
+\draw (tail3) node {$\bullet$};
+\draw (tail4) node {$\bullet$};
+\draw (tail5) node {$\bullet$};
+\draw (tail6) node {$\bullet$};
+\draw (tail7) node {$\bullet$};
+
+\end{tikzpicture}
+\caption{Illustration de la forme ``rho''}
+\end{center}
+\end{figure}
+
+\paragraph*{Partition :} Pour simuler une fonction aléatoire -- la fonction d'itération -- de $G$ dans lui-même, il est pratique de commencer par partitionner $G$ en $n$ ensembles\footnote{En pratique, les valeurs typiques de $n$ sont $32$, $256$ ou $2048$.} (d’à peu près la même taille), de sorte que $G = \mathcal{S}_0 \cup  \mathcal{S}_1 \cup \dots \cup \mathcal{S}_{n-1}$. Les ensembles $\mathcal{S}_i$ sont définis en utilisant une \textit{fonction de sélection} $$s : G \rightarrow \{0, \dots, n-1 \},$$ par $\mathcal{S}_i = \{g \in G : s(g) = i\}$. 
+
+\paragraph*{Résumé :} Les trois ingrédients principaux d'une bonne méthode rho sont : une partition de $G$ grâce à une fonction de sélection, une suite ${(x_i)}_{i\geqslant 1}$ à l'aspect aléatoire construite grâce à une fonction d'itération et à la partition précédente -- la fonction d'itération a autant de règles que le cardinal de la partition -- et un algorithme pour chercher la collision dans la suite ${(x_i)}_{i\geqslant 1}$.
+
+\subsection{Méthode rho de Pollard originale dans $(\Z/r\Z)^\times$}
+
+Dans \cite{pollard1978}, Pollard décrit sa méthode pour $G = (\Z/r\Z)^\times$, où $r$ est un nombre premier, et $g$ un élément primitif du corps $\Z/r\Z$.
+
+\begin{rema}
+Ici, $r$ est premier mais le groupe $G$ est d'ordre $r-1$.
+\end{rema}
+
+Soit $h \in (\Z/r\Z)^\times$ dont nous cherchons le logarithme en base $g$. La fonction d'itération $f: (\Z/r\Z)^\times \rightarrow (\Z/r\Z)^\times$ utilisée par Pollard est :
+$$f(x) = \left\{\begin{array}{ll}
+gx & \text{si } 0 < x \leqslant p/3, \\
+x^2 & \text{si } p/3 < x \leqslant 2p/3, \\
+hx & \text{si } 2p/3 < x < p. \\
+\end{array}\right.$$
+
+La suite est alors définie par $x_1 = 1$ et $x_{i+1} = f(x_i)$ pour $i \geqslant 1$. Pour garder trace de la décomposition $x_i = g^{a_i}h^{b_i}$, nous calculons les suites ${(a_i)}_{i\geqslant 1}$ et ${(b_i)}_{i\geqslant 1}$ comme suit :
+$$a_1 = 0 \quad	\text{ et }\quad a_{i+1} = \left\{\begin{array}{l l}
+a_i + 1 \pmod{r-1} & \text{si } 0 < x \leqslant p/3, \\
+2a_i \pmod{r-1} & \text{si } p/3 < x \leqslant 2p/3, \\
+a_i \pmod{r-1} & \text{si } 2p/3 < x < p. \\
+\end{array}\right.$$
+$$b_1 = 0 \quad	\text{ et }\quad b_{i+1} = \left\{\begin{array}{l l}
+b_i \pmod{r-1} & \text{si } 0 < x \leqslant p/3, \\
+2b_i \pmod{r-1} & \text{si } p/3 < x \leqslant 2p/3, \\
+b_i + 1 \pmod{r-1} & \text{si } 2p/3 < x < p. \\
+\end{array}\right.$$
+
+Nous rassemblons cela sous la notation :
+$$(x_{i+1}, a_{i+1}, b_{b+1}) = \verb|walk| (x_i, a_i, b_i).$$
+
+\begin{rema}
+Il faut garder à l'esprit que les valeurs $a_{i+1}$ et $b_{i+1}$ sont uniquement déterminées par la valeur $x_i$, et que la fonction $\verb|walk|$ dépend seulement de la fonction d'itération $f$.
+\end{rema}
+
+Maintenant, il faut rechercher une collision dans la suite ${(x_i)}_{i\geqslant 1}$. Pollard utilise l'\textit{algorithme de recherche de cycle Floyd}, aussi appelé l'\textit{algorithme du lièvre et de la tortue}. Cet algorithme compare $x_i$ et $x_{2i}$, et donne une collision $(x_i, x_{2i})$, pour $i \geqslant 1$. Le plus petit $i$ tel que $x_i = x_{2i}$ est appelé l'\textit{épacte}. 
+
+\begin{algorithm}[h]
+\caption{Algorithme rho de Pollard avec recherche de cycle de Floyd}
+\label{algoRho}
+\begin{algorithmic}[1]
+\REQUIRE $r$ un nombre premier, $g\in \Z/r\Z$ primitif et $h \in (\Z/r\Z)^\times$ 
+\ENSURE $a$ tel que $g^a = h$ avec $1 \leqslant a < r$, ou ``échec''
+\STATE{$x_1 \gets 1$}
+\STATE{$a_1 \gets 0$}
+\STATE{$b_1 \gets 0$}
+\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(\verb|walk|(x_1, a_1, b_1))$}
+\STATE{$(x_1, a_1, b_1) \gets \verb|walk|(x_1, a_1, b_1)$}
+\WHILE{$x_1 \neq x_2$} 
+	\STATE{$(x_1, a_1, b_1) \gets \verb|walk|(x_1, a_1, b_1)$}
+	\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(\verb|walk|(x_2, a_2, b_2))$} 
+\ENDWHILE
+\IF{$\pgcd(b_1- b_2, r - 1) = 1$}
+	\RETURN{$(a_2-a_1)(b_1-b_2)^{-1} \pmod{r -1}$}
+\ELSE
+	\RETURN{``échec''}
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+Notons $\mu$ la pré-période de la suite et $\lambda$ la période de la suite.
+
+\begin{prop}\label{propFloyd}
+En gardant les notations précédentes, $x_{2i} = x_i$ si, et seulement si, $\lambda$ divise $i$ et $i \geqslant \mu$. En outre, il existe un $\mu \leqslant i < \mu + \lambda$ tel que $x_{2i} = x_i$.
+\end{prop}
+
+\begin{proof}
+Si $x_i = x_j$, avec $1\leqslant i < j$, alors $\lambda$ divise $j-i$, ce qui prouve la première assertion du lemme. La seconde vient du fait qu'il existe un multiple de $\lambda$ entre $\mu$ et $\mu + \lambda$.
+\end{proof}
+
+\begin{figure}[h]
+\begin{center}
+\begin{tikzpicture}
+
+\coordinate (head0) at (0,-3) ;
+\coordinate (head1) at (-.4,-2.2) ;
+\coordinate (head2) at (-.6,-1) ;
+\coordinate (head3) at (-.2,.1) ;
+\coordinate (head4) at (.4,1) ;
+\coordinate (head5) at (1.2,1.6) ;
+\coordinate (tail0) at (3-1,1+1) ;
+\coordinate (tail1) at (3,1+1.414) ;
+\coordinate (tail2) at (3+1,1+1) ;
+\coordinate (tail3) at (3+1.414,1) ;
+\coordinate (tail4) at (3+1,1-1) ;
+\coordinate (tail5) at (3,1-1.414) ;
+\coordinate (tail6) at (3-1,1-1) ;
+\coordinate (tail7) at (3-1.414,1) ;
+\draw[thick] (head0) -- (head1) -- (head2) -- (head3) -- (head4) -- (head5) -- (tail0) -- (tail1) -- (tail2) -- (tail3) -- (tail4) -- (tail5) -- (tail6) -- (tail7) -- (tail0) ;
+\draw[thin, ->, >= stealth] (3,2) arc (90:-230:1) ;
+\draw[thin, >= stealth] (.5,-3) edge[out=135,in=210, ->] (1.2,1.1) ;
+\draw (head0) node {$\bullet$};
+\draw (head1) node {$\bullet$};
+\draw (head2) node {$\bullet$};
+\draw (head3) node {$\bullet$};
+\draw (head4) node {$\bullet$};
+\draw (head5) node {$\bullet$};
+\draw (tail0) node {$\bullet$};
+\draw (tail1) node {$\bullet$};
+\draw (tail3) node {$\bullet$};
+\draw (tail4) node {$\bullet$};
+\draw (tail5) node {$\bullet$};
+\draw (tail6) node {$\bullet$};
+\draw (tail7) node {$\bullet$};
+\draw[very thin, ->, >= stealth, color=red] (head0) to[bend left=90] (head2);
+\draw[very thin, ->, >= stealth, color=red] (head2) to[bend left=90] (head4);
+\draw[very thin, ->, >= stealth, color=red] (head4) to[bend left=90] (tail0);
+\draw[very thin, ->, >= stealth, color=red] (tail0) to[bend left=90] (tail2);
+\draw[very thin, ->, >= stealth, color=red] (tail2) to[bend left=90] (tail4);
+\draw[very thin, ->, >= stealth, color=red] (tail4) to[bend left=90] (tail6);
+\draw[very thin, ->, >= stealth, color=red] (tail6) to[bend left=90] (tail0);
+\draw[very thin, ->, >= stealth, color=black!50!green] (head0) to[bend left=45] (head1);
+\draw[very thin, ->, >= stealth, color=black!50!green] (head1) to[bend left=45] (head2);
+\draw[very thin, ->, >= stealth, color=black!50!green] (head2) to[bend left=45] (head3);
+\draw[very thin, ->, >= stealth, color=black!50!green] (head3) to[bend left=45] (head4);
+\draw[very thin, ->, >= stealth, color=black!50!green] (head4) to[bend left=45] (head5);
+\draw[very thin, ->, >= stealth, color=black!50!green] (head5) to[bend left=45] (tail0);
+\draw[very thin, ->, >= stealth, color=black!50!green] (tail0) to[bend left=45] (tail1);
+\draw[very thin, ->, >= stealth, color=black!50!green] (tail1) to[bend left=45] (tail2);
+\draw[color=cyan] (tail2) node {$\bullet$} node [above right] {collision au huitième saut};
+
+\end{tikzpicture}
+\caption{Illustration de l'algorithme du lièvre (rouge) et de la tortue (verte)}
+\end{center}
+\end{figure}
+
+\subsection{Méthode rho de Pollard originale généralisée}
 
 \begin{defi}[rho-marche]
 Une \textit{rho-marche} est définie comme suit. Pré-calculer $g_j = g^{u_j}h^{v_j}$ pour $0 \leqslant j \leqslant n_s -1$, où $ 0\leqslant u_j, v_j < r$ sont choisit de façon uniformément aléatoire. Poser $x_1 = g$. La \textit{rho-marche originale} est 
@@ -891,104 +1076,6 @@ $$b_{i+1} =
 b_i + v_{S(x_i)} \pmod{r}.$$
 Nous rassemblons cela sous la notation :
 $$(x_{i+1}, a_{i+1}, b_{b+1}) = \verb|walk| (x_i, a_i, b_i).$$
-
-\subsubsection{Méthode rho avec l'algorithme du lièvre et de la tortue}
-
-Une suite $x_1, x_2, \dots$ d'éléments du groupe est calculée. Tôt ou tard, il y a une collision $x_i = x_j$ avec $1 \leqslant i < j$. Nous pouvons imaginer la marche comme ayant une \textit{queue}, qui est les $x_1, \dots, x_i$ de la marche qui ne forment pas un cycle, suivie d'une \textit{tête}, qui est la partie $x_{i+1}, \dots, x_j$. Dessinée, cela marche ressemble à la lettre grecque $\rho$.
-
-\begin{figure}[h]
-\begin{center}
-\begin{tikzpicture}
-
-\coordinate (head0) at (0,-3) ;
-\coordinate (head1) at (-.4,-2.2) ;
-\coordinate (head2) at (-.6,-1) ;
-\coordinate (head3) at (-.2,.1) ;
-\coordinate (head4) at (.4,1) ;
-\coordinate (head5) at (1.2,1.6) ;
-\coordinate (tail0) at (3-1,1+1) ;
-\coordinate (tail1) at (3,1+1.414) ;
-\coordinate (tail2) at (3+1,1+1) ;
-\coordinate (tail3) at (3+1.414,1) ;
-\coordinate (tail4) at (3+1,1-1) ;
-\coordinate (tail5) at (3,1-1.414) ;
-\coordinate (tail6) at (3-1,1-1) ;
-\coordinate (tail7) at (3-1.414,1) ;
-\draw[thick] (head0) -- (head1) -- (head2) -- (head3) -- (head4) -- (head5) -- (tail0) -- (tail1) -- (tail2) -- (tail3) -- (tail4) -- (tail5) -- (tail6) -- (tail7) -- (tail0) ;
-\draw[thin, ->, >= stealth] (3,2) arc (90:-230:1) node [below right] {tête};
-\draw[thin, >= stealth] (.5,-3) edge[out=135,in=210, ->] (1.2,1.1) node [below right] {queue} ;
-\draw (head0) node {$\bullet$};
-\draw (head1) node {$\bullet$};
-\draw (head2) node {$\bullet$};
-\draw (head3) node {$\bullet$};
-\draw (head4) node {$\bullet$};
-\draw (head5) node {$\bullet$};
-\draw (tail0) node {$\bullet$};
-\draw (tail1) node {$\bullet$};
-\draw (tail3) node {$\bullet$};
-\draw (tail4) node {$\bullet$};
-\draw (tail5) node {$\bullet$};
-\draw (tail6) node {$\bullet$};
-\draw (tail7) node {$\bullet$};
-\draw[very thin, ->, >= stealth, color=red] (head0) to[bend left=90] (head2);
-\draw[very thin, ->, >= stealth, color=red] (head2) to[bend left=90] (head4);
-\draw[very thin, ->, >= stealth, color=red] (head4) to[bend left=90] (tail0);
-\draw[very thin, ->, >= stealth, color=red] (tail0) to[bend left=90] (tail2);
-\draw[very thin, ->, >= stealth, color=red] (tail2) to[bend left=90] (tail4);
-\draw[very thin, ->, >= stealth, color=red] (tail4) to[bend left=90] (tail6);
-\draw[very thin, ->, >= stealth, color=red] (tail6) to[bend left=90] (tail0);
-\draw[very thin, ->, >= stealth, color=black!50!green] (head0) to[bend left=45] (head1);
-\draw[very thin, ->, >= stealth, color=black!50!green] (head1) to[bend left=45] (head2);
-\draw[very thin, ->, >= stealth, color=black!50!green] (head2) to[bend left=45] (head3);
-\draw[very thin, ->, >= stealth, color=black!50!green] (head3) to[bend left=45] (head4);
-\draw[very thin, ->, >= stealth, color=black!50!green] (head4) to[bend left=45] (head5);
-\draw[very thin, ->, >= stealth, color=black!50!green] (head5) to[bend left=45] (tail0);
-\draw[very thin, ->, >= stealth, color=black!50!green] (tail0) to[bend left=45] (tail1);
-\draw[very thin, ->, >= stealth, color=black!50!green] (tail1) to[bend left=45] (tail2);
-\draw[color=cyan] (tail2) node {$\bullet$} node [above right] {collision au huitième saut};
-
-\end{tikzpicture}
-\caption{Illustration de l'algorithme du lièvre et de la tortue}
-\end{center}
-\end{figure}
-
-Soient $\ell_q$ la longueur de la queue du ``rho'' et $\ell_t$ la longueur de sa tête. En d'autre termes, la première collision possible est $x_{\ell_q + \ell_t} = x_{\ell_q}$.
-
-L'algorithme de recherche de cycle de Floyd, encore appelé l'algorithme du lièvre et de la tortue, compare $x_i$ et $x_{2i}$. Le lemme~\ref{lemmeFloyd} montre que cet algorithme trouve une collision en au plus $\ell_q  + \ell_t$ pas.
-
-\begin{algorithm}[H]
-\caption{Algorithme rho avec recherche de cycle de Floyd}
-\label{algoRho}
-\begin{algorithmic}[1]
-\REQUIRE $g$ et $h \in \gen{g}$
-\ENSURE $a$ tel que $g^a = h$ avec $1 \leqslant a \leqslant r$, ou ``échec''
-\STATE{choisir aléatoirement une fonction \verb|walk|}
-\STATE{$x_1 \gets g$}
-\STATE{$a_1 \gets 1$}
-\STATE{$b_1 \gets 0$}
-\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(x_1, a_1, b_1)$}
-\WHILE{$x_1 \neq x_2$} 
-	
-	\STATE{$(x_1, a_1, b_1) \gets \verb|walk|(x_1, a_1, b_1)$}
-	\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(\verb|walk|(x_2, a_2, b_2))$} 
-\ENDWHILE
-\IF{$b_1 \equiv b_2 \pmod{r}$}
-	\RETURN{``échec''}
-\ELSE
-	\RETURN{$(a_2-a_1)(b_1-b_2)^{-1} \pmod{r}$}
-\ENDIF
-\end{algorithmic}
-\end{algorithm}
-
-\begin{lemm}\label{lemmeFloyd}
-En gardant les notation précédente, $x_{2i} = x_i$ si, et seulement si, $\ell_t$ divise $i$ et $i \geqslant \ell_q$. En outre, il existe un $\ell_q \leqslant i < \ell_q + \ell_t$ tel que $x_{2i} = x_i$.
-\end{lemm}
-
-\begin{proof}
-Si $x_i = x_j$, avec $1\leqslant i < j$, alors $\ell_t$ divise $j-i$, ce qui prouve la première assertion du lemme. La seconde vient du fait qu'il existe un multiple de $\ell_t$ entre $\ell_q$ et $\ell_q + \ell_t$.
-\end{proof}
-
-Le plus petit index $i$ tel que $x_{2i} = x_i$, est conjecturé être d'une valeur d'environ $0,823\sqrt{\pi r /2}$.
 
 \section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
 
