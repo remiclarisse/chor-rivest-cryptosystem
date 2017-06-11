@@ -78,8 +78,12 @@ static unsigned long euclid(unsigned long a, unsigned long b, long* u, long* v) 
 		u0 = swapu;
 		v0 = swapv;
 	}
-	*u = u0;
-	*v = v0;
+
+	if (u != NULL && v != NULL) {
+		*u = u0;
+		*v = v0;
+	}
+
 	return r0;
 }
 
@@ -88,21 +92,30 @@ static unsigned long getLog(unsigned long power_g, unsigned long power_h, unsign
 
 	unsigned long r = 0, l = 0;
 	long u = 0, v = 0;
+	bool has_solutions = false;
 
 	r = euclid(modulo, power_h, &u, &v);
-	l = v > 0 ? (power_g * v) % modulo : (power_g * (v - modulo / r)) % modulo;
+
+	if (power_g % r == 0) {
+		has_solutions = true;
+		l = v > 0 ? ((power_g / r) * v) % (modulo / r) : ((power_g / r) * (v + (modulo / r))) % (modulo / r);
+		}
 
 	if (!quiet) {
-		fprintf(stdout, "Bézout's indentity:\n\tgcd(%lu, %lu) = %lu = (%li)*%lu + (%li)*%lu\n",
-						power_h, modulo, r, v, power_h, u, modulo);
-		if (verbose) {
-			fprintf(stdout, "\t\t\t 1 = (%li)*%lu + (%li)*%lu\n", v, power_h / r, u, modulo / r);
+		fprintf(stdout, "Bézout's indentity:\n\tgcd(%lu, %lu) = %lu = (%li)*%lu + (%li)*%lu\n\n",
+										power_h, modulo, r, v, power_h, u, modulo);
+		if (has_solutions) {
+				fprintf(stdout, "Solving diophantine equation:\n\ta*%lu + n*%lu = %lu\n\tgcd(%lu, %lu) = %lu divides %lu, so there exist solutions\n\t"
+												"One solution is given by (solving only for a): a = %li*%lu = %lu (mod %lu)\n\n",
+											power_h, modulo, power_g, power_h, modulo, r, power_g, v, power_g / r, l, modulo / r);
+		} else {
+				fprintf(stdout, "Solving diophantine equation:\n\tgcd(%lu, %lu) = %lu does not divide %lu\n\n"
+												"FAILING TO FIND THE LOGARITHM: returns 0!\n\n",
+										power_h, modulo, r, power_g);
 		}
-		fprintf(stdout, "\ta = %lu * (%li) (mod %lu)\n"
-										"\t  = %lu (mod %lu)\n", power_g, v, modulo / r, l, modulo / r);
 	}
 
-	return 1;
+	return l;
 }
 
 /* Main function */
@@ -224,7 +237,7 @@ int main(int argc, char* argv[]) {
 		fprintf(stdout, "<=>\t%lu = a*%lu (mod %lu)\n\n", power_g, power_h, p - 1);
 	}
 
-	unsigned long loga =	getLog(power_g, power_h, p - 1);
+	unsigned long loga = getLog(power_g, power_h, p - 1);
 
 	if (quiet) {
 		fprintf(stdout, "%lu\n", loga);
