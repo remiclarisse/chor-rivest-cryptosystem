@@ -6,13 +6,13 @@ FILE=chor-rivest
 .PHONY: all clean help info open nodebug
 
 # Rules and tagets
-all: $(EXE) $(FILE)
+all: $(EXE) pdf
 
 $(EXE):
 	@cd c && $(MAKE)
 	@cp -f c/$(EXE) ./
 
-$(FILE):
+pdf:
 	@cd tex && $(MAKE)
 	@cp -f tex/$(FILE).pdf ./
 
@@ -26,8 +26,8 @@ nodebug:
 	@cd c && $(MAKE) nodebug
 	@cp -f c/$(EXE)_nodebug ./$(EXE)
 
-open:
-	@cd tex && $(MAKE) open
+open: pdf
+	@evince $(FILE).pdf&
 
 info:
 	@more README.md
@@ -35,7 +35,7 @@ info:
 help:
 	@echo "all:\t\tRun the target build."
 	@echo "$(EXE):\tBuid executable file $(EXE) recursively in the directory."
-	@echo "$(FILE):\tBuid PDF text file $(FILE).pdf recursively in the directory."
+	@echo "pdf:\t\tBuid PDF text file $(FILE).pdf recursively in the directory."
 	@echo "build:\t\tBuild all executable file(s) and PDF text file(s) recursively in the directory."
 	@echo "clean:\t\tRemove all files produced by the compilation."
 	@echo "info:\t\tGive info about this project."

@@ -11,9 +11,10 @@ $(FILE):
 	pdflatex $(FILE).tex > /dev/null
 	bibtex $(FILE).aux > /dev/null
 	pdflatex $(FILE).tex > /dev/null
+	pdflatex $(FILE).tex > /dev/null
 
 open: $(FILE)
-	@evince $(FILE).pdf
+	@evince $(FILE).pdf&
 
 clean:
 	@echo "./tex/ : Cleaning..."
