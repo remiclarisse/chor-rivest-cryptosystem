@@ -20,7 +20,7 @@ rho-pollard.o: rho-pollard.c
 
 
 clean:
-	@echo "./src : Cleaning..."
+	@echo "./c/src/ : Cleaning..."
 	@rm -f *~ *.o $(EXE)
 
 help:
