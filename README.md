@@ -1,4 +1,6 @@
 # chor-rivest-cryptosystem
-A review of the Chor-Rivest Cryptosystem
+A study of the Chor-Rivest Cryptosystem
 
-I - An implementation of the Chor-Rivest Cryptosystem
+You will find :
+	SAGE files of an implementation of the Chor-Rivest Cryptosystem
+	C program of an implementation of Pollard's rho algorithm over Z/pZ
