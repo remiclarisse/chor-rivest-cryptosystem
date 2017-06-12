@@ -5,10 +5,7 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
-
-/* Global variables */
-static bool verbose = false, quiet = false;
-static unsigned long g = 0, h = 0, p = 0;
+#include <inttypes.h>
 
 /* Options list */
 static struct option long_opts[] = {
@@ -21,6 +18,14 @@ static struct option long_opts[] = {
   {NULL, 0, NULL, 0}
 };
 
+/* Size used */
+typedef uintmax_t  my_unsigned_size;
+typedef intmax_t  my_size;
+
+/* Global variables */
+static bool verbose = false, quiet = false;
+static my_unsigned_size g = 0, h = 0, p = 0;
+
 /* Displays the usage of the software ans quits. */
 static void usage(int status) {
   if (status == EXIT_SUCCESS)
@@ -32,12 +37,14 @@ static void usage(int status) {
     "-v, --verbose\t verbose output\n"
     "-q, --quiet\t quiet output\n"
     "-H, --help\t display this help\n\n"
+    "Max integer size is in (bytes): %lu%s.\n\n"
 		"Before using, YOU have to check that:\n"
 		"\t-p is a prime number,\n"
 		"\t-g is primitive modulo p,\n"
 		"\t-h is non zero.\n\n"
     "Try for instance:\n\t./rho-pollard -p999959 -g7 -h3\n"
-    "\t./rho-pollard -p99989 -g2 -h107\n"
+    "\t./rho-pollard -p99989 -g2 -h107\n",
+    sizeof(my_unsigned_size), sizeof(my_unsigned_size) == 8 ? ",\n\texperiments show that the maximum prime is 4294967311" : ""
   );
   else
     fprintf(stderr, "Try 'rho-pollard --help' for more information.\n");
@@ -46,7 +53,7 @@ static void usage(int status) {
 }
 
 /* Computes a beast's step in the walk */
-static void walk(unsigned long* beast, unsigned long* power_g, unsigned long* power_h) {
+static void walk(my_unsigned_size* beast, my_unsigned_size* power_g, my_unsigned_size* power_h) {
 	if (*beast < (p / 3)) {
 		*beast = (*beast * g) % p;
 		*power_g = (*power_g + 1) % (p - 1);
@@ -61,11 +68,11 @@ static void walk(unsigned long* beast, unsigned long* power_g, unsigned long* po
 }
 
 /* Computes Euclid's algorithm and returns Bézout's identity */
-static unsigned long euclid(unsigned long a, unsigned long b, long* u, long* v) {
-	unsigned long r0 = a, r1 = b;
-	long u0 = 1, v0 = 0, u1 = 0, v1 = 1;
-	unsigned long q, swapr;
-	long swapu, swapv;
+static my_unsigned_size euclid(my_unsigned_size a, my_unsigned_size b, my_size* u, my_size* v) {
+	my_unsigned_size r0 = a, r1 = b;
+	my_size u0 = 1, v0 = 0, u1 = 0, v1 = 1;
+	my_unsigned_size q, swapr;
+	my_size swapu, swapv;
 
 	while (r1 != 0) {
 		q = r0 / r1;
@@ -88,17 +95,17 @@ static unsigned long euclid(unsigned long a, unsigned long b, long* u, long* v) 
 	return r0;
 }
 
-static unsigned long modPow(unsigned long base, unsigned long exponent, unsigned long modulo) {
+static my_unsigned_size modPow(my_unsigned_size base, my_unsigned_size exponent, my_unsigned_size modulo) {
   if (exponent == 0) { return 1; }
   else if (exponent == 1) { return base % modulo; }
   else if (exponent % 2 == 0) { return modPow((base * base) % modulo, exponent / 2, modulo) % modulo; }
   else { return (base * modPow((base * base) % modulo, (exponent - 1) / 2, modulo)) % modulo; }
 }
 
-static unsigned long getLog(unsigned long power_g, unsigned long power_h, unsigned long modulo) {
+static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_h, my_unsigned_size modulo) {
 
-	unsigned long r = 0, l = 0;
-	long u = 0, v = 0;
+	my_unsigned_size r = 0, l = 0;
+	my_size u = 0, v = 0;
 
 	r = euclid(modulo, power_h, &u, &v);
 
@@ -141,9 +148,9 @@ static unsigned long getLog(unsigned long power_g, unsigned long power_h, unsign
   if (r == 1) {
     return l;
   } else {
-    unsigned long first = modPow(g, l, p), root = modPow(g, modulo / r, p);
+    my_unsigned_size first = modPow(g, l, p), root = modPow(g, modulo / r, p);
     if (verbose) {
-      for (unsigned long i = 0; i < r; i++) {
+      for (my_unsigned_size i = 0; i < r; i++) {
         fprintf(stdout, "\t\tk = %lu:\t%lu**%lu = %lu (mod %lu)\n", i, g, l + (i * modulo / r), modPow(g, l + (i * modulo / r), p), p);
         if ((first * modPow(root, i, p)) % p == h) {
           l = l + (i * modulo / r);
@@ -152,7 +159,7 @@ static unsigned long getLog(unsigned long power_g, unsigned long power_h, unsign
       fprintf(stdout, "\n");
       return l;
     } else {
-      unsigned long i = 0;
+      my_unsigned_size i = 0;
       for (i = 0; i < r; i++) {
           if ((first * modPow(root, i, p)) % p == h) {
             l = l + (i * modulo / r);
@@ -213,13 +220,13 @@ int main(int argc, char* argv[]) {
 		usage(EXIT_FAILURE);
 	}
 	if (!quiet) {
-		fprintf(stdout, "POLLARD'S RHO ALGORITHM\n\n"
-				"Target: \th = %lu\nBase: \t\tg = %lu\nModulo: \tp = %lu\n\n", h, g, p);
+		fprintf(stdout, "POLLARD'S RHO ALGORITHM (size max: %lu bytes)\n\n"
+				"Target: \th = %lu\nBase: \t\tg = %lu\nModulo: \tp = %lu\n\n", sizeof(my_size), h, g, p);
 	}
 
-	unsigned long tortoise = 1, hare = 1;
-	unsigned long power_g_tortoise = 0, power_h_tortoise = 0;
-	unsigned long power_g_hare = 0, power_h_hare = 0;
+	my_unsigned_size tortoise = 1, hare = 1;
+	my_unsigned_size power_g_tortoise = 0, power_h_tortoise = 0;
+	my_unsigned_size power_g_hare = 0, power_h_hare = 0;
 
 	/* At first, the tortoise makes one step and the hare makes two steps.
 	   Then, we carry on this pattern until a collision is found, both
@@ -268,8 +275,8 @@ int main(int argc, char* argv[]) {
 			hare, g, power_g_hare, h, power_h_hare, p);
 	}
 
-	unsigned long power_g = power_g_tortoise > power_g_hare ? power_g_tortoise - power_g_hare : (p - 1) + (power_g_tortoise - power_g_hare);
-	unsigned long power_h = power_h_hare > power_h_tortoise ? power_h_hare - power_h_tortoise : (p - 1) + (power_h_hare - power_h_tortoise);
+	my_unsigned_size power_g = power_g_tortoise > power_g_hare ? power_g_tortoise - power_g_hare : (p - 1) + (power_g_tortoise - power_g_hare);
+	my_unsigned_size power_h = power_h_hare > power_h_tortoise ? power_h_hare - power_h_tortoise : (p - 1) + (power_h_hare - power_h_tortoise);
 
 	if (!quiet) {
 		fprintf(stdout, "COLLISION FOUND\n\nEquation solving: finding a where %lu = %lu**a (mod %lu)\n"
@@ -286,7 +293,7 @@ int main(int argc, char* argv[]) {
 		fprintf(stdout, "<=>\t%lu = a*%lu (mod %lu)\n\n", power_g, power_h, p - 1);
 	}
 
-	unsigned long loga = getLog(power_g, power_h, p - 1);
+	my_unsigned_size loga = getLog(power_g, power_h, p - 1);
 
 	if (quiet) {
 		fprintf(stdout, "%lu\n", loga);

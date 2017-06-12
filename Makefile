@@ -3,7 +3,7 @@ EXE=rho-pollard
 FILE=chor-rivest
 
 # Special rules and targets
-.PHONY: all clean help info
+.PHONY: all clean help info open nodebug
 
 # Rules and tagets
 all: $(EXE) $(FILE)
@@ -21,6 +21,13 @@ clean:
 	@cd tex && $(MAKE) clean
 	@echo "./ : Cleaning..."
 	@rm -f *~ $(EXE) $(FILE).pdf
+
+nodebug:
+	@cd c && $(MAKE) nodebug
+	@cp -f c/$(EXE)_nodebug ./$(EXE)
+
+open:
+	@cd tex && $(MAKE) open
 
 info:
 	@more README.md
