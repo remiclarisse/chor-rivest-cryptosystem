@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-
 /* Global variables */
 static bool verbose = false, quiet = false;
 static unsigned long g = 0, h = 0, p = 0;
@@ -36,7 +35,9 @@ static void usage(int status) {
 		"Before using, YOU have to check that:\n"
 		"\t-p is a prime number,\n"
 		"\t-g is primitive modulo p,\n"
-		"\t-h is non zero.\n"
+		"\t-h is non zero.\n\n"
+    "Try for instance:\n\t./rho-pollard -p999959 -g7 -h3\n"
+    "\t./rho-pollard -p99989 -g2 -h107\n"
   );
   else
     fprintf(stderr, "Try 'rho-pollard --help' for more information.\n");
@@ -59,7 +60,7 @@ static void walk(unsigned long* beast, unsigned long* power_g, unsigned long* po
 	}
 }
 
-/* Computes Euclid's algorithm */
+/* Computes Euclid's algorithm and returns Bézout's identity */
 static unsigned long euclid(unsigned long a, unsigned long b, long* u, long* v) {
 	unsigned long r0 = a, r1 = b;
 	long u0 = 1, v0 = 0, u1 = 0, v1 = 1;
@@ -87,35 +88,83 @@ static unsigned long euclid(unsigned long a, unsigned long b, long* u, long* v) 
 	return r0;
 }
 
-/* Gives the inverse of number modulo mod or 0 if not invertible */
+static unsigned long modPow(unsigned long base, unsigned long exponent, unsigned long modulo) {
+  if (exponent == 0) { return 1; }
+  else if (exponent == 1) { return base % modulo; }
+  else if (exponent % 2 == 0) { return modPow((base * base) % modulo, exponent / 2, modulo) % modulo; }
+  else { return (base * modPow((base * base) % modulo, (exponent - 1) / 2, modulo)) % modulo; }
+}
+
 static unsigned long getLog(unsigned long power_g, unsigned long power_h, unsigned long modulo) {
 
 	unsigned long r = 0, l = 0;
 	long u = 0, v = 0;
-	bool has_solutions = false;
 
 	r = euclid(modulo, power_h, &u, &v);
 
-	if (power_g % r == 0) {
-		has_solutions = true;
-		l = v > 0 ? ((power_g / r) * v) % (modulo / r) : ((power_g / r) * (v + (modulo / r))) % (modulo / r);
+	if (power_g % r != 0) {
+        if (!quiet) {
+          fprintf(stdout, "Bézout's indentity:\n\tgcd(%lu, %lu) = %lu = (%li)*%lu + (%li)*%lu\n\n"
+                        "Solving diophantine equation:\n\tgcd(%lu, %lu) = %lu does not divide %lu\n\n"
+												"FAILING TO FIND THE LOGARITHM: returns 0!!!\n\n",
+                        power_h, modulo, r, v, power_h, u, modulo,
+                        power_h, modulo, r, power_g);
+      }
+      return 0;
 		}
+
+  l = v > 0 ? ((power_g / r) * v) % (modulo / r) : ((power_g / r) * (v + (modulo / r))) % (modulo / r);
 
 	if (!quiet) {
 		fprintf(stdout, "Bézout's indentity:\n\tgcd(%lu, %lu) = %lu = (%li)*%lu + (%li)*%lu\n\n",
 										power_h, modulo, r, v, power_h, u, modulo);
-		if (has_solutions) {
-				fprintf(stdout, "Solving diophantine equation:\n\ta*%lu + n*%lu = %lu\n\tgcd(%lu, %lu) = %lu divides %lu, so there exist solutions\n\t"
-												"One solution is given by (solving only for a): a = %li*%lu = %lu (mod %lu)\n\n",
-											power_h, modulo, power_g, power_h, modulo, r, power_g, v, power_g / r, l, modulo / r);
-		} else {
-				fprintf(stdout, "Solving diophantine equation:\n\tgcd(%lu, %lu) = %lu does not divide %lu\n\n"
-												"FAILING TO FIND THE LOGARITHM: returns 0!\n\n",
-										power_h, modulo, r, power_g);
-		}
+		fprintf(stdout, "Solving diophantine equation:\n\ta*%lu + n*%lu = %lu\n\tgcd(%lu, %lu) = %lu divides %lu, so there exist solutions\n",
+										power_h, modulo, power_g, power_h, modulo, r, power_g);
+    if (verbose) {
+      fprintf(stdout, "\tSolutions (solving only for a):\n");
+      for (unsigned int i = 0; i < r; i++) {
+        fprintf(stdout, "\t\ta = %lu (mod %lu)\n", l + (i * modulo / r), modulo);
+      }
+      fprintf(stdout, "\tThe solution is of the form: %lu = (%lu**%lu)(w**k) (mod %lu)\n"
+                    "\twhere w is a %lu-th root of unity, i.e. w = %lu**%lu, and 0 <= k <= %lu\n",
+                     h, g, l, p,
+                     r, g, modulo / r, r - 1);
+    }
+    fprintf(stdout, "\tHence, the solution is of the form:\n\t\t%lu = %lu**(%lu + k*%lu) (mod %lu), "
+                    "where 0 <= k <= %lu\n",
+                     h, g, l, modulo / r, p, r - 1);
+    if (!verbose) {
+      fprintf(stdout, "\tTrying out each k for k between 0 and %lu: k = ", r - 1);
+    }
 	}
 
-	return l;
+  if (r == 1) {
+    return l;
+  } else {
+    unsigned long first = modPow(g, l, p), root = modPow(g, modulo / r, p);
+    if (verbose) {
+      for (unsigned long i = 0; i < r; i++) {
+        fprintf(stdout, "\t\tk = %lu:\t%lu**%lu = %lu (mod %lu)\n", i, g, l + (i * modulo / r), modPow(g, l + (i * modulo / r), p), p);
+        if ((first * modPow(root, i, p)) % p == h) {
+          l = l + (i * modulo / r);
+        }
+      }
+      fprintf(stdout, "\n");
+      return l;
+    } else {
+      unsigned long i = 0;
+      for (i = 0; i < r; i++) {
+          if ((first * modPow(root, i, p)) % p == h) {
+            l = l + (i * modulo / r);
+            break;
+          }
+        }
+      if (!quiet) {
+        fprintf(stdout, "%lu\n\n", i);
+      }
+      return l;
+    }
+  }
 }
 
 /* Main function */
