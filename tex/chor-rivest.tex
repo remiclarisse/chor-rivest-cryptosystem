@@ -956,29 +956,6 @@ Il faut garder à l'esprit que les valeurs $a_{i+1}$ et $b_{i+1}$ sont uniquemen
 
 Maintenant, il faut rechercher une collision dans la suite ${(x_i)}_{i\geqslant 1}$. Pollard utilise l'\textit{algorithme de recherche de cycle Floyd}, aussi appelé l'\textit{algorithme du lièvre et de la tortue}. Cet algorithme compare $x_i$ et $x_{2i}$, et donne une collision $(x_i, x_{2i})$, pour $i \geqslant 1$. Le plus petit $i$ tel que $x_i = x_{2i}$ est appelé l'\textit{épacte}. 
 
-\begin{algorithm}[h]
-\caption{Algorithme rho de Pollard avec recherche de cycle de Floyd}
-\label{algoRho}
-\begin{algorithmic}[1]
-\REQUIRE $r$ un nombre premier, $g\in \Z/r\Z$ primitif et $h \in (\Z/r\Z)^\times$ 
-\ENSURE $a$ tel que $g^a = h$ avec $1 \leqslant a < r$, ou ``échec''
-\STATE{$x_1 \gets 1$}
-\STATE{$a_1 \gets 0$}
-\STATE{$b_1 \gets 0$}
-\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(\verb|walk|(x_1, a_1, b_1))$}
-\STATE{$(x_1, a_1, b_1) \gets \verb|walk|(x_1, a_1, b_1)$}
-\WHILE{$x_1 \neq x_2$} 
-	\STATE{$(x_1, a_1, b_1) \gets \verb|walk|(x_1, a_1, b_1)$}
-	\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(\verb|walk|(x_2, a_2, b_2))$} 
-\ENDWHILE
-\IF{$\pgcd(b_1- b_2, r - 1) = 1$}
-	\RETURN{$(a_2-a_1)(b_1-b_2)^{-1} \pmod{r -1}$}
-\ELSE
-	\RETURN{``échec''}
-\ENDIF
-\end{algorithmic}
-\end{algorithm}
-
 Notons $\mu$ la pré-période de la suite et $\lambda$ la période de la suite.
 
 \begin{prop}\label{propFloyd}
@@ -1044,6 +1021,60 @@ Si $x_i = x_j$, avec $1\leqslant i < j$, alors $\lambda$ divise $j-i$, ce qui pr
 \caption{Illustration de l'algorithme du lièvre (rouge) et de la tortue (verte)}
 \end{center}
 \end{figure}
+
+\begin{algorithm}[h]
+\caption{Algorithme rho de Pollard avec recherche de cycle de Floyd}
+\label{algoRho}
+\begin{algorithmic}[1]
+\REQUIRE $r$ un nombre premier, $g\in \Z/r\Z$ primitif et $h \in (\Z/r\Z)^\times$ 
+\ENSURE $a$ tel que $g^a = h$ avec $1 \leqslant a < r$, ou ``échec''
+\STATE{$x_1 \gets 1$}
+\STATE{$a_1 \gets 0$}
+\STATE{$b_1 \gets 0$}
+\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(\verb|walk|(x_1, a_1, b_1))$}
+\STATE{$(x_1, a_1, b_1) \gets \verb|walk|(x_1, a_1, b_1)$}
+\WHILE{$x_1 \neq x_2$} 
+	\STATE{$(x_1, a_1, b_1) \gets \verb|walk|(x_1, a_1, b_1)$}
+	\STATE{$(x_2, a_2, b_2) \gets \verb|walk|(\verb|walk|(x_2, a_2, b_2))$} 
+\ENDWHILE
+\STATE{$d \gets \pgcd(b_1- b_2, r - 1)$}\label{debutAlgoRho}
+\IF{$d$ divise $(a_2 - a_1)$}
+	\STATE{résoudre l'équation diophantienne $u(b_1-b_2)/d + v(r-1)/d = (a_2-a_1)/d$}
+	\STATE{$\alpha\gets g^{u(a_2-a_1)/d} \pmod{r}$}
+	\STATE{$\vartheta\gets g^{(r-1)/d} \pmod{r}$}
+	\FORALL{$j$ allant de $0$ à $d-1$}
+		\IF{$\alpha\vartheta^j = h \pmod{r}$}
+			\RETURN{$u(a_2-a_1)/d + j(r-1)/d \pmod{r-1}$}
+		\ENDIF
+	\ENDFOR	
+\ELSE\label{finAlgoRho}
+	\RETURN{``échec''}
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+Les lignes \ref{debutAlgoRho} à \ref{finAlgoRho} de l'algorithme~\ref{algoRho} méritent de plus amples explications. Quand une collision $(x_i, x_{2i})$ est atteinte, nous avons l'égalité : 
+$$(\ast)\qquad h^n = g^m, \quad\text{ avec }\left\{\begin{array}{r l}
+m &\equiv a_{2i} - a_i \pmod{r-1}, \\
+n &\equiv b_i - b_{2i} \pmod{r-1}.
+\end{array}\right.$$
+Or $h^n = {(g^a)}^n$, ce qui donne
+$$an \equiv m \pmod{r-1}.$$
+Si $n$ est inversible modulo $r-1$, alors nous obtenons directement le logarithme de $h$ en base $g$ : $a \equiv mn^{-1} \pmod{r-1}$. En revanche, si tel n'est pas le cas, alors nous pouvons le recouvrer si, et seulement si, $d := \pgcd(n,r-1)$ divise $m$. En effet, cela revient à résoudre l'équation diophantienne :
+$$(\dagger)\qquad nx + (r-1)y = m.$$
+Nous notons $u$ et $v$ les entiers de l'identité de Bézout :
+$$(\ddagger)\qquad un + v(r-1) = d.$$
+Les entiers $x$, tels que qu'il existe $y\in\Z$ et $(x,y)$ est solution de $(\dagger)$, forment l'ensemble :
+$$u\frac{m}{d} + \frac{r-1}{d}\Z.$$
+Ainsi, il existe un unique $k$ tel que $0 \leqslant k \leqslant d -1$ et $$a = u\frac{m}{d} + k\frac{r-1}{d}.$$
+Posons $$\alpha := g^{um/d} \quad\text{et}\quad\vartheta := g^{(r-1)/d}.$$
+L'élément $\vartheta$ est un racine $d$-ième de l'unité dans $\Z/r\Z$ et $h = \alpha \vartheta^k$ dans $\Z/r\Z$. Nous pouvons alors chercher $k$ de manière exhaustive, sachant que nous avons au préalable calculé $\alpha$ et $\vartheta$.
+
+La façon de faire de Pollard~\cite{pollard1978} est la suivante : après avoir calculer la relation de Bézout $(\ddagger)$, nous élevons $(\ast)$ à la puissance $u$, donnant ainsi :
+$${(h^n)}^u = h^d = g^{um},$$
+où $um$ est de la forme $d\lambda$, car $d$ divise $m$, par $an \equiv m \pmod{r-1}$ et $(\ddagger)$. Ainsi,
+$$h = g^\lambda \vartheta^i,$$
+où $\vartheta := g^{(r-1)/d}$ est un racine $d$-ième de l'unité, et $i$, tel $0\leqslant i \leqslant d-1$, reste à déterminer.
 
 \subsection{Méthode rho de Pollard originale généralisée}
 

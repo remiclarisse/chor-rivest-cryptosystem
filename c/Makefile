@@ -14,11 +14,11 @@ build:
 clean:
 	@cd src && $(MAKE) clean
 	@echo "./c/ : Cleaning..."
-	@rm -f $(EXE) $(EXE)_nodebug
+	@rm -f $(EXE) $(EXE)
 
 nodebug:
 	@cd src && $(MAKE) nodebug
-	@cp -f src/$(EXE)_nodebug ./
+	@cp -f src/$(EXE)_nodebug ./$(EXE)
 
 help:
 	@echo "all:\tRun the target build."

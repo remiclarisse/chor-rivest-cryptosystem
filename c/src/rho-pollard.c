@@ -36,14 +36,14 @@ static void usage(int status) {
     "-v, --verbose\t verbose output\n"
     "-q, --quiet\t quiet output\n"
     "-H, --help\t display this help\n\n"
-    "Max integer size is in (bytes): %lu%s.\n\n"
+    "The maximum integer size is %lu bytes%s.\n\n"
 		"Before using, YOU have to check that:\n"
 		"\t-p is a prime number,\n"
 		"\t-g is primitive modulo p,\n"
 		"\t-h is non zero.\n\n"
     "Try for instance:\n\t./rho-pollard -p999959 -g7 -h3\n"
     "\t./rho-pollard -p99989 -g2 -h107\n",
-    sizeof(my_unsigned_size), sizeof(my_unsigned_size) == 8 ? ",\n\texperiments show that the maximum prime is 4294967311" : ""
+    sizeof(my_unsigned_size), sizeof(my_unsigned_size) == 8 ? ",\n\texperiments suggest that the maximum possible value for p is 4294967311" : ""
   );
   else
     fprintf(stderr, "Try 'rho-pollard --help' for more information.\n");
@@ -111,7 +111,7 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
 	if (power_g % r != 0) {
         if (!quiet) {
           fprintf(stdout, "Bézout's indentity:\n\tgcd(%llu, %llu) = %llu = (%lli)*%llu + (%lli)*%llu\n\n"
-                        "Solving diophantine equation:\n\tgcd(%llu, %llu) = %llu does not divide %llu\n\n"
+                        "Solving diophantine equation:\n\tgcd(%llu, %llu) = %llu does not divide %llu.\n\n"
 												"FAILING TO FIND THE LOGARITHM: returns 0!!!\n\n",
                         power_h, modulo, r, v, power_h, u, modulo,
                         power_h, modulo, r, power_g);
@@ -124,7 +124,7 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
 	if (!quiet) {
 		fprintf(stdout, "Bézout's indentity:\n\tgcd(%llu, %llu) = %llu = (%lli)*%llu + (%lli)*%llu\n\n",
 										power_h, modulo, r, v, power_h, u, modulo);
-		fprintf(stdout, "Solving diophantine equation:\n\ta*%llu + n*%llu = %llu\n\tgcd(%llu, %llu) = %llu divides %llu, so there exist solutions\n",
+		fprintf(stdout, "Solving diophantine equation:\n\ta*%llu + n*%llu = %llu\n\tgcd(%llu, %llu) = %llu divides %llu, so there exist solutions.\n",
 										power_h, modulo, power_g, power_h, modulo, r, power_g);
     if (verbose) {
       fprintf(stdout, "\tSolutions (solving only for a):\n");
@@ -132,9 +132,9 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
         fprintf(stdout, "\t\ta = %llu (mod %llu)\n", l + (i * modulo / r), modulo);
       }
       fprintf(stdout, "\tThe solution is of the form: %llu = (%llu**%llu)(w**k) (mod %llu)\n"
-                    "\twhere w is a %llu-th root of unity, i.e. w = %llu**%llu, and 0 <= k <= %llu\n",
+                    "\twhere w is a %llu-%s root of unity, i.e. w = %llu**%llu, and 0 <= k <= %llu\n",
                      h, g, l, p,
-                     r, g, modulo / r, r - 1);
+                     r, r == 2 ? "nd" : (r == 3 ? "rd" : "th"), g, modulo / r, r - 1);
     }
     fprintf(stdout, "\tHence, the solution is of the form:\n\t\t%llu = %llu**(%llu + k*%llu) (mod %llu), "
                     "where 0 <= k <= %llu\n",
@@ -150,7 +150,7 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
     my_unsigned_size first = modPow(g, l, p), root = modPow(g, modulo / r, p);
     if (verbose) {
       for (my_unsigned_size i = 0; i < r; i++) {
-        fprintf(stdout, "\t\tk = %llu:\t%llu**%llu = %llu (mod %llu)\n", i, g, l + (i * modulo / r), modPow(g, l + (i * modulo / r), p), p);
+        fprintf(stdout, "\t\t\tk = %llu:\t%llu**%llu = %llu (mod %llu)\n", i, g, l + (i * modulo / r), modPow(g, l + (i * modulo / r), p), p);
         if ((first * modPow(root, i, p)) % p == h) {
           l = l + (i * modulo / r);
         }
@@ -194,15 +194,15 @@ int main(int argc, char* argv[]) {
         break;
 
       case 'p': /* Set the modulo */
-        p = strtoul(optarg, NULL, 10);
+        p = strtoull(optarg, NULL, 10);
         break;
 
       case 'g': /* Set the primitve element */
-        g = strtoul(optarg, NULL, 10);
+        g = strtoull(optarg, NULL, 10);
         break;
 
       case 'h': /* Set the target */
-        h = strtoul(optarg, NULL, 10);
+        h = strtoull(optarg, NULL, 10);
         break;
 
       default:
@@ -219,8 +219,10 @@ int main(int argc, char* argv[]) {
 		usage(EXIT_FAILURE);
 	}
 	if (!quiet) {
-		fprintf(stdout, "POLLARD'S RHO ALGORITHM (size max: %lu bytes)\n\n"
-				"Target: \th = %llu\nBase: \t\tg = %llu\nModulo: \tp = %llu\n\n", sizeof(my_size), h, g, p);
+		fprintf(stdout, "POLLARD'S RHO ALGORITHM\nThe maximum integer's size is %lu bytes%s\n\n"
+				"Target: \th = %llu\nBase: \t\tg = %llu\nModulo: \tp = %llu\n\n", sizeof(my_size),
+        sizeof(my_unsigned_size) == 8 ? " (experiments suggest that the maximum possible value for p is 4294967311)" : "",
+         h, g, p);
 	}
 
 	my_unsigned_size tortoise = 1, hare = 1;
@@ -297,7 +299,7 @@ int main(int argc, char* argv[]) {
 	if (quiet) {
 		fprintf(stdout, "%llu\n", loga);
 	} else {
-		fprintf(stdout, "Logarithm: %llu\n\t%llu = %llu**%llu (mod %llu)\n", loga, h, g, loga, p);
+		fprintf(stdout, "LOGARITHM: %llu\n\t%llu = %llu**%llu (mod %llu)\n", loga, h, g, loga, p);
 	}
 	return EXIT_SUCCESS;
 }
