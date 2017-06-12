@@ -5,7 +5,6 @@
 #include <getopt.h>
 #include <stdbool.h>
 #include <string.h>
-#include <inttypes.h>
 
 /* Options list */
 static struct option long_opts[] = {
@@ -19,8 +18,8 @@ static struct option long_opts[] = {
 };
 
 /* Size used */
-typedef uintmax_t  my_unsigned_size;
-typedef intmax_t  my_size;
+typedef unsigned long long  my_unsigned_size;
+typedef long long my_size;
 
 /* Global variables */
 static bool verbose = false, quiet = false;
@@ -111,8 +110,8 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
 
 	if (power_g % r != 0) {
         if (!quiet) {
-          fprintf(stdout, "Bézout's indentity:\n\tgcd(%lu, %lu) = %lu = (%li)*%lu + (%li)*%lu\n\n"
-                        "Solving diophantine equation:\n\tgcd(%lu, %lu) = %lu does not divide %lu\n\n"
+          fprintf(stdout, "Bézout's indentity:\n\tgcd(%llu, %llu) = %llu = (%lli)*%llu + (%lli)*%llu\n\n"
+                        "Solving diophantine equation:\n\tgcd(%llu, %llu) = %llu does not divide %llu\n\n"
 												"FAILING TO FIND THE LOGARITHM: returns 0!!!\n\n",
                         power_h, modulo, r, v, power_h, u, modulo,
                         power_h, modulo, r, power_g);
@@ -123,25 +122,25 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
   l = v > 0 ? ((power_g / r) * v) % (modulo / r) : ((power_g / r) * (v + (modulo / r))) % (modulo / r);
 
 	if (!quiet) {
-		fprintf(stdout, "Bézout's indentity:\n\tgcd(%lu, %lu) = %lu = (%li)*%lu + (%li)*%lu\n\n",
+		fprintf(stdout, "Bézout's indentity:\n\tgcd(%llu, %llu) = %llu = (%lli)*%llu + (%lli)*%llu\n\n",
 										power_h, modulo, r, v, power_h, u, modulo);
-		fprintf(stdout, "Solving diophantine equation:\n\ta*%lu + n*%lu = %lu\n\tgcd(%lu, %lu) = %lu divides %lu, so there exist solutions\n",
+		fprintf(stdout, "Solving diophantine equation:\n\ta*%llu + n*%llu = %llu\n\tgcd(%llu, %llu) = %llu divides %llu, so there exist solutions\n",
 										power_h, modulo, power_g, power_h, modulo, r, power_g);
     if (verbose) {
       fprintf(stdout, "\tSolutions (solving only for a):\n");
       for (unsigned int i = 0; i < r; i++) {
-        fprintf(stdout, "\t\ta = %lu (mod %lu)\n", l + (i * modulo / r), modulo);
+        fprintf(stdout, "\t\ta = %llu (mod %llu)\n", l + (i * modulo / r), modulo);
       }
-      fprintf(stdout, "\tThe solution is of the form: %lu = (%lu**%lu)(w**k) (mod %lu)\n"
-                    "\twhere w is a %lu-th root of unity, i.e. w = %lu**%lu, and 0 <= k <= %lu\n",
+      fprintf(stdout, "\tThe solution is of the form: %llu = (%llu**%llu)(w**k) (mod %llu)\n"
+                    "\twhere w is a %llu-th root of unity, i.e. w = %llu**%llu, and 0 <= k <= %llu\n",
                      h, g, l, p,
                      r, g, modulo / r, r - 1);
     }
-    fprintf(stdout, "\tHence, the solution is of the form:\n\t\t%lu = %lu**(%lu + k*%lu) (mod %lu), "
-                    "where 0 <= k <= %lu\n",
+    fprintf(stdout, "\tHence, the solution is of the form:\n\t\t%llu = %llu**(%llu + k*%llu) (mod %llu), "
+                    "where 0 <= k <= %llu\n",
                      h, g, l, modulo / r, p, r - 1);
     if (!verbose) {
-      fprintf(stdout, "\tTrying out each k for k between 0 and %lu: k = ", r - 1);
+      fprintf(stdout, "\tTrying out each k for k between 0 and %llu: k = ", r - 1);
     }
 	}
 
@@ -151,7 +150,7 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
     my_unsigned_size first = modPow(g, l, p), root = modPow(g, modulo / r, p);
     if (verbose) {
       for (my_unsigned_size i = 0; i < r; i++) {
-        fprintf(stdout, "\t\tk = %lu:\t%lu**%lu = %lu (mod %lu)\n", i, g, l + (i * modulo / r), modPow(g, l + (i * modulo / r), p), p);
+        fprintf(stdout, "\t\tk = %llu:\t%llu**%llu = %llu (mod %llu)\n", i, g, l + (i * modulo / r), modPow(g, l + (i * modulo / r), p), p);
         if ((first * modPow(root, i, p)) % p == h) {
           l = l + (i * modulo / r);
         }
@@ -167,7 +166,7 @@ static my_unsigned_size getLog(my_unsigned_size power_g, my_unsigned_size power_
           }
         }
       if (!quiet) {
-        fprintf(stdout, "%lu\n\n", i);
+        fprintf(stdout, "%llu\n\n", i);
       }
       return l;
     }
@@ -221,7 +220,7 @@ int main(int argc, char* argv[]) {
 	}
 	if (!quiet) {
 		fprintf(stdout, "POLLARD'S RHO ALGORITHM (size max: %lu bytes)\n\n"
-				"Target: \th = %lu\nBase: \t\tg = %lu\nModulo: \tp = %lu\n\n", sizeof(my_size), h, g, p);
+				"Target: \th = %llu\nBase: \t\tg = %llu\nModulo: \tp = %llu\n\n", sizeof(my_size), h, g, p);
 	}
 
 	my_unsigned_size tortoise = 1, hare = 1;
@@ -245,8 +244,8 @@ int main(int argc, char* argv[]) {
 			walk(&hare, &power_g_hare, &power_h_hare);
 
 			fprintf(stdout, "Step %u:\n"
-					"\tTortoise: \t%lu = (%lu**%lu)(%lu**%lu) (mod %lu)\n"
-					"\tHare: \t\t%lu = (%lu**%lu)(%lu**%lu) (mod %lu)\n\n",
+					"\tTortoise: \t%llu = (%llu**%llu)(%llu**%llu) (mod %llu)\n"
+					"\tHare: \t\t%llu = (%llu**%llu)(%llu**%llu) (mod %llu)\n\n",
 					 step, tortoise, g, power_g_tortoise, h, power_h_tortoise, p,
 				 	 hare, g, power_g_hare, h, power_h_hare, p);
 
@@ -269,8 +268,8 @@ int main(int argc, char* argv[]) {
 
 	if (!verbose && !quiet) {
 		fprintf(stdout, "Last step (%u):\n"
-			"\tTortoise: \t%lu = (%lu**%lu)(%lu**%lu) (mod %lu)\n"
-			"\tHare: \t\t%lu = (%lu**%lu)(%lu**%lu) (mod %lu)\n\n",
+			"\tTortoise: \t%llu = (%llu**%llu)(%llu**%llu) (mod %llu)\n"
+			"\tHare: \t\t%llu = (%llu**%llu)(%llu**%llu) (mod %llu)\n\n",
 			step, tortoise, g, power_g_tortoise, h, power_h_tortoise, p,
 			hare, g, power_g_hare, h, power_h_hare, p);
 	}
@@ -279,26 +278,26 @@ int main(int argc, char* argv[]) {
 	my_unsigned_size power_h = power_h_hare > power_h_tortoise ? power_h_hare - power_h_tortoise : (p - 1) + (power_h_hare - power_h_tortoise);
 
 	if (!quiet) {
-		fprintf(stdout, "COLLISION FOUND\n\nEquation solving: finding a where %lu = %lu**a (mod %lu)\n"
-											"\t(%lu**%lu)(%lu**%lu) = (%lu**%lu)(%lu**%lu) (mod %lu)\n",
+		fprintf(stdout, "COLLISION FOUND\n\nEquation solving: finding a where %llu = %llu**a (mod %llu)\n"
+											"\t(%llu**%llu)(%llu**%llu) = (%llu**%llu)(%llu**%llu) (mod %llu)\n",
 											h, g, p, g, power_g_tortoise, h, power_h_tortoise, g, power_g_hare, h, power_h_hare, p);
 		if (verbose) {
-			fprintf(stdout, "<=>\t%lu**(%lu-%lu) = %lu**(%lu-%lu) (mod %lu)\n"
-										"<=>\t%lu**(%lu) = %lu**(%lu) (mod %lu)\n"
-										"<=>\t%lu**(%lu) = %lu**(a*%lu) (mod %lu)\n",
+			fprintf(stdout, "<=>\t%llu**(%llu-%llu) = %llu**(%llu-%llu) (mod %llu)\n"
+										"<=>\t%llu**(%llu) = %llu**(%llu) (mod %llu)\n"
+										"<=>\t%llu**(%llu) = %llu**(a*%llu) (mod %llu)\n",
 										g, power_g_tortoise, power_g_hare, h, power_h_hare, power_h_tortoise, p,
 										g, power_g, h, power_h, p,
 										g, power_g, g, power_h, p);
 		}
-		fprintf(stdout, "<=>\t%lu = a*%lu (mod %lu)\n\n", power_g, power_h, p - 1);
+		fprintf(stdout, "<=>\t%llu = a*%llu (mod %llu)\n\n", power_g, power_h, p - 1);
 	}
 
 	my_unsigned_size loga = getLog(power_g, power_h, p - 1);
 
 	if (quiet) {
-		fprintf(stdout, "%lu\n", loga);
+		fprintf(stdout, "%llu\n", loga);
 	} else {
-		fprintf(stdout, "Logarithm: %lu\n\t%lu = %lu**%lu (mod %lu)\n", loga, h, g, loga, p);
+		fprintf(stdout, "Logarithm: %llu\n\t%llu = %llu**%llu (mod %llu)\n", loga, h, g, loga, p);
 	}
 	return EXIT_SUCCESS;
 }
