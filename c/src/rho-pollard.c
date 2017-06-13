@@ -1,3 +1,9 @@
+/* Pouvoir utiliser des entiers plus grands, eg __uint128_t, ie faire une fonction pour récupérer l'argument
+   Pas besoin de checker que le gcd divise power_g, juste vérifier non nul mod p - 1
+   Faire méthode dans le papier de Pollard [78]
+*/
+
+
 #define _POSIX_C_SOURCE 200809L
 
 #include <stdlib.h>

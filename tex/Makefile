@@ -7,7 +7,7 @@ FILE=chor-rivest
 # Rules and targets
 all: $(FILE)
 
-$(FILE):
+$(FILE): clean
 	pdflatex $(FILE).tex > /dev/null
 	bibtex $(FILE).aux > /dev/null
 	pdflatex $(FILE).tex > /dev/null

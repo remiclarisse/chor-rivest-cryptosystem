@@ -677,7 +677,7 @@ Tout d'abord remarquons que $0 \in \gf(p)$ ne contribue pas à la somme, et ensu
 $$\sum_{a\in\gf(p)} a^i = \sum_{j=0}^{p-2} g^i = \frac{g^{i(p-1)} - 1}{g^{i} - 1} = 0.$$
 \end{proof}
 
-\section{Le calcul de logarithmes dans un groupe abélien}\label{logDiscret}
+\section{Le calcul de logarithmes dans un groupe}\label{logDiscret}
 
 Les résultats proposés ici sont essentiellement tous issus du manuel de Steven Galbraith \cite[section 13 et 14, pp. 246 à 297]{galbraith2012}.
 
@@ -1125,7 +1125,9 @@ $$(x_{i+1}, a_{i+1}, b_{b+1}) = \verb|walk| (x_i, a_i, b_i).$$
 
 \section{L'anatomie des corps}
 
-Nous souhaitons nous rafraîchir la mémoire sur la théorie des corps. Commençons par donner quelques définitions :
+Nous souhaitons nous rafraîchir la mémoire sur la théorie des corps. Malheureusement, les rudiments sur les anneaux ne sont pas rappelés, il est vivement conseillé de consulter le manuel de Patrice Tauvel~\cite{tauvel2008}, cette partie l'utilise d'ailleurs extensivement, de même que le cours d'algèbre de Michel Demazure~\cite{demazure2008} pour la partie sur les corps finis. 
+
+Commençons par donner quelques définitions :
 
 \begin{defi}[Corps]
 Soit $(K,+_K,\cdot_K)$, où $K$ est un ensemble, $+_K : K \times K \rightarrow K$ et $\cdot_K: K \times K \rightarrow K$ sont deux lois de composition interne. Pour faire de $(K,+,\cdot)$ un \textit{corps}, ces deux lois doivent satisfaire aux conditions suivantes : \begin{enumerate}
@@ -1149,11 +1151,47 @@ La définition implique que, quel que soit $a \in K$, $0\cdot a = 0$ et $-a = (-
 $\Z/n\Z$ n'est pas un corps, dès que $n$ est composé. En effet, soit $d$ un diviseur de $n$ distinct de $1$ et $n$. Alors la classe d'équivalence de $d$ dans $\Z/n\Z$ est un diviseur de zéro, donc $\Z/n\Z$ n'est pas intègre.
 \end{exem}
 
-\begin{defi}[Groupe multiplicatif d'un corps]
+\begin{defi}[Groupe multiplicatif]
 Soit $K$ un corps. $(K\backslash\{0\},\cdot)$ est un groupe appelé \textit{groupe multiplicatif du corps $K$}, et il est noté $K^\times$.
 \end{defi}
 
-\subsection{Anneaux : homomorphismes et caractéristique}
+\subsubsection*{Anneau de polynôme sur un corps}
+
+\begin{theo}\label{theoAnnPolyPrincipal}
+Soit $K$ un corps. L'anneau $K[X]$ est principal. En outre, si $\mathfrak{a}$ est un idéal non nul de $K[X]$, il existe un unique polynôme unitaire $U(X)$ de $K[X]$ tel que $$\mathfrak{a} = (U(X)) := U(X)K[X].$$
+\end{theo}
+
+\begin{proof}
+Nous avons $\{0\} = (0)$. Soient $\mathfrak{a}$ un idéal non nul de $K[X]$ et $P(X) \in \mathfrak{a}$, de degré minimal parmi les éléments non-nuls de $\mathfrak{a}$. Nous avons déjà $(P(X)) \subseteq \mathfrak{a}$. Montrons l'autre inclusion : soit $S(X) \in \mathfrak{a}$. La division euclidienne de $S(X)$ par $P(X)$ donne l'écriture $S(X) = Q(X)P(X) + R(X)$, où $Q(X)$ et $R(X)$ sont dans $K[X]$ et $\deg(R(X))< \deg(P(X))$ ou $R(X) = 0$. Ainsi : $$R(x) = S(X) - P(X)Q(X) \in \mathfrak{a}.$$
+Il s'en suit, par le choix de $P(X)$, que $R(X) = 0$. Cela montre que $K[X]$ est principal. Dans ce qui précède, nous pouvons supposer $P(X)$ unitaire. Si $S(X)$ est tel que $(S(X)) = (P(X))$, alors $S(X)$ et $P(X)$ sont deux polynômes associés. Donc si $Q(X)$ est unitaire, nous avons l'égalité $S(X) = Q(X)$.
+\end{proof}
+
+\begin{prop}
+L'anneau $A[X]$ est un anneau principal si, et seulement si, l'anneau $A$ est un corps.
+\end{prop}
+
+\begin{theo}\label{theoSurjecAnnPoly}
+Soit $K$ un corps. Soit $P(X) \in K[X]$ de degré $d \geqslant 1$ et notons $\mathfrak{a}$ l'idéal de $K[X]$ engendré par $P(X)$. Notons $\varphi: K[X] \rightarrow \mathcal{A} := K[X] / \mathfrak{a}$ la surjection canonique, et posons $x = \varphi(X)$. \begin{enumerate}
+\item $(1_\mathcal{A}, x, \dots, x^{d-1})$ est une base du $K$-espace vectoriel $\mathcal A$.
+\item Les conditions suivantes sont équivalentes : \begin{enumerate}
+\item L'anneau $\mathcal{A}$ est intègre.
+\item L'anneau $\mathcal{A}$ est un corps.
+\item Le polynôme $P(X)$ est irréductible.
+\end{enumerate}
+\end{enumerate}
+\end{theo}
+
+\begin{proof} Nous prouvons les points dans l'ordre.
+\begin{enumerate}
+\item Si $A(X) \in K[X]$, nous pouvons écrire $A(X) = P(X)Q(X)+R(X)$, avec $\deg(R(X)) \leqslant d-1$. Ainsi $\varphi(A(X)) = \varphi(R(X))$ et $(1_\mathcal{A}, x, \dots, x^{d-1})$ est une famille génératrice de $\mathcal{A}$.
+S'il existe $\lambda_0, \lambda_1, \dots, \lambda_{d-1} \in K$ tel que 
+$$\lambda_01_\mathcal{A} + \lambda_1x + \cdots + \lambda_{d-1}x^{d-1} = 0,$$
+alors le polynôme $\lambda_0 + \lambda_1X + \cdots + \lambda_{d-1}X^{d-1}$ est dans $\mathfrak{a}$ et est de degré strictement inférieur à $d$ : cela implique que tous les $\lambda_i$ soient nuls.
+\item 
+\end{enumerate}
+\end{proof}
+
+\subsection{Homomorphismes et caractéristique}
 
 \begin{defi}[Homomorphisme d'anneaux]\label{defMorphismeAnneaux}
 Soient $A$ et $B$ deux anneaux. L'application $f: A \rightarrow B$ est un homomorphismes d'anneaux si : \begin{enumerate}
@@ -1241,6 +1279,23 @@ Soit $L$ un corps. Une partie $K \subseteq L$ est un \textit{sous-corps} de $L$ 
 $\Q$ est un sous-corps de $\R$ et $\R$ est un sous-corps de $\C$.
 \end{exem}
 
+\begin{figure}[h]
+\begin{center}
+\begin{tikzpicture}
+\coordinate (Q) at (0,0) ;
+\coordinate (R) at (.8,1.1) ;
+\coordinate (C) at (0,2.2) ;
+\coordinate (Qi) at (-.8,1.1) ;
+\draw (Q) -- (R) -- (C) -- (Qi) -- cycle ;
+\draw[fill=white, color=white] (Q) circle (0.5) node[color=black]{$\Q$} ;
+\draw[fill=white, color=white] (R) circle (0.5) node[color=black]{$\R$};
+\draw[fill=white, color=white] (C) circle (0.5) node[color=black]{$\C$};
+\draw[fill=white, color=white] (Qi) circle (0.5) node[color=black]{$\Q(i)$};
+\end{tikzpicture}
+\caption{Inclusions de corps}
+\end{center}
+\end{figure}
+
 \begin{defi}[Corps premier]
 $K$ est un \textit{corps premier} si $K$ est un corps ne contenant aucun sous-corps autre que lui-même.
 \end{defi}
@@ -1277,6 +1332,31 @@ Soit $K$ un corps. Une \textit{extension} du corps $K$ est un couple $(L, \iota)
 
 Soit $(L, \iota)$ un extension du corps $K$. Comme $\iota$ est injective, nous pouvons identifier $K$ à son image $\iota(K)$ dans $L$. Dans la pratique, sauf risque de confusion, nous faisons systématiquement cette identification : nous disons alors que $L$ est une extension de $K$ si $K$ est un sous-corps de $L$, et nous le notons alors $K\subseteq L$. Il est alors évident que $K$ et $L$ ont la même caractéristique.
 
+\begin{exem}
+Considérons le polynôme $x^3-3 \in \Q[x]$. Dans $\C$, il admet $\alpha$, $\alpha j$ et $\alpha j^2$ pour racines, où $\alpha := \sqrt[3]{3}$ et $j := e^{2i\pi/3}$. Les extensions sont alors :
+
+\begin{figure}[h]
+\begin{center}
+\begin{tikzpicture}
+\coordinate (Q) at (0,0) ;
+\coordinate (Qa) at (-1.5,1.5) ;
+\coordinate (Qaj) at (0,3) ;
+\coordinate (Qaxj2) at (1.5,1.5) ;
+\coordinate (Qaxj) at (0,1.5) ;
+\draw (Q) -- (Qa) -- (Qaj) -- (Qaxj2) -- cycle ;
+\draw (Q) -- (Qaxj) -- (Qaj) ;
+\draw[fill=white, color=white] (Q) circle (0.5) node[color=black]{$\Q$} ;
+\draw[fill=white, color=white] (Qa) circle (0.5) node[color=black]{$\Q(\alpha)$} ;
+\draw[fill=white, color=white] (Qaj) circle (0.5) node[color=black]{$\Q(\alpha,j)$} ;
+\draw[fill=white, color=white] (Qaxj) circle (0.5) node[color=black]{$\Q(\alpha j)$} ;
+\draw[fill=white, color=white] (Qaxj2) circle (0.5) node[color=black]{$\Q(\alpha j^2)$} ;
+\end{tikzpicture}
+\caption{Sous-corps de $\Q(\alpha,j) = \Q(\alpha,\alpha j, \alpha j^2)$}
+\end{center}
+\end{figure}
+
+\end{exem}
+
 \begin{prop}
 Soit $K \subseteq L$ une extension de corps. $L$ est un $K$-espace vectoriel. Une base du $K$-espace vectoriel $L$ est appelée une base de $L$ sur $K$.
 \end{prop}
@@ -1292,6 +1372,8 @@ L'extension de corps $\R \subseteq \C$ est une extension quadratique.
 \begin{defi}
 Soient $K\subseteq L$ un extension de corps et $S$ une partie de $L$. Notons $K[S]$ le sous-anneau de $L$ engendré par $K$ et $S$, et $K(S)$ le sous-corps de $L$ engendré par $K$ et $S$.
 \end{defi}
+
+Si $S = \{x_1, \dots x_n \}$, nous notons $K[x_1, \dots, x_n]$ pour $K[S]$ et $K(x_1, \dots, x_n)$ pour $K(S)$.
 
 \begin{defi}[Extension de type fini]
 L'extension $K \subseteq L$ est \textit{type fini} s'il existe une partie finie $S$ de $L$ telle que $L=K(S)$.
@@ -1327,7 +1409,27 @@ $$\sum_i\lambda_{ij}e_i = 0,$$
 quel que soit $j \in J$. Comme ${(e_i)}_{i\in I}$ est une base de $L$ sur $K$, les $\lambda_{ij}$ sont nuls pour tout $(i,j) \in I\times J$. Le reste se démontre aisément.
 \end{proof}
 
+\subsection{Extensions algébriques}
+Un idéal $\mathfrak{a}$ d'un anneau commutatif $A$ est dit \textit{premier} s'il vérifie les conditions suivantes équivalentes : \begin{enumerate}
+\item $A/\mathfrak{a}$ est un anneau intègre.
+\item $\mathfrak{a} \neq A$ et, si $(a, b) \in A^2$ vérifie $ab \in \mathfrak{a}$, alors soit $a\in \mathfrak{a}$, soit $b\in\mathfrak{a}$.
+\end{enumerate}
+
+\subsubsection*{Élément transcendant et élément algébrique}
+Soient $K \subseteq L$ une extension de corps et $x \in L$. L'application 
+$$\begin{array}{r r c l}
+ \phi_x :& K[X]& \longrightarrow& L \\
+ & P& \longmapsto& P(x),
+\end{array}$$
+est un homomorphisme de $K$-algèbres d'image $K[x]$. Prosaïquement, $K[X]$ et $L$ sont vus comme des $K$-espaces vectoriels munis d'une multiplication interne, ou encore, comme deux anneaux stables par multiplication par un élément du corps $K$.
+
+Notons $\mathfrak{a}_x$ le noyau de $\phi_x$. De deux choses l'une :
+\\$\triangleright\quad\mathfrak{a} = \{0\}$ : l'élément $x$ est dit \textit{transcendant} sur $K$. L'application $\phi_x$ induit un isomorphisme de $K[X]$ sur $K[x]$ qui se prolonge en un isomorphisme de $K(X)$ sur $K(x)$. Le degré de l'extension $K \subseteq K(x)$ est infini.
+\\$\triangleright\quad\mathfrak{a} \neq \{0\}$ : l'élément $x$ est dit \textit{algébrique} sur $K$. Comme $L$ est intègre, l'idéal $\mathfrak{a}_x$ est un idéal premier de $K[X]$. D'après le théorème~\ref{theoAnnPolyPrincipal}, il existe un unique polynôme unitaire irréductible $\mu_{x,K}(X)$ de $K[X]$ tel que $\mathfrak{a}_x = (\mu_{x,K}(X))$. Nous disons que le polynôme $\mu_{x,K}$ est le \textit{polynôme minimal} de $x$ sur $K$. Son degré, noté $\deg_K(x)$, est appelé le \textit{degré de $x$ sur $K$}. Le polynôme $\mu_{x,K}$ sera noté $\mu_x$.
+
 \subsection{Corps finis}
+
+Ne pas hésiter à se référer au cours de Michel Demazure \cite{demazure2008}.
 
 \begin{prop}
 Soit $K$ un corps de caractéristique $p > 0$ et notons $\frob$ l'endomorphisme de Frobenius de $K$. Si $K$ est fini alors $\frob$ est un automorphisme de $K$, et si $K = \F_p$ alors $\frob = \id_{\F_p}$.
