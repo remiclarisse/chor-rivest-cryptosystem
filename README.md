@@ -1,6 +1,8 @@
-# chor-rivest-cryptosystem
-A study of the Chor-Rivest Cryptosystem
+# A study of the Chor-Rivest Cryptosystem
+=========================================
 
-You will find :
-	SAGE files of an implementation of the Chor-Rivest Cryptosystem
-	C program of an implementation of Pollard's rho algorithm over Z/pZ
+## Pollard's Rho Algorithm
+--------------------------
+The `./c/` folder contains an implementation of *Pollard's rho algorithm* for finding
+logarithms in the field Z/pZ, p prime.
+#### What can be improved :
