@@ -37,6 +37,10 @@
 \def\car{\operatorname{car}}
 \def\pgcd{\operatorname{pgcd}}
 \def\id{\operatorname{id}}
+\def\aut{\operatorname{Aut}}
+\def\hom{\operatorname{Hom}}
+\def\isom{\operatorname{Isom}}
+\def\gal{\operatorname{Gal}}
 \def\mbf#1{\mathbf{#1}}
 \def\NP{\mathbb{NP}}
 \def\gen #1{\left\langle#1\right\rangle}
@@ -1187,7 +1191,10 @@ Soit $K$ un corps. Soit $P(X) \in K[X]$ de degré $d \geqslant 1$ et notons $\ma
 S'il existe $\lambda_0, \lambda_1, \dots, \lambda_{d-1} \in K$ tel que 
 $$\lambda_01_\mathcal{A} + \lambda_1x + \cdots + \lambda_{d-1}x^{d-1} = 0,$$
 alors le polynôme $\lambda_0 + \lambda_1X + \cdots + \lambda_{d-1}X^{d-1}$ est dans $\mathfrak{a}$ et est de degré strictement inférieur à $d$ : cela implique que tous les $\lambda_i$ soient nuls.
-\item L'implication $(b) \Rightarrow (a)$ est claire.\\ Montrons $(a) \Rightarrow (c)$. Par l'absurde : si $P(X) = Q(X)R(X)$, avec $\deg(Q) < d$, $\deg(R) < d$, alors $\varphi(Q)$ et $\varphi(R)$ sont non-nuls, bien que $\varphi(Q)\varphi(R) = \varphi(P)$ le soit.
+\item L'implication $(b) \Rightarrow (a)$ est claire.\\ Montrons $(a) \Rightarrow (c)$. Par l'absurde : écrivons $P(X) = Q(X)R(X)$, avec $\deg(Q) < d$, $\deg(R) < d$. Alors $\varphi(Q)$ et $\varphi(R)$ sont non-nuls, bien que $\varphi(Q)\varphi(R) = \varphi(P)$ le soit.\\
+Montrons $(c) \Rightarrow (b)$. Comme $d \geqslant 1$, on a $\mathfrak{a} \neq K[X]$. Soit $\mathfrak{b}$ un idéal de $K[X]$ contenant strictement $\mathfrak{a}$ et soit $Q(X) \in \mathfrak{b} \backslash \mathfrak{a}$. Si $P$ est irréductible, il est étranger à $Q$ et, grâce à une identité de Bézout, nous obtenons : 
+$$K[X] = (P(X)) + (Q(X)) \subseteq \mathfrak{b}.$$
+D'où $\mathfrak{b} = K[X]$. Par conséquent, $\mathfrak{a}$ est un idéal maximal de $K[X]$, et $\mathcal{A}$ est un corps.
 \end{enumerate}
 \end{proof}
 
@@ -1384,7 +1391,7 @@ L'extension $K \subseteq L$ est \textit{simple} s'il existe une partie $S$ de $L
 Tout élément $x$ de $L$ vérifiant $L=K(x)$ est appelé un \textit{élément primitif} de l'extension.
 \end{defi}
 
-\begin{prop}
+\begin{prop}\label{propExtensions}
 Soient $K \subseteq L$ un extension de corps et $S$, $T$ deux parties de $L$, et $\mathcal F$ l'ensemble des parties finies de $S$. Alors :
 $$K( S \cup T) = K(S)(T) = K(T)(S), \quad K(S) = \bigcup_{U\in\mathcal F} K(U).$$
 \end{prop}
@@ -1415,7 +1422,6 @@ Un idéal $\mathfrak{a}$ d'un anneau commutatif $A$ est dit \textit{premier} s'i
 \item $\mathfrak{a} \neq A$ et, si $(a, b) \in A^2$ vérifie $ab \in \mathfrak{a}$, alors soit $a\in \mathfrak{a}$, soit $b\in\mathfrak{a}$.
 \end{enumerate}
 
-\subsubsection*{Élément transcendant et élément algébrique}
 Soient $K \subseteq L$ une extension de corps et $x \in L$. L'application 
 $$\begin{array}{r r c l}
  \phi_x :& K[X]& \longrightarrow& L \\
@@ -1427,9 +1433,85 @@ Notons $\mathfrak{a}_x$ le noyau de $\phi_x$. De deux choses l'une :
 \\$\triangleright\quad\mathfrak{a} = \{0\}$ : l'élément $x$ est dit \textit{transcendant} sur $K$. L'application $\phi_x$ induit un isomorphisme de $K[X]$ sur $K[x]$ qui se prolonge en un isomorphisme de $K(X)$ sur $K(x)$. Le degré de l'extension $K \subseteq K(x)$ est infini.
 \\$\triangleright\quad\mathfrak{a} \neq \{0\}$ : l'élément $x$ est dit \textit{algébrique} sur $K$. Comme $L$ est intègre, l'idéal $\mathfrak{a}_x$ est un idéal premier de $K[X]$. D'après le théorème~\ref{theoAnnPolyPrincipal}, il existe un unique polynôme unitaire irréductible $\mu_{x,K}(X)$ de $K[X]$ tel que $\mathfrak{a}_x = (\mu_{x,K}(X))$. Nous disons que le polynôme $\mu_{x,K}$ est le \textit{polynôme minimal} de $x$ sur $K$. Son degré, noté $\deg_K(x)$, est appelé le \textit{degré de $x$ sur $K$}. Le polynôme $\mu_{x,K}$ sera noté $\mu_x$.
 
+Par passage au quotient, $\phi_x$ induit un isomorphisme de $K$-algèbres :
+$$\psi_x : \frac{K[X]}{(\mu_x(X))} \longrightarrow K[x].$$
+Compte tenu du théorème~\ref{theoSurjecAnnPoly}, nous avons $K(x) = K[x]$, et $\psi_x(K)$ est isomorphe à $K$. Nous pouvons identifier $K$ et $\psi_x(K)$, et considérer $K(x)$ comme un extension de $K$. Si nous posons $n = \deg_K(x)$, toujours d'après le théorème~\ref{theoSurjecAnnPoly}, $\{A,x,\dots,x^{n-1}\}$ est une base du $K$-espace vectoriel $K(x)$. Ainsi : $$[K(x) : K] = \deg_K(x).$$
+
+\begin{defi}[Extension algébrique] Une extension $K \subseteq L$ est dite \textit{algébrique} si tout élément de $L$ est algébrique sur $K$. Si c'est le cas, nous pouvons aussi dire que $L$ est algébrique sur $K$.
+\end{defi}
+
+\begin{defi}[Extension transcendante] Une extension $K \subseteq L$ est dite \textit{transcendante} si elle n'est pas algébrique.
+\end{defi}
+
+\begin{prop}
+Soit $K \subseteq L$ une extension de corps. \begin{enumerate}
+\item Si l'extension est finie, elle est algébrique. En outre, pour tout $x \in L$, l'entier $\deg_K(x)$ divise $[L:K]$.
+\item Dire que $x\in L$ est algébrique sur $K$ signifie que l'extension $K \subseteq K(x)$ est de degré fini.
+\end{enumerate}
+\end{prop}
+
+\begin{proof}
+Dans l'ordre : \begin{enumerate}
+\item Soit $x\in L$. Si l'extension $K \subseteq L$ est finie, la famille ${(x^n)}_{n\in\N}$ est liée sur $K$. Il existe donc $P(X) \in K[X] \backslash \{0\}$ tel que $P(x) = 0$. Ainsi, $x$ est algébrique sur $K$. On a alors $[L:K] = [L:K(x)][K(x):K]$, d'où découle le second point, puisque $[K(x):K] = \deg_K(x)$.
+\item Si $x$ est algébrique sur $K$, l'extension $K \subseteq K(x)$ est finie (c'est le second ``$\triangleright$'' au dessus). La réciproque est un cas particulier du premier point.
+\end{enumerate}
+\end{proof}
+
+\begin{rema}
+Une extension algébrique n'est pas nécessairement de degré finie. En revanche si $K \subseteq L$ est une extension de corps, toute $K$-sous-algèbre de $L$ est un corps.
+\end{rema}
+
+\begin{prop}
+Soient $K \subseteq L$ une extension et $S$ une partie de $L$. On suppose que tout élément de $S$ est algébrique sur $K$. Alors, \begin{enumerate}
+\item l'extension $K \subseteq K(S)$ est algébrique,
+\item si $S$ est finie, l'extension $K \subseteq K(S)$ est finie.
+\end{enumerate}
+\end{prop}
+
+\begin{proof}
+D'après la proposition~\ref{propExtensions}, il suffit de prouver le second point. C'est clair si $S = \emptyset$. Supposons $S \neq \emptyset$ et l'assertion établie pour les parties de $K$ de cardinal strictement inférieur à celui de $S$. Soient $x \in S$ et $T = S\backslash \{x\}$. Nous avons $K(S) = K(T)(x)$. D'après l'hypothèse de récurrence, $[K(T) : K]$ est fini. D'autre part, $x$ étant algébrique sur $K$ l'est sur $K(T)$. Il en résulte que $[K(S):K(T)]$ est fini. Cela conclut, car $[K(S):K] = [K(S):K(T)][K(T):K]$.
+\end{proof}
+
+\begin{theo}
+Soit $L \subseteq L$ une extension. Les conditions suivantes sont équivalentes : \begin{enumerate}
+\item L'extension $K \subseteq L$ est finie.
+\item Il existe $x_1, \dots, x_n \in L$ algébriques sur $K$ tels que $L = K[x_1, \dots, x_n]$.
+\item Il existe $x_1, \dots, x_n \in L$ algébriques sur $K$ tels que $L = K(x_1, \dots, x_n)$.
+\end{enumerate}
+\end{theo}
+
+\begin{proof}
+Montrons $(1) \Rightarrow (2)$. Si l'extension est finie, il existe $n\in\N$ et $x_1, \dots, x_n$ dans $L$ tels que $L = Kx_1 + \cdots + Kx_n$. D'où $L = K[x_1, \dots, x_n]$. D'autre part, les $x_i$ sont algébriques sur $K$.\\
+Montrons $(2) \Rightarrow (3)$. Si $x_r$, pour $2 \leqslant r \leqslant n$, est algébrique sur $K$, il l'est sur $K(x_1, \dots, x_{r-1})$, et nous avons donc $K(x_1, \dots, x_r) = K(x_1, \dots, x_{r-1})[x_r]$. D'où $K(x_1, \dots x_n) = K[x_1, \dots, x_n]$.\\
+L'implication $(3) \Rightarrow (1)$ est plutôt claire.
+\end{proof}
+
+\subsection{Extensions de décomposition}
+
+\subsubsection*{Groupe de Galois}
+
+Nous notons $\aut(K)$ l'ensemble des automorphismes du corps $K$, c'est un sous-groupe du groupe des bijections de $K$, la loi considérée étant la composition des applications.
+
+Si $G$ est un sous-groupe de $\aut(K)$, nous notons $K^G$ l'ensemble des $x \in L$ tels que $\sigma(x) = x$ pour tout $\sigma \in G$. Il est immédiat de vérifier que $K^G$ est un sous-corps de $K$, appelé le \textit{corps des invariants} de $G$ dans $K$.
+
+\begin{defi}[$K$-homomorphisme]
+Soient $K \subseteq L$ et $K \subseteq M$ deux extensions d'un même corps $K$. Nous appelons \textit{$K$-homomorphisme} de $L$ dans $M$ tout homomorphisme $\sigma$ du corps $L$ dans le corps $M$ tel que $\sigma(x) = x$ pour tout $x \in K$. L'ensemble des $K$-homomorphismes de $L$ dans $M$ est noté $\hom_K(L,M)$.
+\end{defi}
+
+Soient $K \subseteq L$ et $K \subseteq M$ comme dans la définition. \begin{enumerate}
+\item Dire que $\sigma \in \hom_K(L,M)$ signifie que $\sigma$ est un homomorphisme de la $K$-algèbre $L$ dans la $K$-algèbre $M$.
+\item Un élément de $\hom_K(L,M)$ est injectif. S'il est surjectif (donc bijectif), il est dit un \textit{$K$-isomorphisme} de $L$ sur $M$. L'ensemble des $K$-isomorphismes de $L$ dans $M$ est noté $\isom_K(L,M)$.
+\item Un élément de $\hom_K(L,L)$ est appelé un \textit{$K$-endomorphisme} de $L$, et un élément de $\isom_K(L,L)$ est appelé un \textit{$K$-automorphisme} de $L$. Il est clair que $\isom_K(L,L)$ est un sous-groupe de $\aut(L)$, où la loi est la composition des applications.
+\item Si l'extension $K \subseteq L$ est finie, nous avons $\hom_K(L,L) = \isom_K(L,L)$. Ce n'est plus nécessairement le cas si $[L:K]$ est infini. Par exemple, si $L = K(X)$ (corps des fractions à une indéterminée sur $K$), l'application $L \rightarrow L, F(X) \mapsto F(X^2)$ est un élément de $\hom_K(L,L) \backslash \isom_K(L,L)$.
+\end{enumerate}
+
+\begin{defi}[Groupe de Galois]
+Soit $K \subseteq L$ un extension. Le groupe $\isom_K(L,L)$ est appelé le \textit{groupe de Galois} de $L$ sur $K$, et est noté $\gal(L/K)$.
+\end{defi}
+
 \subsection{Corps finis}
 
-Ne pas hésiter à se référer au cours de Michel Demazure \cite{demazure2008}.
+Ne pas hésiter à se référer au Cours d'Algèbre de Michel Demazure \cite{demazure2008}.
 
 \begin{prop}
 Soit $K$ un corps de caractéristique $p > 0$ et notons $\frob$ l'endomorphisme de Frobenius de $K$. Si $K$ est fini alors $\frob$ est un automorphisme de $K$, et si $K = \F_p$ alors $\frob = \id_{\F_p}$.
