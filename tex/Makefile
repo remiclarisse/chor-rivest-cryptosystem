@@ -18,7 +18,7 @@ open: $(FILE)
 
 clean:
 	@echo "./tex/ : Cleaning..."
-	@rm -f *~ $(FILE).aux $(FILE).bbl $(FILE).blg $(FILE).toc *.log *.gz
+	@rm -f *~ $(FILE).aux $(FILE).bbl $(FILE).blg $(FILE).toc *.log *.gz $(FILE).out
 
 help:
 	@echo "all:\tRun the whole build to make the PDF file."
