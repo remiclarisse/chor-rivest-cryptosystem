@@ -6,10 +6,10 @@
 \usepackage{amsmath, amsthm, amssymb}
 \usepackage{tikz}
 \usepackage{algorithm, algorithmic}
-%\usepackage{hyperref}
 \usepackage{array}
 \usepackage{cite}
 \usepackage{tikz}
+%\usepackage{hyperref}
 
 \newtheorem{theo}{Théorème}[section]
 \newtheorem{lemm}[theo]{Lemme}
@@ -257,7 +257,7 @@ $$(\alpha_0, \dots, \alpha_{16}) = (2, 12, 4, 1, 0, 10, 7, 8, 15, 16, 3, 5, 13, 
 sage: alpha = [K(i) for i in range (p)]
 sage: shuffle (alpha)
 \end{verbatim}
-\subsubsection{Génération des clés}
+\subsubsection*{Génération des clés}
 Nous prenons un élément $t\in\gf(17^6)$ de degré algébrique $6$ sur $\gf(17)$. Comme plus haut, nous notons $a = x \pmod{P(x)}$, le $t$ sélectionné est alors :
 $$t := 9a^5 + 16a^4 + 10a^3 + 3a^2 + 12a + 12,$$
 de polynôme minimal :
@@ -311,7 +311,7 @@ sage: c = [mod (d + log (t + alpha[s[i]], g), q - 1)
                                               for i in range (p)]
 \end{verbatim}
 
-\subsubsection{Chiffrement d'un message}
+\subsubsection*{Chiffrement d'un message}
 Maintenant, donnons nous un message à chiffrer de longueur $17$ et de poids de Hamming $6$ :
 $$m := [m_0\cdots m_{16}] = [00100101100100100].$$
 \begin{verbatim}
@@ -324,7 +324,7 @@ $$e := 23\;410\;132.$$
 sage: e = mod (sum ([m[i]*c[i] for i in range (p)]), q-1)
 \end{verbatim}
 
-\subsubsection{Déchiffrement du message}
+\subsubsection*{Déchiffrement du message}
 Nous souhaitons écrire $g^{e - hd}$ comme un polynôme en $t$. Or \verb|Sage| nous donne $g^{e - hd}$ comme polynôme en $a$ : $$g^{e - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
 Pour parvenir à exprimer $g$ comme nous le souhaitons, il faut effectuer un changement de base du $\gf(17)$-espace vectoriel $\gf(17^6)$ : passer de la base $\mathcal{A} := (1, a, a^2, \dots, a^{h-1})$ à la base $\mathcal{T} := (1, t, t^2, \dots, t^{h-1})$.
 La matrice de passage facile à calculer est celle qui passe de la base $\mathcal{T}$ à la base $\mathcal{A}$ : il suffit d'écrire dans \verb|Sage| les différentes puissances de $t$, et \verb|Sage| les exprime en fonction des puissances de $a$. Voici cette matrice :
@@ -418,7 +418,7 @@ La transformation inverse est donnée par l'algorithme suivant :
 
 \section{Les attaques avec divulgation partielle de la clé privée}
 
-Nous examinons les attaques possibles proposées dans le papier de B. Chor et R. Rivest \cite[Section VII, A]{chorRivest1988} et dans celui de S. Vaudenay \cite[Section 4]{vaudenay2000}. Notons aussi que K. Huber \cite{huber1991} propose une attaque plus alambiquée lorsque l'élément primitif $g$ est connu.
+Nous examinons les attaques possibles proposées dans le papier de B. Chor et R. Rivest \cite[Section VII, A]{chorRivest1988} et dans celui de S. Vaudenay \cite[Section 4]{vaudenay2000}. Notons aussi que Huber \cite{huber1991} propose une attaque plus alambiquée lorsque l'élément primitif $g$ est connu.
 
 Commençons par une observation de Serge Vaudenay \cite[Section 3]{vaudenay2000}.
 
@@ -431,12 +431,107 @@ $$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g^p}\left(\
 Nous pouvons aussi remplacer $(t, \alpha_{\sigma})$ par $(t + u, \alpha_{\sigma} - u)$, pour tout $u \in \gf(p)$. Et enfin, nous pouvons remplacer $(t,d,\alpha_\sigma)$ par $(ut, d - \log_g(u), u\alpha_\sigma)$, quel que soit $u \in \gf(p)^\times$.
 Cela donne donc au moins $hp(p-1)$ clés privées équivalentes. Il s'agit alors de déterminer une de ces clés.
 
-\begin{rema}Ce qu'il faut garder à l'esprit est qu'il est possible de choisir -- d'imposer -- les valeurs de deux images de la permutation. \`A savoir, si $\sigma$ est la permutation originale du système, nous déterminons une clé privée équivalente dont la permutation est $\pi$ : pour $i \neq j$, nous construisons $\pi$ telle que
-$$\pi(0) = i,\quad \pi(1) = j,$$
-$$\forall k : 0\leqslant k \leqslant p-1, \quad 
-\alpha_{\pi(k)} = u\cdot\alpha_{\sigma(k)} - v,$$
-$$ \text{ où }\quad u = \frac{\alpha_i - \alpha_j}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p)^\times \quad \text{ et } \quad v =  \frac{\alpha_i\alpha_{\sigma(1)} - \alpha_j\alpha_{\sigma(0)}}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p).$$
+\subsubsection*{Plus détaillé, peut-être abscons ...}
+
+Notons $$\mathcal{U} := \gf(p^h) \times \gf(p^h) \times \frac{\Z}{(p^h-2)\Z} \times \mathfrak{S}(\{0,1,\dots, p-1\}),$$
+où $\mathfrak{S}(\{0,1,\dots, p-1\})$ est l'ensemble des bijections de l'ensemble $\{0,1,\dots, p-1\}$.
+
+Un élément $(g, t, d, \sigma)$ de $\mathcal{U}$ est une clé privée possible du cryptosystème si $g$ est primitif et $t$ est algébrique de degré $h$ (il n'y a pas de restriction sur l'entier $d$ et la permutation $\sigma$). Notons $\mathcal{P}$ l'ensemble des clés privées possibles du cryptosystème.
+
+\begin{rema}
+Le cardinal de $\mathcal{U}$ est :
+$$p^h \times p^h \times (p^h - 2) \times p! = p^{3h}p! - 2p^{2h}p!.$$
+Le cardinal de $\mathcal{P}$ est :
+$$\phi(p^h - 1) \times \Xi(p,h) \times (p^h - 2) \times p!,$$
+où $\Xi(p, h)$ est le nombre d'élément algébrique de degré $h$ dans le corps $\gf(p^h)$ vu comme extension du corps $\gf(p)$. Si $h$ se factorise en $h = \prod_{1\leqslant i \leqslant l} r_i^{\alpha_{i}}$, alors
+$$\Xi(p,h) = \sum_{\substack{d \in \N^l \\ d \leqslant \alpha}} (-1)^{|\alpha - d|} \left( p^{\prod_j r_j^{d_j}}\right)\quad(???)$$
 \end{rema}
+
+\begin{defi}[Clés équivalentes]\label{defiCleEquivalente}
+Deux clés privées de $\mathcal{P}$ sont dites \textit{équivalentes} si elles fabriquent la même clé publique. En d'autres termes, deux clés privées $(g,t,d,\sigma)$ et $(g',t',d',\pi)$ sont équivalentes, si on a l'égalité d'ensembles :
+$$\left\{d + \log_g(t + \alpha_{\sigma(i)}) : 0\leqslant i \leqslant p-1\right\} = \left\{d' + \log_{g'}(t' + \alpha_{\pi(i)}) : 0\leqslant i \leqslant p-1\right\}.$$
+\end{defi}
+
+Commençons par nous pencher sur une action de groupe sur l'ensemble des permutations $\mathfrak{S}(\{0,1,\dots, p-1\})$ :
+\begin{prop}
+Le groupe $G := \gf(p)^\times\ltimes\gf(p)$, muni de la loi $$(u,v) \cdot (u', v') = (uu', v+uv'),$$ l'élément neutre étant $(1,0)$ et l'inverse de $(u,v)$ étant $(u^{-1}, -vu^{-1})$, agit sur l'ensemble $\mathfrak{S} := \mathfrak{S}(\{0,1,\dots, p-1\})$ par :
+$$\begin{array}{r c l}
+\left(\gf(p)^\times\times\gf(p)\right) \times \mathfrak{S}& \longrightarrow& \mathfrak{S} \\
+((u, v), \sigma) & \longmapsto& (u, v)\diamond\sigma,
+\end{array}$$ 
+où la permutation $(u, v)\diamond\sigma$ est définie comme suit :
+$$\alpha_{((u, v)\diamond\sigma)(i)} = u\alpha_{\sigma(i)} +v.$$ 
+\end{prop}
+
+\begin{proof}
+Si $(u, v) \in G$ et si $\sigma \in \mathfrak{S}$, alors $(u, v)\diamond\sigma$ est bien une permutation : en effet pour tous $i \neq j$, on a $\alpha_{((u, v)\diamond\sigma)(i)} \neq \alpha_{((u, v)\diamond\sigma)(j)}$.
+Montrons que nous avons bien une action de groupe : soit $\sigma \in \mathfrak{S}$, on a facilement que $(1, 0)\diamond\sigma = \sigma$, maintenant si $(u, v)$ et $(u', v')$ sont dans $G$ :
+\begin{align*}
+\alpha_{(u, v)\diamond((u', v')\diamond\sigma)(i)} &= u\alpha_{(u', v')\diamond\sigma(i)} +v\\
+&= u\left(u'\alpha_{\sigma(i)} +v'\right) +v\\
+&= uu'\alpha_{\sigma(i)} +uv'+v\\
+&= \alpha_{((u, v)\cdot(u', v'))\diamond\sigma(i)}.
+\end{align*}
+Donc $(u, v)\diamond((u', v')\diamond\sigma) = ((u, v)\cdot(u, v))\diamond\sigma$.
+\end{proof}
+
+\begin{prop}
+Soit $\sigma \in \mathfrak{S}$. Pour tous $i \neq j$, il existe un unique $(u,v) \in G$ tel que, si on note $\pi := (u,v) \diamond \sigma$, $$\pi(0) = i \qquad \text{et}\qquad \pi(1) = j.$$
+\end{prop}
+
+\begin{proof}
+Il faut prendre :
+$$\quad u = \frac{\alpha_i - \alpha_j}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p)^\times \quad \text{ et } \quad v =  \frac{\alpha_i\alpha_{\sigma(1)} - \alpha_j\alpha_{\sigma(0)}}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p).$$
+\end{proof}
+
+\begin{prop}
+L'action du groupe $G$ partitionne l'ensemble $\mathfrak{S}$ en $(p-2)!$ orbites de cardinal $p^2-p$.
+\end{prop}
+
+Plus haut, nous avons noté trois façons de fabriquer des clés équivalentes à une clé privée donnée. Pour étayer cela, nous allons expliciter les groupes et action de groupes en jeu : \\
+$\triangleright \quad$ le groupe $\mathfrak{A} = \left\{ \id_{\gf(p^h)}, \frob, \frob^2, \dots, \frob^{h-1} \right\} = \gen{\frob}$, où $\frob$ est l'automorphisme de Frobenius de $\gf(p^h)/\gf(p)$, dont la loi est la composition des applications, agit sur l'ensemble $\mathcal{P}$ par :
+$$\begin{array}{r c l}
+\mathfrak{A} \times \mathcal{P}& \longrightarrow& \mathcal{P} \\
+(f, \mathbf{k}) = \left(f, \left(g,t,d,\sigma \right)\right)& \longmapsto& f\odot\mathbf{k} = \left(f(g), f(t), d, \sigma \right).
+\end{array}$$ 
+Pour une clé privée $\mathbf{k} \in \mathcal{P}$, l'orbite de $\mathbf{k}$ possède $h$ éléments.\\
+$\triangleright \quad$ le groupe $\gf(p)^\times$ muni de la multiplication agit sur l'ensemble $\mathcal{P}$ par :
+$$\begin{array}{r c l}
+\gf(p)^\times \times \mathcal{P}& \longrightarrow& \mathcal{P} \\
+(u, \mathbf{k}) = \left(u, \left(g,t,d,\sigma \right)\right)& \longmapsto& u\otimes\mathbf{k} = \left(g,ut,d - \log_g(u),(u,0)\diamond\sigma \right).
+\end{array}$$
+L'action ici est peut-être moins évidente : soient $u$ et $u'$ dans $\gf(p)^\times$ et soit $\mathbf{k} \in \mathcal{P}$, vérifions que $(u'u)\otimes\mathbf{k} = u'\otimes(u\otimes\mathbf{k})$.
+\begin{align*}
+u'\otimes(u\otimes\mathbf{k}) &= u'\otimes(g,ut,d - \log_g(u),(u,0)\diamond\sigma) \\
+&= (g,u'ut,d - \log_g(u) - \log_g(u'),(u',0)\diamond((u,0)\diamond\sigma)) \\
+&= (g,u'ut,d - (\log_g(u) + \log_g(u')),((u',0)\cdot(u,0))\diamond\sigma) \\
+&= (g,(u'u)t,d - \log_g(u'u),(u'u,0)\diamond\sigma) \\
+&= (u'u)\otimes\mathbf{k}.
+\end{align*} 
+Et pour tout $\mathbf{k} \in \mathcal{P}$, l'orbite de $\mathbf{k}$ contient $p-1$ éléments.\\
+$\triangleright \quad$ le groupe $\gf(p)$ muni de l'addition agit sur l'ensemble $\mathcal{P}$ par :
+$$\begin{array}{r c l}
+\gf(p) \times \mathcal{P}& \longrightarrow& \mathcal{P} \\
+(v, \mathbf{k}) = \left(v, \left(g,t,d,\sigma \right)\right)& \longmapsto& v\oplus\mathbf{k} = \left(g,t+v,d,(1,v)\diamond\sigma \right).
+\end{array}$$
+Ici encore, vérifions qu'on ait bien une action : soient $v$ et $v'$ dans $\gf(p)$ et soit $\mathbf{k} \in \mathcal{P}$, vérifions que $(v'+v)\oplus\mathbf{k} = v'\oplus(v\oplus\mathbf{k})$.
+\begin{align*}
+v'\oplus(v\oplus\mathbf{k}) &= v'\oplus(g,t + v,d,(1,v)\diamond\sigma) \\
+&= (g,t+v+v',d,(1,v')\diamond((1,v)\diamond\sigma)) \\
+&= (g,t+v+v',d,((1,v')\cdot(1,v))\diamond\sigma) \\
+&= (g,t+v+v', d,(1,v + v')\diamond\sigma) \\
+&= (v'+v)\oplus\mathbf{k}.\\
+\end{align*} 
+Pour tout $\mathbf{k} \in \mathcal{P}$, l'orbite de $\mathbf{k}$ contient $p$ éléments.\\
+
+\begin{theo}
+Le groupe $\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)$ agit sur $\mathcal{P}$ par :
+$$\begin{array}{r c l}
+(\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)) \times \mathcal{P}& \longrightarrow& \mathcal{P} \\
+\left((f,u,v), \left(g,t,d,\sigma \right)\right)& \longmapsto&  \left(f(g), uf(t)+v,d-\log_g(u),(u,v)\diamond\sigma \right).
+\end{array}$$
+Le cardinal de l'orbite d'une clé est $hp(p-1)$.
+\end{theo}
 
 \subsection{Attaque due à B. Chor et R. Rivest ($g$ et $d$ connus)}
 Sachant $d$, nous pouvons calculer 
@@ -466,18 +561,24 @@ Si un des $b_i$, disons $b_0$, est premier avec $p^h-1$, alors $L$ est l'un des 
 
 \subsection{Attaque due à O. Goldreich ($t$ connu)} \label{attaqueOG}
 
-\subsubsection{Telle que proposée par B. Chor et R. Rivest}
-
 Choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}(t+\alpha_i).$$
-En tant qu'ensembles, nous avons
-$$\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\} = L\{b_0 - b_0, b_1 - b_0, \dots, b_{p-1} - b_0\},$$
-où l'égalité est modulo $p^h -1$. Ensuite, nous procédons comme dans l'attaque précédente, sous-section~\ref{attaqueTDconnus}.
+Notons $L := \log_{g'}(g)$, de sorte que $g=g'^L$ et $\sigma(0) = r$.
+\begin{align*}
+\left\{b_0 - b_r, b_1 - b_r, \dots, b_{p-1} - b_r\right\} &= \left\{\log_{g'}\left(\frac{t+\alpha_0}{t+\alpha_r}\right), \dots, \log_{g'}\left(\frac{t+\alpha_{p-1}}{t+\alpha_r}\right)\right\} \\
+&= \frac{1}{L}\left\{\log_{g}\left(\frac{t+\alpha_0}{t+\alpha_r}\right), \dots, \log_{g}\left(\frac{t+\alpha_{p-1}}{t+\alpha_r}\right)\right\} \\
+&= \frac{1}{L}\left\{\log_{g}\left(\frac{t+\alpha_{\sigma(0)}}{t+\alpha_{\sigma(0)}}\right), \dots, \log_{g}\left(\frac{t+\alpha_{\sigma(p-1)}}{t+\alpha_{\sigma(0)}}\right)\right\} \\
+&= \frac{1}{L}\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\}.
+\end{align*}
 
-\subsubsection{Telle que proposée par S. Vaudenay}
-Supposons que $\sigma(0) = i$ et $\sigma(1) = j$, par la symétrie dans la clé privée, nous savons qu'un choix arbitraire de $(i,j)$ convient. Choisissons $g'$ un élément primitif de $\gf(p^h)$. Calculons $\log_{g'}(t+\alpha_i)$ et $\log_{g'}(t+\alpha_j)$, et alors les équations :
-$$c_0 = d + \frac{\log_{g'}(t+\alpha_i)}{\log_{g'}(g)},$$
-$$c_1 = d + \frac{\log_{g'}(t+\alpha_j)}{\log_{g'}(g)},$$
-permettent de déterminer $d$ et $\log_{g'}(g)$. 
+En tant qu'ensembles, nous avons donc
+$$\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\} = L\{b_0 - b_r, b_1 - b_r, \dots, b_{p-1} - b_r\},$$
+où l'égalité est modulo $p^h -1$. Ensuite, nous procédons comme dans l'attaque précédente, sous-section~\ref{attaqueTDconnus}.
+ 
+\subsubsection*{Déterminer $r$} Supposons $\alpha_r \neq 0$. Alors la clé $(g,\alpha_rt,d-\log_g(\alpha_r),(\alpha_r,0) \diamond\sigma)$ est dans la classe d'équivalence de la clé $(g,t,d,\sigma)$, voir la définition~\ref{defiCleEquivalente}.\\
+Soit $i$ tel que $0\leqslant i \leqslant p-1$ :
+\begin{align*}
+c_i - c_0 &= \log_g(t+\alpha_{\sigma(i)}) - \log_g(t+\alpha_{\sigma(0)})\\
+\end{align*}
 
 \subsection{Attaque due à A. Odlyzko ($\sigma$ connue)}
 
@@ -1498,7 +1599,7 @@ Si $G$ est un sous-groupe de $\aut(K)$, nous notons $K^G$ l'ensemble des $x \in 
 Soient $K \subseteq L$ et $K \subseteq M$ deux extensions d'un même corps $K$. Nous appelons \textit{$K$-homomorphisme} de $L$ dans $M$ tout homomorphisme $\sigma$ du corps $L$ dans le corps $M$ tel que $\sigma(x) = x$ pour tout $x \in K$. L'ensemble des $K$-homomorphismes de $L$ dans $M$ est noté $\hom_K(L,M)$.
 \end{defi}
 
-Soient $K \subseteq L$ et $K \subseteq M$ comme dans la définition. \begin{enumerate}
+Apportons quelques précisions. Soient $K \subseteq L$ et $K \subseteq M$ comme dans la définition. \begin{enumerate}
 \item Dire que $\sigma \in \hom_K(L,M)$ signifie que $\sigma$ est un homomorphisme de la $K$-algèbre $L$ dans la $K$-algèbre $M$.
 \item Un élément de $\hom_K(L,M)$ est injectif. S'il est surjectif (donc bijectif), il est dit un \textit{$K$-isomorphisme} de $L$ sur $M$. L'ensemble des $K$-isomorphismes de $L$ dans $M$ est noté $\isom_K(L,M)$.
 \item Un élément de $\hom_K(L,L)$ est appelé un \textit{$K$-endomorphisme} de $L$, et un élément de $\isom_K(L,L)$ est appelé un \textit{$K$-automorphisme} de $L$. Il est clair que $\isom_K(L,L)$ est un sous-groupe de $\aut(L)$, où la loi est la composition des applications.
