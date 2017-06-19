@@ -427,7 +427,7 @@ Commençons par une observation de Serge Vaudenay \cite[Section 3]{vaudenay2000}
 Dans le cryptosystème de Chor-Rivest, nous choisissons la clé privée de façon aléatoire puis, à partir de celle-ci, nous calculons la clé publique. Le système repose sur la difficulté de trouver une clé secrète à partir de la clé publique. Cependant, nous remarquons qu'il y a plusieurs clés privées \textit{équivalentes}, à savoir qu'il existe plusieurs jeux de clés privées qui donnent la même clé publique.
 
 Détaillons. Nous pouvons remplacer $t$ et $g$ par leur puissance $p$-ième, la clé publique reste inchangée car :
-$$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g^p}\left(\left(t + \alpha_{\sigma(i)}\right)^p\right) = \log_{g}\left(t + \alpha_{\sigma(i)}\right).$$
+$$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g}\left(\left(t + \alpha_{\sigma(i)}\right)^p\right) = \log_{g}\left(t + \alpha_{\sigma(i)}\right).$$
 Nous pouvons aussi remplacer $(t, \alpha_{\sigma})$ par $(t + u, \alpha_{\sigma} - u)$, pour tout $u \in \gf(p)$. Et enfin, nous pouvons remplacer $(t,d,\alpha_\sigma)$ par $(ut, d - \log_g(u), u\alpha_\sigma)$, quel que soit $u \in \gf(p)^\times$.
 Cela donne donc au moins $hp(p-1)$ clés privées équivalentes. Il s'agit alors de déterminer une de ces clés.
 
@@ -528,10 +528,54 @@ Pour tout $\mathbf{k} \in \mathcal{P}$, l'orbite de $\mathbf{k}$ contient $p$ é
 Le groupe $\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)$ agit sur $\mathcal{P}$ par :
 $$\begin{array}{r c l}
 (\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)) \times \mathcal{P}& \longrightarrow& \mathcal{P} \\
-\left((f,u,v), \left(g,t,d,\sigma \right)\right)& \longmapsto&  \left(f(g), uf(t)+v,d-\log_g(u),(u,v)\diamond\sigma \right).
+\left((f,u,v), \left(g,t,d,\sigma \right)\right)& \longmapsto&  \left(f(g), uf(t)-v,d-\log_{f(g)}(u),(u,v)\diamond\sigma \right).
 \end{array}$$
-Le cardinal de l'orbite d'une clé est $hp(p-1)$.
+Le cardinal de l'orbite d'un élément est $hp(p-1)$. Chaque clé secrète est donc équivalente à au moins $hp(p-1) -1$ autres clés secrètes.
 \end{theo}
+
+\begin{proof}
+La loi de groupe est : pour tous $(f,u,v)$ et $(f',u',v')$ dans $\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)$,
+$$(f,u,v)(f',u,v) = (ff',uu', v+uv').$$
+L'élément neutre de ce groupe est $(\id_{\gf(p^h)}, 1, 0)$ et l'inverse de $(f,u,v)$ est l'élément $(f^{-1}, u^{-1}, -vu^{-1})$.
+
+Montrons que nous avons bien une action. Soit $(g,t,d,\sigma) \in \mathcal{P}$ et calculons : 
+\begin{align*}
+(\id_{\gf(p^h)}, 1, 0) \cdot (g,t,d,\sigma) &= \left(\id_{\gf(p^h)}(g), \id_{\gf(p^h)}(t),d,(1,0)\diamond\sigma \right)\\
+&= \left(g, t,d, \sigma \right).\\
+\end{align*}
+Soient $((f,u,v),(f',u',v')) \in ({\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)})^2$  et $(g,t,d,\sigma) \in \mathcal{P}$.
+$$((f,u,v)(f',u,v)) \cdot (g,t,d,\sigma) = (ff', uu', v+uv') \cdot (g,t,d,\sigma)$$
+$$= \left(ff'(g), uu'(ff'(t)) - v-uv',d - \log_{ff'(g)}(uu'),(uu', v+uv')\diamond\sigma \right),$$
+D'autre part, $(f,u,v)\cdot\left((f',u,v) \cdot (g,t,d,\sigma)\right)$ vaut
+$$(f,u,v)\cdot (f'(g),u'f'(t)-v',d - \log_{f'(g)}(u'),(u',v')\diamond\sigma),$$
+et en remarquant que $\log_{f'(g)}(u') = \log_{ff'(g)}(u')$, car $u' \in \gf(p)$, on a :
+$$= \left(ff'(g), uf(u'f'(t) - v') -v,d - \log_{ff'(g)}(uu'),(u, v)\diamond((u',v')\diamond\sigma) \right)$$
+$$= \left(ff'(g), uu'(ff'(t)) - uv' -v,d - \log_{ff'(g)}(uu'),(uu',v + uv')\diamond\sigma \right).$$
+
+Montrons que cette action est libre : soient $(f,u,v)  \in \mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)$ et $(g,t,d,\sigma) \in \mathcal{P}$ tels que
+$$(f,u, v) \cdot (g,t,d,\sigma) =\left(f(g), uf(t)-v,d-\log_{f(g)}(u),(u,v)\diamond\sigma \right) =(g,t,d,\sigma).$$
+L'égalité $f(g) = g$ et le fait que $g$ soit primitif impliquent que $f = \id_{\gf(p^h)}$. De même, $d-\log_{g}(u) = d$ donne $\log_{g}(u) = 0$, d'où $u=1$. Du reste, nous en déduisons que $v=0$. Ainsi, si $(f,u,v)$ fixe $(g,t,d,\sigma)$, alors $(f,u,v) = (\id_{\gf(p^h)},1,0)$ : donc l'action est libre et chaque orbite contient $hp(p-1)$ éléments.
+\end{proof}
+
+\begin{prop}
+Soit $(g,t,d,\sigma) \in \mathcal{P}$ une clé privée. Soit $(g',t',d',\pi)$ une clé équivalente à $(g,t,d,\sigma)$, i.e. il existe $(f,u,v) \in {\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)}$ tel que : 
+$$(g',t',d',\pi) = (f,u,v)\cdot(g,t,d,\sigma).$$
+Si \#\# \textbf{condition} \#\#, alors $t\neq t'$.
+\end{prop}
+
+\begin{proof}
+Soit $(f,u,v) \in {\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)}$ tel que $$t = uf(t) +v.$$
+À savoir, pour un certain $0 \leqslant j \leqslant h-1$,
+$$t = ut^{p^j} +v.$$
+Ou en reformulant, il existe $(a,b) \in \gf(p)^{\times} \times \gf(p)$ tel que : $$t^{p^j} +at +b = 0,$$
+où en fait $a := -u^{-1}$ et $b := vu^{-1}$.
+Définissons le polynôme $$\nu(x) := x^{p^j} +ax +b \in \gf(p)[x].$$
+Le polynôme minimal $\mu(x) \in \gf(p)[x]$ de $t$ est de degré $h$ et divise $\nu(x)$.
+\end{proof}
+
+\begin{coro}
+Sous ses conditions, la proposition précédente implique que dans l'orbite d'une clé privée (sous l'action que nous considérons), il n'existe pas deux éléments ayant la même seconde coordonnée (le $t$ algébrique de degré $h$ sur $\gf(p^h)$). Ainsi, si nous fixons $t$ dans la clé privée, il n'existe pas d'autre clé équivalente (atteignable par l'action de groupe) ayant le même $t$. En d'autres termes, fixer $t$ revient à fixer la clé secrète (parmi ses clés équivalentes).
+\end{coro}
 
 \subsection{Attaque due à B. Chor et R. Rivest ($g$ et $d$ connus)}
 Sachant $d$, nous pouvons calculer 
@@ -1626,9 +1670,21 @@ Par la proposition~\ref{caracIntegre}, $p$ est un nombre premier et la propositi
 
 \section{La théorie d'Artin-Schreier}
 
+\section{L'étude adhoc du polynôme $\nu(x)$}
+
+Soit $h \geqslant 1$ et soit $t$ un élément algébrique de degré $h$ dans $\gf(p^h)/\gf(p)$. Notons $\mu(x) \in \gf(p)[x]$ le polynôme minimal de $t$.
+Étudions le polynôme $\nu(x)$ défini par :
+$$\nu(x) := x^{p^j} +ax +b \in \gf(p)[x],$$
+où $a\in \gf(p)^\times$, $b\in \gf(p)$ et $0\leqslant j \leqslant h-1$.
+
+Supposons que $t$ est racine de $\nu(x)$, i.e. $\mu(x)$ divise $\nu(x)$, et que $h \leqslant p$. Cela implique immédiatement que $j \geqslant 1$.
+
+\subsection*{Si $b = 0$ :}
+Alors $\nu(t) = t\left( t^{p^{j}-1} + a\right) =0$, à savoir $t^{p^{j}-1} + a = 0$, et $t$ est un racine ${p^{j}-1}$ de $-a$.
+
 \section{Le paradoxe des anniversaires}
 
-Le ``paradoxe des anniversaires'', comme expliqué dans \cite[sous-section 14.1]{galbraith2012} vient de l'application suivante : dans un ensemble aléatoire de 23 personnes ou plus, la probabilité que deux individus partagent le même anniversaire est supérieure à $0,5$.
+Le ``paradoxe des anniversaires'', comme expliqué dans \cite[sous-section 14.1]{galbraith2012}, vient de l'application suivante : dans un ensemble aléatoire de 23 personnes ou plus, la probabilité que deux individus partagent le même anniversaire est supérieure à $0,5$.
 
 \begin{theo}\label{paradoxeAnniversaire}
 Soit $\mathcal S$ un ensemble à $n$ éléments. Si les éléments sont tirés de façon uniformément aléatoire de $\mathcal S$, alors le nombre attendu d'éléments à tirer avant d'avoir un tirage identique à un précédent est moins de $\sqrt{\pi n /2} + 2$.
