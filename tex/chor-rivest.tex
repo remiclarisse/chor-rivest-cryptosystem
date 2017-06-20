@@ -603,26 +603,60 @@ où l'égalité est modulo $p^h -1$. Les nombres $L$ et $p^h-1$ sont premiers en
 
 Si un des $b_i$, disons $b_0$, est premier avec $p^h-1$, alors $L$ est l'un des $$(d-c_j)b_0^{-1} \pmod{p^h-1},$$ pour un $0 \leqslant j \leqslant p-1$. Sinon, l'attaquant peut calculer $L$ modulo chaque facteur puissance de nombre premier et les combiner en utilisant le théorème des restes chinois.
 
-\subsection{Attaque due à O. Goldreich ($t$ connu)} \label{attaqueOG}
+\subsection{Attaque due à O. Goldreich ($t$ connu) \textit {\small [version modifiée]}} \label{attaqueOG}
 
 Choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}(t+\alpha_i).$$
-Notons $L := \log_{g'}(g)$, de sorte que $g=g'^L$ et $\sigma(0) = r$.
+Notons $L := \log_{g'}(g)$, de sorte que $g=g'^L$. Remarquons que, si $x \in \gf(p^h)$ :
+$$L\log_{g}(x) = \log_{g'}(x).$$
+Considérons les ensembles suivants :
 \begin{align*}
-\left\{b_0 - b_r, b_1 - b_r, \dots, b_{p-1} - b_r\right\} &= \left\{\log_{g'}\left(\frac{t+\alpha_0}{t+\alpha_r}\right), \dots, \log_{g'}\left(\frac{t+\alpha_{p-1}}{t+\alpha_r}\right)\right\} \\
-&= \frac{1}{L}\left\{\log_{g}\left(\frac{t+\alpha_0}{t+\alpha_r}\right), \dots, \log_{g}\left(\frac{t+\alpha_{p-1}}{t+\alpha_r}\right)\right\} \\
-&= \frac{1}{L}\left\{\log_{g}\left(\frac{t+\alpha_{\sigma(0)}}{t+\alpha_{\sigma(0)}}\right), \dots, \log_{g}\left(\frac{t+\alpha_{\sigma(p-1)}}{t+\alpha_{\sigma(0)}}\right)\right\} \\
-&= \frac{1}{L}\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\}.
+\left\{b_0 - b_0, b_0 - b_1, \dots, b_0 - b_{p-1}\right\} &= \left\{\log_{g'}\left(\frac{t+\alpha_0}{t+\alpha_0}\right), \dots, \log_{g'}\left(\frac{t+\alpha_0}{t+\alpha_{p-1}}\right)\right\}.
 \end{align*}
+\begin{align*}
+L\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\} &= L\left\{\log_{g}\left(\frac{t+\alpha_{\sigma(0)}}{t+\alpha_{\sigma(0)}}\right), \dots, \log_{g}\left(\frac{t+\alpha_{\sigma(p-1)}}{t+\alpha_{\sigma(0)}}\right)\right\} \\
+&= \left\{\log_{g'}\left(\frac{t+\alpha_{\sigma(0)}}{t+\alpha_{\sigma(0)}}\right), \dots, \log_{g'}\left(\frac{t+\alpha_{\sigma(p-1)}}{t+\alpha_{\sigma(0)}}\right)\right\}. \\
+\end{align*}
+Notons $i$ l’antécédent et $j$ l'image de $0$ par la permutation $\sigma$, i.e. $\sigma(i) = 0$ et $\sigma(0) = j$. Alors :
+$$b_0 - b_j = L(c_i-c_0).$$
+Il faut ensuite se servir de l'égalité d'ensembles :
+$$\left\{b_0 - b_j, b_1 - b_j, \dots, b_{p-1} - b_j\right\} = L\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\},$$
+pour vérifier que nous avons trouvé le bon $L$.
 
-En tant qu'ensembles, nous avons donc
-$$\{c_0 - c_0, c_1 - c_0, \dots, c_{p-1} -c_0\} = L\{b_0 - b_r, b_1 - b_r, \dots, b_{p-1} - b_r\},$$
-où l'égalité est modulo $p^h -1$. Ensuite, nous procédons comme dans l'attaque précédente, sous-section~\ref{attaqueTDconnus}.
- 
-\subsubsection*{Déterminer $r$} Supposons $\alpha_r \neq 0$. Alors la clé $(g,\alpha_rt,d-\log_g(\alpha_r),(\alpha_r,0) \diamond\sigma)$ est dans la classe d'équivalence de la clé $(g,t,d,\sigma)$, voir la définition~\ref{defiCleEquivalente}.\\
-Soit $i$ tel que $0\leqslant i \leqslant p-1$ :
-\begin{align*}
-c_i - c_0 &= \log_g(t+\alpha_{\sigma(i)}) - \log_g(t+\alpha_{\sigma(0)})\\
-\end{align*}
+\begin{algorithm}[h]
+\caption{Algorithme implémentant l'attaque de Goldreich}
+\label{algoAttaqueGoldreich}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$ et $t$
+\ENSURE $g$ et $d$ ou ``échec''
+\STATE{choisir $g'$ un élément primitif arbitraire de $\gf(p^h)$}
+\STATE{calculer les $b_i := \log_{g'}(t+\alpha_i)$}
+\STATE{initialiser deux listes $B$ et $C$ de longueur $p$}
+\FOR{$i$ allant de $0$ à $p-1$}
+	\STATE{$B[i] \gets b_0 - b_i$}
+	\STATE{$C[i] \gets c_i - c_0$}
+\ENDFOR
+\FOR{$i$ allant de $0$ à $p-1$}
+	\IF{$\pgcd(C[i], p^h-1) = 1$}
+		\FOR{$j$ allant de $0$ à $p-1$}
+			\STATE{$L \gets C[i]^{-1}B[j] \pmod{p^h-1}$}
+			\FOR{$k$ allant de $0$ à $p-1$}
+				\IF{$b_k - b_j \not\in L\cdot C$}
+					\IF{$j < p-1$}
+									
+						\STATE{arrêter cette boucle essayer un autre $j$}	
+					\ELSE
+						\RETURN{``échec''}
+					\ENDIF
+				\ENDIF
+			\ENDFOR			
+			\STATE{$g \gets g'^L$}
+			\STATE{$d \gets c_0 - \log_g(t+\alpha_j) \pmod{p^h-2}$}
+			\RETURN{$g$ et $d$}
+		\ENDFOR
+	\ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Attaque due à A. Odlyzko ($\sigma$ connue)}
 

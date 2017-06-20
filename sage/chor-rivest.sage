@@ -2,7 +2,7 @@
 
 # Les paramètres p et h sont à choisir de sorte que p soit un nombre premier
 # et h friable pour pouvoir faire aisement du logarithme discret dans GF(p^h)
-# (essayer p = 197 et h = 6)
+# (essayer p = 197 et h = 24)
 
 # Pour générer les clés :
 # Keys = CRGenerateKeys (p, h)
