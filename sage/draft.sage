@@ -15,6 +15,7 @@ def blip (c, p, h, alpha, t) :
     C = [ mod (c[i]-c[0], r) for i in range(p) ]
     A = [ mod (a[0]-a[i], r) for i in range(p) ]
     for i in range (p) :
+        print "i:" + str(i)
         if gcd (C[i], r) == 1 :
             for j in range (p) :
                 L = mod (C[i], r) ** (-1) * mod (A[j], r)
@@ -34,8 +35,11 @@ def blip (c, p, h, alpha, t) :
                 if gcd (C[i], r) != 0 :
                     if A[j] % gcd (C[i], r) == 0 :
                         d = gcd (C[i], r)
+                        print "i:" + str(i) + "\tj:" + str(j) + "\td:" + str(d)
                         for w in range (d) :
-                            L = mod (C[i] / d, r / d) ** (-1) * mod (A[j] / d, r / d) + w * (r / d)
+                            if w % 100 == 0 and w != 0 :
+                                print "i:" + str(i) + "\tj:" + str(j) + "\td:" + str(d) + "\tw:" + str(w)
+                            L = mod (int(C[i]) / int(d), int(r) / int(d)) ** (-1) * mod (int(A[j]) / int(d), int(r) / int(d)) + w * (int(r) / int(d))
                             # if ok : sigma(0) = j and sigma(i) = 0
                             still_looking = True
                             k = 0
