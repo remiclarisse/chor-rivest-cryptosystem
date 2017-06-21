@@ -630,31 +630,32 @@ pour vérifier que nous avons trouvé le bon $L$.
 \ENSURE $g$ et $d$ ou ``échec''
 \STATE{choisir $g'$ un élément primitif arbitraire de $\gf(p^h)$}
 \STATE{calculer les $b_i := \log_{g'}(t+\alpha_i)$}
-\STATE{initialiser deux listes $B$ et $C$ de longueur $p$}
+\STATE{$B \gets [ b_0 - b_i$ pour $i$ allant de $0$ à $p-1 ] $}
+\STATE{$C \gets [ c_i - c_0$ pour $i$ allant de $0$ à $p-1 ] $}
 \FOR{$i$ allant de $0$ à $p-1$}
-	\STATE{$B[i] \gets b_0 - b_i$}
-	\STATE{$C[i] \gets c_i - c_0$}
+	\FOR{$j$ allant de $0$ à $p-1$}
+		\IF{$C[i] \neq 0$ et $B[j] \neq 0$}
+			\STATE{$d \gets \pgcd(C[i], p^h-1)$}
+			\IF{$d$ divise $B[j]$}
+				\STATE{$b \gets B[j] / d$}
+				\STATE{$c \gets C[i] / d$}
+				\STATE{$r \gets (p^h-1) / d$}
+				\STATE{$L \gets c^{-1}b \pmod{r}$}
+				\FOR{$k$ allant de $0$ à $d-1$}
+					\STATE{$\mathcal{D} \gets \{L\cdot C[n] \pmod{r}$ pour $n$ allant de $0$ à $p-1 \}$}
+					\STATE{$\mathcal{E} \gets \{B[n] - B[j] \pmod{r}$ pour $n$ allant de $0$ à $p-1 \}$}	
+					\IF[le $L$ est bon et $\sigma(i) = 0$ et $\sigma(0) = j$]{$\mathcal{D} = \mathcal{E}$}
+						\STATE{$g \gets g'^L$}
+						\STATE{$d \gets c_0 - \log_g(t+\alpha_j)$}
+						\RETURN{$g$ et $d$}
+					\ENDIF				
+					\STATE{$L \gets L + r$}
+				\ENDFOR
+			\ENDIF
+		\ENDIF
+	\ENDFOR
 \ENDFOR
-\FOR{$i$ allant de $0$ à $p-1$}
-	\IF{$\pgcd(C[i], p^h-1) = 1$}
-		\FOR{$j$ allant de $0$ à $p-1$}
-			\STATE{$L \gets C[i]^{-1}B[j] \pmod{p^h-1}$}
-			\FOR{$k$ allant de $0$ à $p-1$}
-				\IF{$b_k - b_j \not\in L\cdot C$}
-					\IF{$j < p-1$}
-									
-						\STATE{arrêter cette boucle essayer un autre $j$}	
-					\ELSE
-						\RETURN{``échec''}
-					\ENDIF
-				\ENDIF
-			\ENDFOR			
-			\STATE{$g \gets g'^L$}
-			\STATE{$d \gets c_0 - \log_g(t+\alpha_j) \pmod{p^h-2}$}
-			\RETURN{$g$ et $d$}
-		\ENDFOR
-	\ENDIF
-\ENDFOR
+\RETURN{``échec''}
 \end{algorithmic}
 \end{algorithm}
 
@@ -1704,7 +1705,7 @@ Par la proposition~\ref{caracIntegre}, $p$ est un nombre premier et la propositi
 
 \section{La théorie d'Artin-Schreier}
 
-\section{L'étude adhoc du polynôme $\nu(x)$}
+\section{L'étude ad hoc du polynôme $\nu(x)$}
 
 Soit $h \geqslant 1$ et soit $t$ un élément algébrique de degré $h$ dans $\gf(p^h)/\gf(p)$. Notons $\mu(x) \in \gf(p)[x]$ le polynôme minimal de $t$.
 Étudions le polynôme $\nu(x)$ défini par :
