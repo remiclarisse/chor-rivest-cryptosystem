@@ -1,3 +1,12 @@
+# p = 197
+# h = 24
+# r = 8
+# [PubKey, PrivKey] = CRGenerateKeys (p, h)
+# [c, p, h, Q, alpha] = PubKey
+# [t, g, sInv, d] = PrivKey
+# gpr = g**((p**h-1)/(p**r-1))
+# s = [sInv.index(i) for i in range (p)]
+
 def blop (t, p, h) :
     K = t.parent()
     for j in range (h) :
@@ -34,9 +43,19 @@ def blip (c, p, h, alpha, t) :
                     L = L + modulus
     return "fail"
 
-def run (p, h) :
-    [PubKey, PrivKey] = CRGenerateKeys (p, h);
-    [c, p, h, Q, alpha] = PubKey;
-    [t, g, sInv, d] = PrivKey;
-    gg, dd = blip (c, p, h, alpha, t)
-    print "g:" + str(g == gg) + ", d:" + str(d == dd)
+def blup (c, p, h, alpha, s, gpr, r) :
+    n = h / r
+    K = gpr.parent()
+    A.<X> = PolynomialRing (K)
+    Q = A(0)
+    for i in range (n + 1) :
+        L = A(1)
+        for k in range (n + 1) :
+            if k != i:
+                L = L * A((alpha[s[i]] - alpha[s[k]]) ** (-1) * (X - alpha[s[k]]))
+        Q = Q + gpr ** c[i] * L
+    R = Q.roots()
+    T = []
+    for root in R :
+        T.append(-root[0])
+    return T

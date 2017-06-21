@@ -426,7 +426,7 @@ Commençons par une observation de Serge Vaudenay \cite[Section 3]{vaudenay2000}
 
 Dans le cryptosystème de Chor-Rivest, nous choisissons la clé privée de façon aléatoire puis, à partir de celle-ci, nous calculons la clé publique. Le système repose sur la difficulté de trouver une clé secrète à partir de la clé publique. Cependant, nous remarquons qu'il y a plusieurs clés privées \textit{équivalentes}, à savoir qu'il existe plusieurs jeux de clés privées qui donnent la même clé publique.
 
-Détaillons. Nous pouvons remplacer $t$ et $g$ par leur puissance $p$-ième, la clé publique reste inchangée car :
+Affinons. Nous pouvons remplacer $t$ et $g$ par leur puissance $p$-ième, la clé publique reste inchangée car :
 $$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g}\left(\left(t + \alpha_{\sigma(i)}\right)^p\right) = \log_{g}\left(t + \alpha_{\sigma(i)}\right).$$
 Nous pouvons aussi remplacer $(t, \alpha_{\sigma})$ par $(t + u, \alpha_{\sigma} - u)$, pour tout $u \in \gf(p)$. Et enfin, nous pouvons remplacer $(t,d,\alpha_\sigma)$ par $(ut, d - \log_g(u), u\alpha_\sigma)$, quel que soit $u \in \gf(p)^\times$.
 Cela donne donc au moins $hp(p-1)$ clés privées équivalentes. Il s'agit alors de déterminer une de ces clés.
@@ -456,7 +456,7 @@ Commençons par nous pencher sur une action de groupe sur l'ensemble des permuta
 \begin{prop}
 Le groupe $G := \gf(p)^\times\ltimes\gf(p)$, muni de la loi $$(u,v) \cdot (u', v') = (uu', v+uv'),$$ l'élément neutre étant $(1,0)$ et l'inverse de $(u,v)$ étant $(u^{-1}, -vu^{-1})$, agit sur l'ensemble $\mathfrak{S} := \mathfrak{S}(\{0,1,\dots, p-1\})$ par :
 $$\begin{array}{r c l}
-\left(\gf(p)^\times\times\gf(p)\right) \times \mathfrak{S}& \longrightarrow& \mathfrak{S} \\
+G \times \mathfrak{S}& \longrightarrow& \mathfrak{S} \\
 ((u, v), \sigma) & \longmapsto& (u, v)\diamond\sigma,
 \end{array}$$ 
 où la permutation $(u, v)\diamond\sigma$ est définie comme suit :
@@ -465,7 +465,7 @@ $$\alpha_{((u, v)\diamond\sigma)(i)} = u\alpha_{\sigma(i)} +v.$$
 
 \begin{proof}
 Si $(u, v) \in G$ et si $\sigma \in \mathfrak{S}$, alors $(u, v)\diamond\sigma$ est bien une permutation : en effet pour tous $i \neq j$, on a $\alpha_{((u, v)\diamond\sigma)(i)} \neq \alpha_{((u, v)\diamond\sigma)(j)}$.
-Montrons que nous avons bien une action de groupe : soit $\sigma \in \mathfrak{S}$, on a facilement que $(1, 0)\diamond\sigma = \sigma$, maintenant si $(u, v)$ et $(u', v')$ sont dans $G$ :
+Montrons que nous avons bien une action de groupe : soit $\sigma \in \mathfrak{S}$, on a facilement que $(1, 0)\diamond\sigma = \sigma$, maintenant si $(u, v)$ et $(u', v')$ sont dans $G$, alors quel que soit $i$ :
 \begin{align*}
 \alpha_{(u, v)\diamond((u', v')\diamond\sigma)(i)} &= u\alpha_{(u', v')\diamond\sigma(i)} +v\\
 &= u\left(u'\alpha_{\sigma(i)} +v'\right) +v\\
@@ -557,11 +557,11 @@ $$(f,u, v) \cdot (g,t,d,\sigma) =\left(f(g), uf(t)-v,d-\log_{f(g)}(u),(u,v)\diam
 L'égalité $f(g) = g$ et le fait que $g$ soit primitif impliquent que $f = \id_{\gf(p^h)}$. De même, $d-\log_{g}(u) = d$ donne $\log_{g}(u) = 0$, d'où $u=1$. Du reste, nous en déduisons que $v=0$. Ainsi, si $(f,u,v)$ fixe $(g,t,d,\sigma)$, alors $(f,u,v) = (\id_{\gf(p^h)},1,0)$ : donc l'action est libre et chaque orbite contient $hp(p-1)$ éléments.
 \end{proof}
 
-\begin{prop}
+\begin{theo}
 Soit $(g,t,d,\sigma) \in \mathcal{P}$ une clé privée. Soit $(g',t',d',\pi)$ une clé équivalente à $(g,t,d,\sigma)$, i.e. il existe $(f,u,v) \in {\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)}$ tel que : 
 $$(g',t',d',\pi) = (f,u,v)\cdot(g,t,d,\sigma).$$
 Si \#\# \textbf{condition} \#\#, alors $t\neq t'$.
-\end{prop}
+\end{theo}
 
 \begin{proof}
 Soit $(f,u,v) \in {\mathfrak{A} \times \gf(p)^\times \ltimes \gf(p)}$ tel que $$t = uf(t) +v.$$
@@ -574,8 +574,12 @@ Le polynôme minimal $\mu(x) \in \gf(p)[x]$ de $t$ est de degré $h$ et divise $
 \end{proof}
 
 \begin{coro}
-Sous ses conditions, la proposition précédente implique que dans l'orbite d'une clé privée (sous l'action que nous considérons), il n'existe pas deux éléments ayant la même seconde coordonnée (le $t$ algébrique de degré $h$ sur $\gf(p^h)$). Ainsi, si nous fixons $t$ dans la clé privée, il n'existe pas d'autre clé équivalente (atteignable par l'action de groupe) ayant le même $t$. En d'autres termes, fixer $t$ revient à fixer la clé secrète (parmi ses clés équivalentes).
+Sous ses conditions, le théorème précédent implique que dans l'orbite d'une clé privée (sous l'action que nous considérons), il n'existe pas deux éléments ayant la même seconde coordonnée (le $t$ algébrique de degré $h$ sur $\gf(p^h)$). Ainsi, si nous fixons $t$ dans la clé privée, il n'existe pas d'autre clé équivalente (atteignable par l'action de groupe) ayant le même $t$. En d'autres termes, fixer $t$ revient à fixer la clé secrète (parmi ses clés équivalentes).
 \end{coro}
+
+\begin{prop}
+Il est faux que nous pouvons choisir $t$ et l'image de $0$ et $1$ par $\sigma$. (À prouver !!!)
+\end{prop}
 
 \subsection{Attaque due à B. Chor et R. Rivest ($g$ et $d$ connus)}
 Sachant $d$, nous pouvons calculer 
@@ -646,7 +650,7 @@ pour vérifier que nous avons trouvé le bon $L$.
 					\STATE{$\mathcal{E} \gets \{B[n] - B[j] \pmod{r}$ pour $n$ allant de $0$ à $p-1 \}$}	
 					\IF[le $L$ est bon et $\sigma(i) = 0$ et $\sigma(0) = j$]{$\mathcal{D} = \mathcal{E}$}
 						\STATE{$g \gets g'^L$}
-						\STATE{$d \gets c_0 - \log_g(t+\alpha_j)$}
+						\STATE{$d \gets c_0 - \log_g(t+\alpha_j) \pmod{p^h -2}$}
 						\RETURN{$g$ et $d$}
 					\ENDIF				
 					\STATE{$L \gets L + r$}
@@ -749,7 +753,24 @@ Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions
 
 \subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$ et $\sigma$}
 
-Supposons connus $g_{p^r} = g^{(p^h-1)/(p^r-1)}$, pour $r$ divisant $h$ (comme dans la proposition~\ref{premierePropVaudenay}), ainsi que la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (g_{p^r})^{c_i})}_i$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-t$. Nous résolvons l'attaque en testant l'opposé chaque racine grâce à l'attaque de O.~Goldreich exposée en sous-section~\ref{attaqueOG}.
+Supposons connus $g_{p^r} = g^{(p^h-1)/(p^r-1)}$, pour $r$ divisant $h$ (comme dans la proposition~\ref{premierePropVaudenay}), ainsi que la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (g_{p^r})^{c_i})}_i$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-t$.  Par la symétrie dans la clé privée, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. Nous résolvons l'attaque en calculant $g$ et $d$ grâce à l'attaque de O.~Goldreich exposée en sous-section~\ref{attaqueOG}.
+
+\begin{algorithm}[h]
+\caption{Algorithme implémentant la première attaque de Vaudenay}
+\label{algoPremiereAttaqueVaudenay}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $\sigma$, $r$ divisant $h$ et $g^{(p^h-1)/(p^r-1)}$
+\ENSURE $t, t^{p^r}, t^{p^{2r}}, \dots, t^{p^{h - r}}$
+\STATE{$\rho \gets g^{(p^h-1)/(p^r-1)}$}
+\STATE{$n \gets h/r$}
+\STATE{$Q(x) \in \gf(p^r)[x]$ :  initialisé $Q(x) \gets 0$}
+\FOR{$i$ allant de $0$ à $n$}
+	\STATE{calculer l'interpolateur de Lagrange : $$L(x) \gets \prod_{\substack{0\leqslant k\leqslant n \\ k \neq i}}\frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}$$}
+	\STATE{$Q(x) \gets Q(x) + \rho^{c_i} L(x)$}
+\ENDFOR
+\RETURN{$[-t \in \gf(p^h)$ pour $t$ racine du polynôme $Q(x) ]$}
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$}
 
