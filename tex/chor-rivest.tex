@@ -791,7 +791,7 @@ $$(g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i
 car $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}\right) = 1.$$
 Ainsi, nous avons l'égalité de polynôme :
 $$Q(x) - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
-car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque $x$ est substitué par $\alpha_{\sigma(i)}$, où $0\leqslant i \leqslant p-1$.
+car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque le polynôme est évalué en les $\alpha_{\sigma(i)}$, où $0\leqslant i \leqslant p-1$.
 
 \`A cause de la symétrie de la clé privée, indiquée en sous-section~\ref{symetrieClePrivee}, nous pouvons choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$. Un algorithme naïf pour trouver la permutation $\sigma$ est de chercher exhaustivement les valeurs  $\sigma(i_j)$ pour $j=0$ et $3\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
 
@@ -808,8 +808,8 @@ car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $
 	\FORALL{$\ell \not\in S$} \label{algoNaifgprBoucle2}
 		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\sigma(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}} $$}
 		\IF{il existe $i$ tel que $\mathbf{res} = (g_{p^r})^{c_i}$ et $\sigma(i)$ n'est pas définie}
-			\STATE{$\sigma(i) \gets j$}
-			\STATE{$S \gets S + [\sigma(i)]$}
+			\STATE{$\sigma(i) \gets \ell$}
+			\STATE{$S \gets S \cup [\sigma(i)]$}
 		\ELSE
 			\STATE{continuer la boucle ligne~\ref{algoNaifgprBoucle}}
 		\ENDIF

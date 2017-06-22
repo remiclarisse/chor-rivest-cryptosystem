@@ -46,7 +46,7 @@ def blip (c, p, h, alpha, t) :
 def blup (c, p, h, alpha, s, gpr, r) :
     n = h / r
     K = gpr.parent()
-    A.<X> = PolynomialRing (K)
+    A.<X> = PolynomialRing(K)
     Q = A(0)
     for i in range (n + 1) :
         L = A(1)
@@ -59,3 +59,25 @@ def blup (c, p, h, alpha, s, gpr, r) :
     for root in R :
         T.append(-root[0])
     return T
+
+def blap (c, p, h, alpha, gpr, r, data) :
+    n = h / r
+    sig = [0 for i in range (p)]
+    defined = [False for i in range (p)]
+    found = False
+    while not found :
+        carry_on = True
+        while carry_on :
+            newnbs = [floor ( random() * 10 ** (log(p,10) + 1) ) % p for i in range (2, n + 1)]
+            carry_on = False
+            if len (set(data + newnbs)) != (n + 1) :
+                carry_on = True
+            if data + newnbs == sig[0 : n + 1] :
+                carry_on = True
+        sig[0 : n + 1] = data + newnbs + [0 for i in range (n + 2, p)]
+        defined = [False for i in range (p)]
+        for j in sig :
+            defined[sig] = True
+        for j in range (p) :
+            if not defined[sig] :
+                
