@@ -60,24 +60,74 @@ def blup (c, p, h, alpha, s, gpr, r) :
         T.append(-root[0])
     return T
 
-def blap (c, p, h, alpha, gpr, r, data) :
+def next_value (array, i, p) :
+    array[i] = array[i] + 1
+    while array[i] in array[:i] :
+        array[i] = array[i] + 1
+    if array[i] == p :
+        next_value (array, i - 1, p)
+        restart_value (array, i, p)
+
+def restart_value (array, i, p) :
+    array[i] = -1
+    new_value = 0
+    while new_value in array :
+        new_value = new_value + 1
+    array[i] = new_value
+
+def increment (array, stone, p) :
+    array[-1] = array[-1] + 1
+    while array[-1] in array[:-1] :
+        array[-1] = array[-1] + 1
+    if array[-1] == p :
+        next_value (array, -2, p)
+        restart_value (array, -1, p)
+    if array[1] != stone :
+        return False
+    else :
+        return True
+
+def blap (c, p, h, alpha, gpr, r, data) : # data === array of size two (e.g. [0, 1])
     n = h / r
-    sig = [0 for i in range (p)]
-    defined = [False for i in range (p)]
+    K = gpr.parent()
+    sig = [-1 for i in range (p)] # pas obligé de le définir ici ?
+    defined = [False for i in range (p)] # pas obligé de le définir ici ?
+    newnbs = data + [i for i in range (2, n)] + [n - 1]
     found = False
-    while not found :
-        carry_on = True
-        while carry_on :
-            newnbs = [floor ( random() * 10 ** (log(p,10) + 1) ) % p for i in range (2, n + 1)]
-            carry_on = False
-            if len (set(data + newnbs)) != (n + 1) :
-                carry_on = True
-            if data + newnbs == sig[0 : n + 1] :
-                carry_on = True
-        sig[0 : n + 1] = data + newnbs + [0 for i in range (n + 2, p)]
+    ok = True
+    while not found and ok:
+        ok = increment (newnbs, data[1], p)
+        print newnbs
+        sig = newnbs + [-1 for i in range (p - (n + 1))]
         defined = [False for i in range (p)]
         for j in sig :
-            defined[sig] = True
-        for j in range (p) :
-            if not defined[sig] :
-                
+            if j != -1 :
+                defined[j] = True
+        carry_on = True
+        l = 0
+        while l < p and carry_on :
+            if not defined[l] :
+                Q = K(0)
+                for j in range (n + 1) :
+                    L = K(1)
+                    for k in range (n + 1) :
+                        if k != j :
+                            L = L * (alpha[sig[j]] - alpha[sig[k]]) ** (-1) * (alpha[l] - alpha[sig[k]])
+                    Q = Q + gpr ** c[j] * L
+                i = 0
+                while i < p and gpr ** c[i] != Q :
+                    i = i + 1
+                if i == p : # ordre des tests avec 'or' ?
+                    carry_on = False
+                elif sig[i] != -1 :
+                    carry_on = False
+                else :
+                    sig[i] = l
+                    defined[l] = True
+            l = l + 1
+        if carry_on :
+            found = True
+    if not ok :
+        return "fail"
+    else :
+        return sig

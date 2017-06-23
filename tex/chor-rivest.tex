@@ -1710,6 +1710,31 @@ Apportons quelques précisions. Soient $K \subseteq L$ et $K \subseteq M$ comme 
 Soit $K \subseteq L$ un extension. Le groupe $\isom_K(L,L)$ est appelé le \textit{groupe de Galois} de $L$ sur $K$, et est noté $\gal(L/K)$.
 \end{defi}
 
+\begin{prop}
+Soient $K$ un corps et $P$ son sous-corps premiers. Les groupes $\aut(K)$ et $\gal(K/P)$ sont égaux.
+\end{prop}
+
+Soient $K \subseteq L$ une extension de corps, $\mathcal{A}$ une $K$-algèbre, et $\mathcal{L}_K(\mathcal{A}, L)$ l'ensemble des application $K$-linéaire de $\mathcal{A}$ dans $L$. On vérifie facilement que l'on munit $\mathcal{L}_K(\mathcal{A}, L)$ d'une structure de $L$-espace vectoriel en posant :
+$$(f+g)(x) = f(x)+g(x) \quad\text{et}\quad (\lambda f)(x) = \lambda f(x),$$
+pour $f, g \in \mathcal{L}_K(\mathcal{A},L)$, $\lambda \in L$, et $x \in \mathcal{A}$.
+
+\begin{theo}
+Soient $K \subseteq L$ une extension de corps, $\mathcal{A}$ une $K$-algèbre, et $\mathcal{H}$ l'ensemble des homomorphismes de $K$-algèbres de $\mathcal{A}$ dans $L$. Alors $\mathcal{H}$ est une partie libre du $L$-espace vectoriel $\mathcal{L}_K(\mathcal{A}, L)$.
+\end{theo}
+
+\begin{proof}
+Soit $(u_1, \dots, u_n)$ une famille d'éléments deux à deux distincts de $\mathcal{H}$. Pour tout $i$, on a $u_i(1_\mathcal{A}) = 1_K$, donc $u_i \neq 0$.
+
+Montrons que la famille précédente est libre sur $L$. C'est clair si $n = 1$, d'après ce qui précède. Supposons $n \geqslant 2$, et raisonnons par récurrence sur l'entier $n$.
+Soient $\lambda_1, \dots,\lambda _n \in L$ tels que 
+$$\lambda_1 u_1 + \cdots + \lambda_n u_n = 0.$$
+Si $x,y \in \mathcal{A}$, on a :
+$$0 = \sum_{i=1}^n \lambda_i u_i(xy) - u_n(x)\sum_{i=1}^n \lambda_i u_i(y) = \sum_{i=1}^{n-1} \lambda_i \left(u_i(x) - u_n(x)\right)u_i(y).$$
+On en déduit que, pour tout $x\in\mathcal{A}$,
+$$\sum_{i=1}^{n-1}\lambda_i(u_i(x)-u_n(x)) u_i = 0$$
+D'après l'hypothèse de récurrence, on obtient $\lambda_i(u_i(x)-u_n(x)) = 0$ pour tout $1 \leqslant i\leqslant n-1$ et pour tout $x\in \mathcal A$. Les $u_i$ étant distincts, il vient $\lambda_i = 0$ si $i$ est distinct de $n$. Alors $\lambda_nu_n = 0$, puis $\lambda_n =0$, car $u_n \neq 0$.
+\end{proof}
+
 \subsection{Corps finis}
 
 Ne pas hésiter à se référer au Cours d'Algèbre de Michel Demazure \cite{demazure2008}.

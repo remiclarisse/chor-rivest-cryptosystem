@@ -2,12 +2,8 @@ Dans l'attaque de Vaudenay/Goldreich, vérifier si, à t connu, il est
 vraiement possible de choisir sig(0) = i et sig(1) = j (!?) quel que 
 soient i et j distincts. => démontrer prop 4.9. !!!
 
-Continuer revision corps : tauvel pp.95, 5.1.3.
+Continuer revision corps : tauvel pp.98, 5.1.8.
 
 Attaque knowing t : regarder si faire un pgcd entre L et p^h-1 
-accelère l'algo ?
-
-Attaque pour recouvrer sig : trouver une façon de retirer l'aléa ! de 
-ne pas tester plusieurs fois le même ensemble (pas seulement different
-du précédent).
-	Finir d'implémenter l'attaque !!!
+		    accelère l'algo ?
+		    essaie avec u * t ** (p ** r) + v !
