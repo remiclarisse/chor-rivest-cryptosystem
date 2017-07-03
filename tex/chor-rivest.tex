@@ -481,7 +481,7 @@ Soit $\sigma \in \mathfrak{S}$. Pour tous $i \neq j$, il existe un unique $(u,v)
 
 \begin{proof}
 Il faut prendre :
-$$\quad u = \frac{\alpha_i - \alpha_j}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p)^\times \quad \text{ et } \quad v =  \frac{\alpha_i\alpha_{\sigma(1)} - \alpha_j\alpha_{\sigma(0)}}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p).$$
+$$\quad u = \frac{\alpha_i - \alpha_j}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p)^\times \quad \text{ et } \quad v =  \frac{\alpha_j\alpha_{\sigma(0)} - \alpha_i\alpha_{\sigma(1)}}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p).$$
 \end{proof}
 
 \begin{prop}
@@ -646,9 +646,9 @@ pour vérifier que nous avons trouvé le bon $L$.
 				\STATE{$r \gets (p^h-1) / d$}
 				\STATE{$L \gets c^{-1}b \pmod{r}$}
 				\FOR{$k$ allant de $0$ à $d-1$}
-					\STATE{$\mathcal{D} \gets \{L\cdot C[n] \pmod{r}$ pour $n$ allant de $0$ à $p-1 \}$}
-					\STATE{$\mathcal{E} \gets \{B[n] - B[j] \pmod{r}$ pour $n$ allant de $0$ à $p-1 \}$}	
-					\IF[le $L$ est bon et $\sigma(i) = 0$ et $\sigma(0) = j$]{$\mathcal{D} = \mathcal{E}$}
+					\STATE{$\mathcal{C} \gets \{L\cdot C[n] \pmod{r}$ pour $n$ allant de $0$ à $p-1 \}$}
+					\STATE{$\mathcal{B} \gets \{B[n] - B[j] \pmod{r}$ pour $n$ allant de $0$ à $p-1 \}$}	
+					\IF[le $L$ est bon et $\sigma(i) = 0$ et $\sigma(0) = j$]{$\mathcal{C} = \mathcal{B}$}
 						\STATE{$g \gets g'^L$}
 						\STATE{$d \gets c_0 - \log_g(t+\alpha_j) \pmod{p^h -2}$}
 						\RETURN{$g$ et $d$}
@@ -744,7 +744,7 @@ car $t^{p^{r(h/r)}} = t^{p^h} = t = t^{p^0}$. Cela montre aussi que $Q(-t) = 0$.
 &= (g_{p^r})^d \prod_{i=0}^{h/r-1} \left(\alpha_{\sigma(j)} + t^{p^{ri}}\right)\\
 &= Q\left(\alpha_{\sigma(j)}\right) \\
 \end{align*}
-Cela conclut la démonstration de la proposition.
+Cela achève la démonstration de la proposition.
 \end{proof}
 
 Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(g_{p^r}, Q)$, et $g_{p^r}$ est donc essentiellement unique.
@@ -796,30 +796,81 @@ car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $
 \`A cause de la symétrie de la clé privée, indiquée en sous-section~\ref{symetrieClePrivee}, nous pouvons choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$. Un algorithme naïf pour trouver la permutation $\sigma$ est de chercher exhaustivement les valeurs  $\sigma(i_j)$ pour $j=0$ et $3\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
 
 \begin{algorithm}[h]
-\caption{Algorithme pour recouvrer $\sigma$ sachant $g_{p^r}$}
+\caption{Algorithme pour trouver $\pi$ sachant $g_{p^r}$}
 \label{algoNaifgpr}
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ et $g_{p^r}$
-\ENSURE une permutation $\sigma$ d'une clé privée équivalente
+\ENSURE une permutation $\pi$ d'une clé privée équivalente
 \STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
-\STATE{choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$ distincts dans $\{0, \dots, p-1\}$}
-\FORALL{$\sigma(i_0), \sigma(i_3), \dots, \sigma(i_{h/r})$ distincts deux à deux} \label{algoNaifgprBoucle}
-	\STATE{$S \gets \left[\sigma(i_0), \sigma(i_3), \dots, \sigma(i_{h/r})\right]$}
+\STATE{choisir arbitrairement $\pi(i_1)$ et $\pi(i_2)$ distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$\pi(i_0), \pi(i_3), \dots, \pi(i_{h/r})$ distincts deux à deux} \label{algoNaifgprBoucle}
+	\STATE{$S \gets \left[\pi(i_0), \pi(i_3), \dots, \pi(i_{h/r})\right]$}
 	\FORALL{$\ell \not\in S$} \label{algoNaifgprBoucle2}
-		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\sigma(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}} $$}
-		\IF{il existe $i$ tel que $\mathbf{res} = (g_{p^r})^{c_i}$ et $\sigma(i)$ n'est pas définie}
-			\STATE{$\sigma(i) \gets \ell$}
-			\STATE{$S \gets S \cup [\sigma(i)]$}
+		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\pi(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\pi(i_k)}}{\alpha_{\pi(i_j)}-\alpha_{\pi(i_k)}} $$}
+		\IF{il existe $i$ tel que $\mathbf{res} = (g_{p^r})^{c_i}$ et $\pi(i)$ n'est pas définie}
+			\STATE{$\pi(i) \gets \ell$}
+			\STATE{$S \gets S \cup [\pi(i)]$}
 		\ELSE
 			\STATE{continuer la boucle ligne~\ref{algoNaifgprBoucle}}
 		\ENDIF
 	\ENDFOR
-	\RETURN{$\sigma$}
+	\RETURN{$\pi$}
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
 
 La complexité de cet algorithme est grossièrement $\O(rp^{h/r})$ opérations dans $\gf(p)$ : la boucle à la ligne~\ref{algoNaifgprBoucle2} fait en moyenne $\O(pr/h)$ itérations, chacune avec une complexité $\O(h)$, et il nous avons besoin de $\O(p^{h/r}-1)$ itérations de cette boucle.
+
+La permutation $\pi$ donnée par l'algorithme~\ref{algoNaifgpr} est telle qu'il existe $u \in \gf(p)^\times$ et $v \in \gf(p)$ vérifiant pour tout $0 \leqslant i \leqslant p-1$ :
+$$\alpha_{\pi(i)} = u \alpha_{\sigma(i)} + v,$$
+où la permutation $\sigma$ est celle de la clé secrète d'origine, détenue par le destinataire légitime.
+\begin{align*}
+Q_\pi(x) &= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\pi(i_k)}}{\alpha_{\pi(i_j)}-\alpha_{\pi(i_k)}}, \\
+&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-u\alpha_{\sigma(i_k)} - v}{u\alpha_{\sigma(i_j)}-u\alpha_{\sigma(i_k)}}, \\
+&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{u^{-1}x - u^{-1}v-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}, \\
+&= Q_\sigma(u^{-1}(x -v)). \\
+\end{align*}
+Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(x)$, alors $-u^{-1}(\omega +v)$ est racine du polynôme $Q_\sigma(x)$, ainsi si on fait tourner l'algorithme~\ref{algoPremiereAttaqueVaudenay} avec la permutation $\pi$, les valeurs retournées sont :
+$$u t -v,\quad u t^{p^r} -v,\quad u t^{p^{2r}} -v,\quad \dots,\quad u t^{p^{h - r}} -v.$$
+Il est alors plus simple de déterminer un $g$ pour avoir une clé privée équivalente, que d'utiliser l'attaque de Goldreich, sous-section~\ref{attaqueOG}.
+
+En effet, pour $0 \leqslant j < h/r$, à savoir on choisit n'importe quel élément retourné par l'algorithme~\ref{algoPremiereAttaqueVaudenay}, choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}\left(u t^{p^{jr}} -v+\alpha_{\pi(i)}\right)$$
+Notons $L := \log_{g'}(g^{p^{jr}})$, de sorte que $g^{p^{jr}}=g'^L$. Alors pour tout $0 \leqslant i \leqslant p-1$ :
+\begin{align*}
+b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}} -v + \alpha_{\pi(0)}}\right) \\
+&= \log_{g'}\left(\frac{u t^{p^{jr}} -v + u \alpha_{\sigma(i)}+v}{u t^{p^{jr}} -v + u \alpha_{\sigma(0)}+v}\right)\\
+&= \log_{g'}\left(\frac{u t^{p^{jr}} + u \alpha_{\sigma(i)}}{u t^{p^{jr}} + u \alpha_{\sigma(0)}}\right)\\
+&= L\log_{g^{p^{jr}}}\left(\frac{t^{p^{jr}} + \alpha_{\sigma(i)}}{t^{p^{jr}} + \alpha_{\sigma(0)}}\right)\\
+&= L(c_i - c_0) \\
+\end{align*}
+
+\begin{algorithm}[h]
+\caption{Algorithme implémentant l'attaque de Goldreich simplifiée}
+\label{algoAttaqueGoldreichsimplifiee}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $t$ et $\pi$
+\ENSURE $g$ et $d$ ou ``échec''
+\STATE{choisir $g'$ un élément primitif arbitraire de $\gf(p^h)$}
+\STATE{calculer les $b_i := \log_{g'}(t+\alpha_{\pi(i)})$}
+\STATE{$B \gets [ b_i - b_0$ pour $i$ allant de $0$ à $p-1 ] $}
+\STATE{$C \gets [ c_i - c_0$ pour $i$ allant de $0$ à $p-1 ] $}
+\FOR{$i$ allant de $0$ à $p-1$}
+	\IF{$\pgcd(C[i], p^h-1) = 1$}
+		\STATE{$L \gets C[i]^{-1}B[i] \pmod{p^h-1}$}
+		\STATE{$\mathcal{C} \gets \{L\cdot C[n] \pmod{p^h-1}$ pour $n$ allant de $0$ à $p-1 \}$}
+		\STATE{$\mathcal{B} \gets \{B[n] \pmod{p^h-1}$ pour $n$ allant de $0$ à $p-1 \}$}	
+		\IF{$\mathcal{C} = \mathcal{B}$}
+			\STATE{$g \gets g'^L$}
+			\STATE{$d \gets c_0 - \log_g(t+\alpha_{\pi(0)}) \pmod{p^h -2}$}
+			\RETURN{$g$ et $d$}
+		\ENDIF				
+	\ENDIF
+\ENDFOR
+\RETURN{``échec''}
+\end{algorithmic}
+\end{algorithm}
+
+Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, le ``$t$'' donné est $u t^{p^{jr}} -v$, il retourne le conjugué $g^{p^{jr}}$ du $g$ d'origine et l'entier $d - \log_{g^{p^{jr}}}(u)$.
 
 Quand $r$ est suffisamment grand, il existe un meilleur algorithme. En fait, si $r \geqslant h/r$, la famille $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$ est libre (voir plus loin). Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$, pour $0\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{i_0}} - (g_{p^r})^{c_{i_0}}, \quad (g_{p^r})^{c_{i_1}} - (g_{p^r})^{c_{i_0}},\quad \dots,\quad (g_{p^r})^{c_{i_{h/r}}} - (g_{p^r})^{c_{i_0}}.$$
 

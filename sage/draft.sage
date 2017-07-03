@@ -1,3 +1,6 @@
+# reset()
+# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
+# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/draft.sage")
 # p = 197
 # h = 24
 # r = 8
@@ -6,6 +9,7 @@
 # [t, g, sInv, d] = PrivKey
 # gpr = g**((p**h-1)/(p**r-1))
 # s = [sInv.index(i) for i in range (p)]
+
 
 def blop (t, p, h) :
     K = t.parent()
@@ -97,7 +101,7 @@ def blap (c, p, h, alpha, gpr, r, data) : # data === array of size two (e.g. [0,
     ok = True
     while not found and ok:
         ok = increment (newnbs, data[1], p)
-        print newnbs
+        print newnbs # verbose mode
         sig = newnbs + [-1 for i in range (p - (n + 1))]
         defined = [False for i in range (p)]
         for j in sig :
@@ -131,3 +135,18 @@ def blap (c, p, h, alpha, gpr, r, data) : # data === array of size two (e.g. [0,
         return "fail"
     else :
         return sig
+
+def blipblip (c, p, h, alpha, t, pi) :
+    r = int(p ** h - 1)
+    K = t.parent()
+    gg = K.multiplicative_generator()
+    a = [ int(mod (log (t + alpha[pi[i]], gg), r)) for i in range (p) ]
+    C = [ Integer(mod (c[i]-c[0], r)) for i in range(p) ]
+    A = [ int(mod (a[i]-a[0], r)) for i in range(p) ]
+    for i in range (p) :
+        if gcd (C[i], r) == 1 :
+            L = (C[i]).inverse_mod(r) * (A[i])
+            D = [ (L * C[l]) % r for l in range(p) ]
+            if set(D) == set(A) :
+                return gg**L, int(mod(c[0] - log(t + alpha[pi[0]], gg**L), r - 1))
+    return "fail"
