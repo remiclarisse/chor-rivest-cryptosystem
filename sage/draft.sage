@@ -47,7 +47,7 @@ def blip (c, p, h, alpha, t) :
                     L = L + modulus
     return "fail"
 
-def blup (c, p, h, alpha, s, gpr, r) :
+def blup (c, p, h, alpha, pi, gpr, r) :
     n = h / r
     K = gpr.parent()
     A.<X> = PolynomialRing(K)
@@ -56,7 +56,7 @@ def blup (c, p, h, alpha, s, gpr, r) :
         L = A(1)
         for k in range (n + 1) :
             if k != i:
-                L = L * A((alpha[s[i]] - alpha[s[k]]) ** (-1) * (X - alpha[s[k]]))
+                L = L * A((alpha[pi[i]] - alpha[pi[k]]) ** (-1) * (X - alpha[pi[k]]))
         Q = Q + gpr ** c[i] * L
     R = Q.roots()
     T = []
@@ -101,7 +101,7 @@ def blap (c, p, h, alpha, gpr, r, data) : # data === array of size two (e.g. [0,
     ok = True
     while not found and ok:
         ok = increment (newnbs, data[1], p)
-        print newnbs # verbose mode
+        # print newnbs # verbose mode
         sig = newnbs + [-1 for i in range (p - (n + 1))]
         defined = [False for i in range (p)]
         for j in sig :
@@ -150,3 +150,97 @@ def blipblip (c, p, h, alpha, t, pi) :
             if set(D) == set(A) :
                 return gg**L, int(mod(c[0] - log(t + alpha[pi[0]], gg**L), r - 1))
     return "fail"
+
+def crackMessage (PubKey, e, gpr, r) :
+    # Récuperer la clé publique
+    c = PubKey[0]
+    p = PubKey[1]
+    h = PubKey[2]
+    q = p ** h
+    alpha = PubKey[4]
+    # Générer une clé privée équivalente
+    pi = blap (c, p, h, alpha, gpr, r, [0, 1])
+    piInv = [pi.index(i) for i in range (p)]
+    T = blup (c, p, h, alpha, pi, gpr, r)
+    t = T[0]
+    mu = t.minimal_polynomial()
+    g, d = blipblip (c, p, h, alpha, t, pi)
+    # Faire le changement de base
+    V = t.parent().vector_space()
+    Minv = Matrix (GF(p), [V(t ** i) for i in range (h)]).transpose().inverse()
+    # Calculer le polynôme à factoriser (i.e. G(x) + mu(x))
+    A.<x> = PolynomialRing (GF(p))
+    Q = A(list (Minv * V(g ** (e - h * d)))) + A(mu)
+    # Récupérer les opposés des racines
+    beta = [p - Q.roots()[i][0] for i in range (h)]
+    # Recouvrer le message clair
+    m = [0 for i in range (p)]
+    for k in beta :
+        m[piInv [alpha.index(k)]] = 1
+    return m
+
+def is_not_consistent (pi) :
+    size = len(pi) - pi.count(-1)
+    s = set(pi) - {-1}
+    return size != len(s)
+
+def blapblap (c, p, h, alpha, gpr, r, data) :
+    if r ** 2 < h :
+        print "r too small, expected at least " + str(int(sqrt(h) + 1))
+        return None
+    n = h / r
+    K = gpr.parent()
+    V = K.vector_space()
+    pi = [ -1 ] + data + [ -1 for i in range (p - 3) ]
+    found = False
+    G = [ V(gpr**c[i] - gpr**c[0]) for i in range (n + 1) ]
+    M = Matrix(G).transpose()
+    X = [ M.solve_right(V(gpr**c[i] - gpr**c[0])) for i in range (p) ]
+    u = 0
+    while not found and u < p :
+        print "u=" + str(u)
+        ok = True
+        pi = [ -1 ] + data + [ -1 for i in range (p - 3) ]
+        i = 3
+        while ok and i < p :
+            a1 = X[i][1]
+            a2 = X[i][2]
+            if gcd (int(a2 - u * a1), p) == 1 and a1 != 0 :
+                aa = mod (a2 * alpha[pi[2]] - u * a1 * alpha[pi[1]], p) *  mod (a2 - u * a1, p) ** (-1)
+                pi[i] = alpha.index(aa)
+                if is_not_consistent (pi) :
+                    ok = False
+            i = i + 1
+            print "\t" + str(pi)
+        # if ok :
+        #     found = True
+        u = u + 1
+    if not found :
+        return "fail"
+    else :
+        return "MUY BIEN!"
+
+def is_generator (z) :
+    K = z.parent()
+    q = K.cardinality() - 1
+    if z.is_zero() :
+        return False
+    fac = list(factor(q))
+    for div in fac :
+        if (z ** (q / div[0])).is_one() :
+            return False
+    return True
+
+def blyp (PubKey, r) :
+    [c, p, h, Q, alpha] = PubKey
+    K.<b> = FiniteField(p ** h)
+    g = K.random_element()
+    while not is_generator(g) :
+        g = K.random_element()
+    z = g ** ((p ** h - 1) / (p ** r - 1))
+    L = []
+    for i in range (p ** r - 1) :
+        print i
+        if gcd (i, p ** r - 1) == 1 :
+            L.append(z ** i)
+    return L

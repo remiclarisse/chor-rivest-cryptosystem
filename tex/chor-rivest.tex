@@ -10,6 +10,7 @@
 \usepackage{cite}
 \usepackage{tikz}
 %\usepackage{hyperref}
+\allowdisplaybreaks
 
 \newtheorem{theo}{Théorème}[section]
 \newtheorem{lemm}[theo]{Lemme}
@@ -874,7 +875,7 @@ Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, l
 
 Quand $r$ est suffisamment grand, il existe un meilleur algorithme. En fait, si $r \geqslant h/r$, la famille $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$ est libre (voir plus loin). Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$, pour $0\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{i_0}} - (g_{p^r})^{c_{i_0}}, \quad (g_{p^r})^{c_{i_1}} - (g_{p^r})^{c_{i_0}},\quad \dots,\quad (g_{p^r})^{c_{i_{h/r}}} - (g_{p^r})^{c_{i_0}}.$$
 
-Notons $a_i^j$ le coefficient de $(g_{p^r})^{c_{i_{j}}} - (g_{p^r})^{c_{i_0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$. Par $(\ddagger)$, nous avons :
+Notons $a_j^i$ le coefficient de $(g_{p^r})^{c_{i_{j}}} - (g_{p^r})^{c_{i_0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$. Par $(\ddagger)$, nous avons :
 \begin{align*}
 \frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}} \right)^{-1} \\
 &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
@@ -887,30 +888,70 @@ $$(\star) \qquad\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(
 En passant toute les valeurs de $u$ en revue, nous pouvons obtenir $\sigma(i)$ de l'équation $(\star)$. Cette remarque donne naissance à l'algorithme suivant :
 
 \begin{algorithm}[h]
-\caption{Algorithme pour recouvrer $\sigma$ sachant $g_{p^r}$ lorsque $r\geqslant \sqrt h$}
+\caption{Algorithme pour trouver $\pi$ sachant $g_{p^r}$ lorsque $r\geqslant \sqrt h$}
 \label{algogpr}
 \begin{algorithmic}[1]
-\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, $r\geqslant \sqrt h$ et $g_{p^r}$
-\ENSURE une permutation $\sigma$ d'une clé privée équivalente
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ tel que $r\geqslant \sqrt h$ et $g_{p^r}$
+\ENSURE une permutation $\pi$ d'une clé privée équivalente
 \STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
-\STATE{pré-calculer la matrice de changement de bases de la base ``classique'' vers la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$}
-\STATE{choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$ distincts dans $\{0, \dots, p-1\}$}
+\STATE{pré-calculer la matrice de changement de bases de la base ``classique'' vers la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{0\leqslant j \leqslant h/r}$}
+\STATE{choisir arbitrairement $\pi(i_1)$ et $\pi(i_2)$ distincts dans $\{0, \dots, p-1\}$}
 \FORALL{$u$ dans $\gf(p)$} 
 	\FORALL{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq i_0, i_1, i_2$} 
 		\STATE{écrire $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$ dans la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$}
 		\STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
-		\STATE{trouver la valeur de $\sigma(i)$ grâce à $(\star)$}
-		
+		\STATE{trouver la valeur de $\pi(i)$ grâce à $(\star)$}
 	\ENDFOR
-	\IF{$\sigma$ est consistante}
-		\STATE{compléter $\sigma(i_0)$}
-		\RETURN{$\sigma$}
+	\IF{$\pi$ est consistante}
+		\STATE{compléter $\pi(i_0)$}
+		\RETURN{$\pi$}
 	\ENDIF
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Test pour trouver les $g^{(p^h-1)/(p^r-1)}$}
+$$\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\pi(i)}-\alpha_{\pi(i_1)}}{\alpha_{\pi(i)}-\alpha_{\pi(i_2)}}
+\quad\Leftrightarrow\quad
+\alpha_{\pi(i)} = \frac{a_2^i\alpha_{\pi(i_2)}-ua_1^i\alpha_{\pi(i_1)}}{a_2^i-ua_1^i}.$$
+
+\subsection{Test pour trouver $g^{(p^h-1)/(p^r-1)}$}
+
+Les équations : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
+$$(\ddagger) \qquad (g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
+signifient que tous les $(g_{p^r})^{c_i}$ sont en fait dans un même sous-espace affine de dimension $h/r$ du $\gf(p)$-espace vectoriel $\gf(p^r)$. 
+
+Donc si on suppose que $h/r + 1 \leqslant r$, à savoir $r \geqslant \sqrt{h + 1/4} + 1/2$, on peut donner un test facile pour $g_{p^r}$.
+
+\begin{prop}
+S'il existe un facteur $r$ de $h$ de sorte que $r \geqslant \sqrt{h + 1/4} + 1/2$, et si $$g_{p^r} := g^{(p^h-1)/(p^r-1)} = g^{1+p^r+p^{2r}+\cdots+p^{h-r}},$$ alors tous les $g_{p^r}^{c_i}$ sont sur le même sous-espace affine de dimension $h/r$ de $\gf(p^r)$ lorsque celui-ci est considéré comme un espace affine de dimension $r$ sur $\gf(p)$.
+\end{prop}
+
+\begin{proof}
+To do !!
+\end{proof}
+
+L'existence d'un tel $r$ peut être considérée comme un mauvais prérequis, cependant vu que les paramètres du cryptosystème de Chor-Rivest doivent être choisis de sorte que le problème du logarithme discret soit facile, nous savons déjà que $h$ à plusieurs facteurs, et il est donc fort probable que cette hypothèse sur $r$ soit satisfaite. En fait, les $h$ sans tels facteurs sont les nombres premiers et les carrés de nombres premiers. Le vrai problème est que $r$ ne doit pas être trop grand.
+
+Nous pouvons donc écrire un algorithme qui vérifie si un candidat pour $g_{p^r}$ est bon : l'algorithme vérifie simplement si les $g_{p^r}^{c_i}$ sont affinement liés. Cet algorithme a pour complexité moyenne $\O(h^3/r)$ opérations dans $\gf(p)$. Comme il y a $\phi(p^r-1)/r$ candidats, nous pouvons chercher exhaustivement un $g_{p^r}$ avec une complexité de $\O(h^3p^r/r^2)$.
+
+\begin{algorithm}[h]
+\caption{Algorithme pour trouver $g_{p^r}$ lorsque $r\geqslant \sqrt{h + 1/4} + 1/2$}
+\label{algoTestgpr}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$ et $r$ divisant $h$ tel que $r\geqslant \sqrt{h + 1/4} + 1/2$
+\ENSURE un élément $g_{p^r}$
+\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$\zeta \in \gf(p^h)$ générateur de $\gf(p^r)^\times$} \label{algoTestgprboucle}
+	\STATE{calculer l'équation du sous-espace affine $V$ engendré par $(\zeta^{c_{i_0}}, \dots, \zeta^{c_{i_{h/r}}})$}
+	\FORALL{$i$ différent de $i_0, \dots, i_{h/r}$ }	
+		\IF{$\zeta^{c_{i}}$ ne satisfait pas à l'équation du sous-espace affine $V$}
+			\STATE{continuer la boucle ligne~\ref{algoTestgprboucle}}
+		\ENDIF
+	\ENDFOR
+	\RETURN{$\zeta$}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Sur l'usage de tous les $c_i$}
 

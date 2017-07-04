@@ -7,3 +7,5 @@ Continuer revision corps : tauvel pp.98, 5.1.8.
 Attaque knowing t : regarder si faire un pgcd entre L et p^h-1 
 		    accelère l'algo ?
 		    essaie avec u * t ** (p ** r) + v !
+
+démontrer prop 6.2 (test pour trouver gpr)
