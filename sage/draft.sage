@@ -1,14 +1,14 @@
-# reset()
-# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
-# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/draft.sage")
-# p = 197
-# h = 24
-# r = 8
-# [PubKey, PrivKey] = CRGenerateKeys (p, h)
-# [c, p, h, Q, alpha] = PubKey
-# [t, g, sInv, d] = PrivKey
-# gpr = g**((p**h-1)/(p**r-1))
-# s = [sInv.index(i) for i in range (p)]
+reset()
+attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
+attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/draft.sage")
+p = 197
+h = 24
+r = 8
+[PubKey, PrivKey] = CRGenerateKeys (p, h)
+[c, p, h, Q, alpha] = PubKey
+[t, g, sInv, d] = PrivKey
+gpr = g**((p**h-1)/(p**r-1))
+s = [sInv.index(i) for i in range (p)]
 
 
 def blop (t, p, h) :
@@ -157,7 +157,8 @@ def crackMessage (PubKey, e, gpr, r) :
     p = PubKey[1]
     h = PubKey[2]
     q = p ** h
-    alpha = PubKey[4]
+    K = gpr.parent()
+    alpha = [ K(PubKey[4][i]) for i in range (p) ]
     # Générer une clé privée équivalente
     pi = blap (c, p, h, alpha, gpr, r, [0, 1])
     piInv = [pi.index(i) for i in range (p)]
@@ -220,27 +221,39 @@ def blapblap (c, p, h, alpha, gpr, r, data) :
     else :
         return "MUY BIEN!"
 
-def is_generator (z) :
-    K = z.parent()
-    q = K.cardinality() - 1
-    if z.is_zero() :
-        return False
-    fac = list(factor(q))
-    for div in fac :
-        if (z ** (q / div[0])).is_one() :
-            return False
-    return True
+def in_spaned_subspace (v, M) :
+    value = True
+    try :
+        M.solve_right(v)
+    except Exception :
+        value = False
+    finally :
+        return value
 
 def blyp (PubKey, r) :
     [c, p, h, Q, alpha] = PubKey
+    n = h / r
     K.<b> = FiniteField(p ** h)
-    g = K.random_element()
-    while not is_generator(g) :
-        g = K.random_element()
-    z = g ** ((p ** h - 1) / (p ** r - 1))
-    L = []
-    for i in range (p ** r - 1) :
-        print i
-        if gcd (i, p ** r - 1) == 1 :
-            L.append(z ** i)
-    return L
+    V = K.vector_space()
+    g = K.multiplicative_generator()
+    order = p ** r - 1
+    z = g ** ((p ** h - 1) / order)
+    pourcentage = -1
+    zeta = 1
+    for i in range (1, p ** r - 1) :
+        zeta = zeta * z
+        if int(i * 100 / (p ** r - 1)) != pourcentage :
+            pourcentage = int(i * 100 / (p ** r - 1))
+            print str(pourcentage) + "%"
+        if zeta.multiplicative_order() ==  order :
+            G = [ V(zeta**c[i] - zeta**c[0]) for i in range (1, n + 1) ]
+            M = Matrix(G).transpose()
+            j = 1
+            ok = True
+            while ok and j < p :
+                if not in_spaned_subspace (V(zeta**c[j] - zeta**c[0]), M) :
+                    ok = False
+                j = j + 1
+            if ok :
+                return zeta
+    return "fail"

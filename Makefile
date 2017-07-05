@@ -1,6 +1,6 @@
 # Variables
 EXE=rho-pollard
-FILE=chor-rivest
+FILE=rapport-stage
 
 # Special rules and targets
 .PHONY: all clean help info open
@@ -13,7 +13,7 @@ $(EXE):
 	@cp -f c/$(EXE) ./
 
 pdf:
-	@cd tex && $(MAKE)
+	@cd tex && $(MAKE) $(FILE)
 	@cp -f tex/$(FILE).pdf ./
 
 clean:

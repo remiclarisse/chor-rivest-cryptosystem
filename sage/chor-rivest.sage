@@ -26,7 +26,7 @@ def CRGenerateKeys (p, h) :
     K.<a> = FiniteField(q)
     Q = a.minimal_polynomial()
     # Prendre une numérotation de GF(p)
-    alpha = [K(i) for i in range (p)]
+    alpha = [int(i) for i in range (p)]
     shuffle (alpha)
     # Prendre un t algébrique de degré h sur GF(p)
     while True :
