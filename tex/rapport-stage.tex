@@ -10,7 +10,8 @@
 \usepackage{cite}
 \usepackage{tikz}
 %\usepackage{hyperref}
-\allowdisplaybreaks
+\usepackage[top=3cm, bottom=3cm, left=3cm , right=3cm]{geometry}
+
 
 \newtheorem{theo}{Théorème}[section]
 \newtheorem{lemm}[theo]{Lemme}
@@ -74,9 +75,9 @@
 
 \begin{document}
 \thispagestyle{empty}
-\centerline{\includegraphics[width=8cm,height=25mm]{logo-bordeaux.png} \hspace{1cm} \includegraphics[width=8cm,height=25mm]{logo-inria.png}}
+\centerline{\includegraphics[width=8cm,height=25mm]{logo-bordeaux.png} \hspace{2cm} \includegraphics[width=8cm,height=25mm]{logo-inria.png}}
 
-\vspace{1cm}
+\vspace{2cm}
 
 \centerline{\large\bfseries Master 1 de Cryptologie et Sécurité Informatique}
 \centerline{\large\bfseries \'Equipe-projet GRACE}
@@ -85,16 +86,16 @@
 
 
 \begin{center}
-\vspace{4cm}
+\vspace{3.5cm}
 
 {\Huge\bfseries Rapport de stage \\}
 \vspace{0.15cm}\centerline{\rule{10cm}{0.5pt}}\vspace{0.15cm}
 {\LARGE\bfseries \'Etude du cryptosystème de Chor-Rivest}
- \vspace{2cm}
+ \vspace{4cm}
 
 {\large Rémi {\sc Clarisse}}
 
-\vspace{6cm}
+\vspace{6.5cm}
 
 {\large Tuteurs: Daniel {\sc Augot} et Luca {\sc De Feo}}
 \end{center}
@@ -103,6 +104,10 @@
 \section*{Introduction}
 
 Dans l'article~\cite{chorRivest1988}
+
+\section{Présentation de l'INRIA}
+
+Inria emploie 2 600 collaborateurs issus des meilleures universités mondiales, qui relèvent les défis des sciences informatiques et mathématiques. Inria est organisé en « équipes-projets » qui rassemblent des chercheurs aux compétences complémentaires autour d’un projet scientifique focalisé. Ce modèle ouvert et agile lui permet d’explorer des voies originales avec ses partenaires industriels et académiques. Inria répond ainsi aux enjeux pluridisciplinaires et applicatifs de la transition numérique. A l'origine de nombreuses innovations créatrices de valeur et d'emploi, Inria transfère vers les entreprises (start-up, PME et grands groupes) ses résultats et ses compétences, dans des domaines tels que la santé, les transports, l'énergie, la communication, la sécurité et la protection de la vie privée, la ville intelligente, l’usine du futur…
 
 \newpage
 \bibliographystyle{abbrv}
