@@ -1,0 +1,111 @@
+\documentclass[a4paper, titlepage]{article}
+
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}      
+\usepackage[francais]{babel}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{tikz}
+\usepackage{algorithm, algorithmic}
+\usepackage{array}
+\usepackage{cite}
+\usepackage{tikz}
+%\usepackage{hyperref}
+\allowdisplaybreaks
+
+\newtheorem{theo}{Théorème}[section]
+\newtheorem{lemm}[theo]{Lemme}
+\newtheorem{prop}[theo]{Proposition}
+\newtheorem{coro}[theo]{Corollaire}
+\theoremstyle{definition}
+\newtheorem{defi}[theo]{Définition}
+\theoremstyle{remark}
+\newtheorem{rema}[theo]{Remarque}
+\newtheorem{exem}[theo]{Exemple}
+\newtheorem{appl}[theo]{Application}
+
+\def\N{\mathbb N}
+\def\A{\mathbb A}
+\def\Z{\mathbb Z}
+\def\Q{\mathbb Q}
+\def\R{\mathbb R}
+\def\C{\mathbb C}
+\def\K{\mathbb K}
+\def\F{\mathbb F}
+\def\O{\mathcal O}
+\def\o{o}
+\def\gf{\operatorname{GF}}
+\def\frob{\operatorname{Frob}}
+\def\card{\operatorname{Card}}
+\def\car{\operatorname{car}}
+\def\pgcd{\operatorname{pgcd}}
+\def\id{\operatorname{id}}
+\def\aut{\operatorname{Aut}}
+\def\hom{\operatorname{Hom}}
+\def\isom{\operatorname{Isom}}
+\def\gal{\operatorname{Gal}}
+\def\mbf#1{\mathbf{#1}}
+\def\NP{\mathbb{NP}}
+\def\gen #1{\left\langle#1\right\rangle}
+\def\ceil #1{\left\lceil#1\right\rceil}
+\def\floor #1{\left\lfloor#1\right\rfloor}
+
+\floatname{algorithm}{Algorithme}
+\renewcommand{\algorithmicrequire}{\textbf{Entrée :}}
+\renewcommand{\algorithmicensure}{\textbf{Sortie :}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{si}}
+\renewcommand{\algorithmicthen}{\textbf{alors}}
+\renewcommand{\algorithmicelse}{\textbf{sinon}}
+\renewcommand{\algorithmicfor}{\textbf{pour}}
+\renewcommand{\algorithmicforall}{\textbf{pour tout}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{tant que}}
+\renewcommand{\algorithmicloop}{\textbf{boucle}}
+\renewcommand{\algorithmicrepeat}{\textbf{repéter}}
+\renewcommand{\algorithmicuntil}{\textbf{jusqu'à}}
+\renewcommand{\algorithmicprint}{\textbf{afficher}}
+\renewcommand{\algorithmicreturn}{\textbf{retourner}}
+\renewcommand{\algorithmictrue}{\textbf{vrai}}
+\renewcommand{\algorithmicfalse}{\textbf{faux}}
+
+\title{\'Etude du cryptosystème de Chor-Rivest}    
+\author{Rémi {\sc Clarisse}}        
+\date{Mai-Août 2017}       
+
+\begin{document}
+\thispagestyle{empty}
+\centerline{\includegraphics[width=8cm,height=25mm]{logo-bordeaux.png} \hspace{1cm} \includegraphics[width=8cm,height=25mm]{logo-inria.png}}
+
+\vspace{1cm}
+
+\centerline{\large\bfseries Master 1 de Cryptologie et Sécurité Informatique}
+\centerline{\large\bfseries \'Equipe-projet GRACE}
+\centerline{\rule{5cm}{2pt}}
+\centerline{\bfseries Stage estival 2017}
+
+
+\begin{center}
+\vspace{4cm}
+
+{\Huge\bfseries Rapport de stage \\}
+\vspace{0.15cm}\centerline{\rule{10cm}{0.5pt}}\vspace{0.15cm}
+{\LARGE\bfseries \'Etude du cryptosystème de Chor-Rivest}
+ \vspace{2cm}
+
+{\large Rémi {\sc Clarisse}}
+
+\vspace{6cm}
+
+{\large Tuteurs: Daniel {\sc Augot} et Luca {\sc De Feo}}
+\end{center}
+\newpage
+
+\section*{Introduction}
+
+Dans l'article~\cite{chorRivest1988}
+
+\newpage
+\bibliographystyle{abbrv}
+\bibliography{mybib}
+
+\end{document}
