@@ -38,6 +38,7 @@
 \def\card{\operatorname{Card}}
 \def\car{\operatorname{car}}
 \def\pgcd{\operatorname{pgcd}}
+\def\ppcm{\operatorname{ppcm}}
 \def\id{\operatorname{id}}
 \def\aut{\operatorname{Aut}}
 \def\hom{\operatorname{Hom}}
@@ -954,26 +955,131 @@ Nous pouvons donc écrire un algorithme qui vérifie si un candidat pour $g_{p^r
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Sur l'usage de tous les $c_i$}
+\subsection{Utilisation des $c_i$}
 
 Nous allons améliorer l'attaque précédente en utilisant la connaissance de tous les $c_i$. Nous allons nous servir du fait suivant :
 
 \begin{prop}
-Soit $Q(x)$ un polynôme de $\gf(p^r)[x]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e \leqslant (p-1)/d$. Nous avons $$\sum_{a \in \gf(p)} Q(a)^e = 0.$$
+Soit $Q(x)$ un polynôme de $\gf(p^r)[x]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Nous avons $$\sum_{a \in \gf(p)} Q(a)^e = 0.$$
 \end{prop}
 
 Le lemme qui suit va permettre de démontrer cette proposition.
 
 \begin{lemm}
-Soit $k$ un entier tel que $1 \leqslant k \leqslant p-1$. Alors
-$$\sum_{a\in\gf(p)} a^i = 0.$$
-Ainsi, si $P(x) \in \gf(p^n)[x]$ est de degré inférieur à $p-1$, alors : $$\sum_{a\in\gf(p)} P(a) = 0.$$
+Soit $k$ un entier tel que $1 \leqslant k < p-1$. Alors
+$$\sum_{a\in\gf(p)} a^k = 0.$$
+Ainsi, si $P(x) \in \gf(p^r)[x]$, pour $r \geqslant 1$, est de degré inférieur à $p-1$, alors : $$\sum_{a\in\gf(p)} P(a) = 0.$$
 \end{lemm}
 
 \begin{proof}[Démonstration du lemme]
-Tout d'abord remarquons que $0 \in \gf(p)$ ne contribue pas à la somme, et ensuite, notons $g$ un élément primitif du corps $\gf(p)$. Alors
-$$\sum_{a\in\gf(p)} a^i = \sum_{j=0}^{p-2} g^i = \frac{g^{i(p-1)} - 1}{g^{i} - 1} = 0.$$
+Tout d'abord remarquons que $0 \in \gf(p)$ ne contribue pas à la somme, et ensuite, notons $g$ un élément primitif du corps $\gf(p)$. Alors, pour $1 \leqslant k < p-1$ :
+$$\sum_{a\in\gf(p)} a^k = \sum_{a\in\gf(p)^\times} a^k = \sum_{j=0}^{p-2} g^{jk} = \frac{g^{k(p-1)} - 1}{g^{k} - 1} = \frac{1^{k} - 1}{g^{k} - 1} = 0.$$
+Soit $P(x) \in \gf(p^r)[x]$ de degré inférieur à $p-1$ :
+$$P(x) = b_{p-2}x^{p-2} + \cdots + b_1x + b_0, \qquad \text{où }b_i \in \gf(p^r).$$
+Ainsi, on obtient bien :
+\begin{align*}
+\sum_{a\in\gf(p)} P(a) &= \sum_{a\in\gf(p)} \left({b_{p-2}a^{p-2} + \cdots + b_1a + b_0}\right) \\
+&= \sum_{k=1}^{p-2} \left({ b_k\sum_{a\in\gf(p)} a^k}\right) + pb_0 \\
+&= 0.
+\end{align*}
 \end{proof}
+
+\begin{proof}[Démonstration de la proposition]
+Comme $Q(x) \in \gf(p^r)[x]$ est de degré $d$ et que $1\leqslant e < (p-1)/d$, le polynôme $Q(x)^e$ est de degré inférieur à $p-1$. Ainsi le lemme précédent permet de conclure :
+$$\sum_{a\in\gf(p)} Q(a)^e = 0.$$
+\end{proof}
+
+\begin{prop}
+Pour tout $1 \leqslant e < (p-1)r/h$, nous avons :
+$$\sum_{i=0}^{p-1} (g_{p^r})^{ec_i} = 0.$$
+\end{prop}
+
+\begin{proof}
+Considérons le polynôme $Q(x)\in\gf(p^r)[x]$ de la proposition~\ref{premierePropVaudenay} : le polynôme $Q(x)$ est de degré $h/r$, à coefficients dans $\gf(p^r)$ et tel que, pour tout $0 \leqslant i \leqslant p-1$ :
+$$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
+Ainsi par la proposition précédente, pour tout $1 \leqslant e < (p-1)r/h$ :
+$$\sum_{a\in\gf(p)} Q(a)^e = \sum_{i=0}^{p-1} Q\left(\alpha_{\sigma(i)}\right)^e = 0,$$
+d'où l'égalité souhaitée :
+$$\sum_{i=0}^{p-1} (g_{p^r})^{ec_i} = 0.$$
+\end{proof}
+
+Cela donne une façon plus simple de sélectionner tous les candidats pour $g_{p^r}$ -- que la recherche exhaustive. Son principal avantage est qu'il fonctionne dans n'importe quel sous-corps. Par exemple, ont peut considérer $r=1$ et trouver les seuls $g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$, nous avons :
+$$\sum_{i=0}^{p-1} (g_p)^{ec_i} = 0.$$
+La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf(p)$-opérations : il est peu probable qu'un mauvais candidat ne sera pas détecté par le $e = 1$. Ainsi, nous pouvons recouvrer $g_p$ en $\O(p^2)$ opérations binaires.
+
+Malheureusement, le $g_{p^r}$ ne peut pas être utilisé efficacement quand $r$ est trop petit. Cependant, on peut toujours utiliser $g_{p^r}$ des petits sous-corps pour le calculer dans des corps plus grands. Notre but est de calculer $g_{p^r}$ avec $r$ assez grand (tel que $r^2 \geqslant h$). Nous considérons le problème du calcul de $g_{p^r}$ lorsque $r_1,\dots,r_k$ sont les facteurs de $r$ et avec la connaissance de $g_{p^{r_i}}$. Comme $g_{p^{r_i}} = (g_{p^r})^{1+p^{r_i}+p^{2r_i}+\cdots+p^{r-r_i}}$, nous avons 
+$$(\dagger)\qquad\log(g_{p^r}) = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1},$$
+où la base des logarithmes est n'importe quel élément primitif $\gamma$ fixé dans le corps $\gf(p^r)$. La connaissance de tous les $g_{p^{r_i}}$ donne donc la connaissance de $\log(g_{p^r})$ modulo
+$$\ell := \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}.$$
+Nous avons donc besoin seulement de $(p^r-1)/\ell$ essais pour recouvrer $g_{p^r}$.
+
+\begin{algorithm}[h]
+\caption{Algorithme pour récupérer $g_{p^r}$ à partir des $g_{p^{r_i}}$}
+\label{algogprFromgpri}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, ${\{r_i\}}_{1\leqslant i\leqslant k}$ diviseurs de $r$ et $g_{p^{r_i}}$
+\ENSURE l'ensemble des $g_{p^r}$ possibles
+\STATE{choisir $\gamma$ un élément primitif de $\gf(p^r)$}
+\FORALL{$i$ allant de $1$ à $k$}
+	\STATE{résoudre l'équation $(\dagger)$ : $$x_i = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
+\ENDFOR
+\STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
+\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$ où $x$ est unique modulo $\ell$}
+\STATE{$\beta \gets \gamma^{x}$}
+\FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}\label{algoNaifgprFromgpriBoucle}
+	\FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}	
+		\STATE{calculer la somme : $$\mathbf{res} \gets \sum_{i=0}^{p-1} \beta^{ec_i}\gamma^{ec_i\ell y}$$}
+		\IF{$\mathbf{res} \neq 0$}
+			\STATE{continuer la boucle ligne~\ref{algoNaifgprFromgpriBoucle}}
+		\ENDIF
+	\ENDFOR
+	\STATE{ajouter $\beta\gamma^{\ell y}$ à la liste des $g_{p^r}$ possibles}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+Chaque boucle de la ligne~\ref{algoNaifgprFromgpriBoucle} demande en moyenne $\O(pr^2)$ opérations dans $\gf(p)$.
+
+Nous pouvons maintenant définir l'algorithme global de l'attaque.
+
+\begin{defi}
+Soit $G$ un graphe orienté acyclique (\textit{DAG for directed acyclic graph}) étiqueté enraciné dont la racine est étiquetée par un corps fini $\gf(p^r)$ et tel que pour chaque arête $u \rightarrow v$ de $G$, l'étiquette $l(u)$ de $u$ est un sous-corps maximal (au sens de l'inclusion) de l'étiquette $L(v)$ de $v$ et une extension de $\gf(p)$. On dit que $G$ est un DAG $p$-factorisant de $\gf(p^r)$.
+\end{defi}
+
+\begin{defi}
+\`A une extension $\gf(p^r)$ et $G$ son DAG $p$-factorisant, on associe :
+$$C(G) := \sum_{v} \frac{\#L(v) -1}{\ppcm\{\#L(w)-1 \mid v \leftarrow w\}},$$
+où nous prenons pour convention : $\ppcm(\emptyset) = 1$.
+\end{defi}
+
+Nous pouvons définir un algorithme pour calculer $g_{p^r}$ avec pour compléxité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf(p^r)$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
+$$\O\left(\min_{\substack{r \text{ divisant } h \\ r^2 \geqslant h}} \; \min_{\substack{G \text{ est un DAG}\\p\text{-factorisant} \\ \text{ de } \gf(p^r)}} \; 
+pr^2C(G)\right)$$
+
+%\begin{algorithm}[h]
+%\caption{Algorithme pour récupérer $g_{p^r}$ à partir des $g_{p^{r_i}}$}
+%\label{algoGeneral}
+%\begin{algorithmic}[1]
+%\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, ${\{r_i\}}_{1\leqslant i\leqslant k}$ diviseurs de $r$ et $g_{p^{r_i}}$
+%\ENSURE l'ensemble des $g_{p^r}$ possibles
+%\STATE{choisir $\gamma$ un élément primitif de $\gf(p^r)$}
+%\FORALL{$i$ allant de $1$ à $k$}
+%	\STATE{résoudre l'équation $(\dagger)$ : $$x_i = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
+%\ENDFOR
+%\STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
+%\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$ où $x$ est unique modulo $\ell$}
+%\STATE{$\beta \gets \gamma^{x}$}
+%\FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}
+%	\FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}	
+%		\STATE{calculer la somme : $$\mathbf{res} \gets \sum_{i=0}^{p-1} \beta^{ec_i}\gamma^{ec_i\ell y}$$}
+%		\IF{$\mathbf{res} \neq 0$}
+%			\STATE{continuer la boucle ligne~\ref{algoNaifgprFromgpriBoucle}}
+%		\ENDIF
+%	\ENDFOR
+%	\STATE{ajouter $\beta\gamma^{\ell y}$ à la liste des $g_{p^r}$ possibles}
+%\ENDFOR
+%\end{algorithmic}
+%\end{algorithm}
 
 \section{Le calcul de logarithmes dans un groupe}\label{logDiscret}
 
@@ -982,7 +1088,6 @@ Les résultats proposés ici sont essentiellement tous issus du manuel de Steven
 \begin{defi}\label{defLogDiscret}
 Soit $G$ un groupe noté multiplicativement. Le \textit{problème du logarithme discret} est : étant donné $g\in G$ et $h \in \gen{g}$, trouver $a$, tel que $h=g^a$.\end{defi}
 Nous notons alors $a=\log_g(h)$, et $g$ est appelé la base du logarithme $a$.
-
 
 \begin{exem}
 Considérons le problème du logarithme discret dans le groupe additif des entiers modulo $p$, où $p$ est un nombre premier. C'est-à-dire qu'étant donné $g \neq 0$ et $h$ dans $\Z/p\Z$, nous cherchons $a \in \Z$ tel que $ag = h$. Comme $\Z/p\Z$ est un corps, il suffit de prendre $a \equiv g^{-1}h \pmod{p}$. Nous pouvons déterminer $g^{-1}$ grâce à une identité de Bézout. Ainsi, résoudre ce cas de logarithme discret se fait en temps polynomial.
@@ -1409,7 +1514,14 @@ b_i + v_{S(x_i)} \pmod{r}.$$
 Nous rassemblons cela sous la notation :
 $$(x_{i+1}, a_{i+1}, b_{b+1}) = \verb|walk| (x_i, a_i, b_i).$$
 
-\section{L'algorithme $L(1/4 + \o(1))$ d'Antoine Joux}
+\section{L'algorithme $L(1/4 + \o(1))$ de Joux}
+
+Soit $p$ un nombre premier et $n$ un entier. Notons :
+$$L_Q(\alpha, c) := \exp\left({(c+\o(1))(\log Q)^\alpha(\log\log Q)^{1 - \alpha}}\right),$$
+où $Q:= p^n$, $0 \leqslant \alpha\leqslant 1$ et $c \geqslant 0$.
+
+\subsection{Travaux précédents le logarithme discret en petite caractéristique}
+
 
 \section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
 

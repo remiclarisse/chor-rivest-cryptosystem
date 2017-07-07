@@ -1,15 +1,14 @@
-reset()
-attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
-attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/draft.sage")
-p = 197
-h = 24
-r = 8
-[PubKey, PrivKey] = CRGenerateKeys (p, h)
-[c, p, h, Q, alpha] = PubKey
-[t, g, sInv, d] = PrivKey
-gpr = g**((p**h-1)/(p**r-1))
-s = [sInv.index(i) for i in range (p)]
-
+# reset()
+# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
+# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/draft.sage")
+# p = 31
+# h = 12
+# r = 4
+# [PubKey, PrivKey] = CRGenerateKeys (p, h)
+# [c, p, h, Q, alpha] = PubKey
+# [t, g, sInv, d] = PrivKey
+# gpr = g**((p**h-1)/(p**r-1))
+# s = [sInv.index(i) for i in range (p)]
 
 def blop (t, p, h) :
     K = t.parent()
@@ -257,3 +256,113 @@ def blyp (PubKey, r) :
             if ok :
                 return zeta
     return "fail"
+
+def blypblyp (PubKey, r, ri, gpri) :
+    [c, p, h, Q, alpha] = PubKey
+    n = h / r
+    K = gpri[0].parent()
+    g = K.multiplicative_generator()
+    gamma = g ** ((p ** h - 1) / (p ** r - 1)) # élément primitif de GF(p^r)
+    a = []
+    for i in range (len (ri)) :
+        l = log (gpri[i], gamma)
+        d = 0
+        for k in range (int(r / ri[i])) :
+            d += p ** (k * ri[i])
+        a.append((l / d) % (p ** ri[i] - 1))
+    modulii = [ p ** ri[i] - 1 for i in range (len (ri)) ]
+    resCRT = CRT(a, modulii)
+    beta = gamma ** resCRT
+    ell = lcm (modulii)
+    possible_gpr = []
+    for x in range ((p ** r - 1) / ell) :
+        e = 1
+        ok = True
+        while e < (p - 1) * r / h and ok :
+            res = 0
+            for i in range (p) :
+                res += beta ** (e * c[i]) * gamma ** (e * c[i] * ell * x)
+            if res != 0 :
+                ok = False
+            e += 1
+        if ok :
+            possible_gpr.append(beta * gamma ** (ell * x))
+    print possible_gpr
+    return possible_gpr[0]
+
+def blypblypblyp (PubKey, K) :
+    [c, p, h, Q, alpha] = PubKey
+    g = K.multiplicative_generator()
+    gamma = g ** ((p ** h - 1) / (p  - 1)) # élément primitif de GF(p^r)
+    for i in range (p) :
+        if gcd (i, p - 1) == 1 :
+            z = gamma ** i
+            e = 1
+            ok = True
+            while e < (p - 1) / h and ok :
+                res = 0
+                for j in range (p) :
+                    res += z ** (e * c[j])
+                if res != 0 :
+                    ok = False
+                e += 1
+            if ok :
+                return z
+    return "fail"
+
+def find_DAG (r) :
+    if r.is_prime() or r == 1:
+        return [1]
+    divs = []
+    for k, i in list (factor (r))[::-1] :
+        if k != 1 and k != r :
+            divs.append(r / k)
+    return divs
+
+def assault (c, p ,h, r, K) :
+    ri = divisors(r)
+    K.<b> = FiniteField(p ** h)
+    gpri = [ blypblypblyp (PubKey, K) ] + [ K(1) for i in range (1, len (ri)) ]
+    for i in range (1, len (ri)) :
+        dag = find_DAG(ri[i])
+        gpri[i] = blypblyp (PubKey, ri[i], [ ri[j] for j in range (len(ri)) if ri[j] in dag ], [ gpri[j] for j in range (len (gpri)) if ri[j] in dag ])
+    return gpri[-1]
+
+def VaudenayAttack (e, PubKey) :
+    # Récuperer la clé publique
+    [c, p, h, Q, alpha] = PubKey
+    # Choisir un r adéquat
+    for r in divisors (h) :
+        if r ** 2 >= h :
+            break
+    print "Chosen divisor of h: r=" + str(r)
+    K.<b> = FiniteField(p ** h)
+    # Trouver un élément primitif gpr de GF(p^r) tel que les gpr^ci soient dans
+    # le même sous-espace affine
+    gpr = assault (c, p ,h, r, K)
+    # Trouver une permutation d'une clé équivalente
+    alpha = [ K(alpha[i]) for i in range (p) ]
+    pi = secondVaudenayAttack (c, p, h, alpha, gpr, r, [0, 1])
+    piInv = [pi.index(i) for i in range (p)]
+    # Trouver un élément t algébrique de degré h dans GF(p^h)
+    t = thirdVaudenayAttack (c, p, h, alpha, pi, gpr, r)
+    mu = t.minimal_polynomial()
+    # Enfin faire l'attaque de Goldreich, version simplifiée !
+    g, d = simplifiedGoldreichAttack (c, p, h, alpha, t, pi)
+    # Une clé équivalente est construite : on peut déchiffrer le message comme
+    # le destinataire légitime !
+    # Faire le changement de base
+    print "Decrypting the ciphertext"
+    V = t.parent().vector_space()
+    Minv = Matrix (GF(p), [V(t ** i) for i in range (h)]).transpose().inverse()
+    # Calculer le polynôme à factoriser (i.e. G(x) + mu(x))
+    A.<x> = PolynomialRing (GF(p))
+    poly = A(list (Minv * V(g ** (e - h * d)))) + A(mu)
+    # Récupérer les opposés des racines
+    beta = [p - poly.roots()[i][0] for i in range (h)]
+    # Recouvrer le message clair
+    m = [0 for i in range (p)]
+    for k in beta :
+        m[piInv [alpha.index(k)]] = 1
+    print "JOB DONE!!"
+    return m, [t, g, piInv, d]
