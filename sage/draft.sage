@@ -293,7 +293,7 @@ def blypblyp (PubKey, r, ri, gpri) :
 def blypblypblyp (PubKey, K) :
     [c, p, h, Q, alpha] = PubKey
     g = K.multiplicative_generator()
-    gamma = g ** ((p ** h - 1) / (p  - 1)) # élément primitif de GF(p^r)
+    gamma = g ** ((p ** h - 1) / (p  - 1)) # élément primitif de GF(p)
     for i in range (p) :
         if gcd (i, p - 1) == 1 :
             z = gamma ** i
@@ -307,6 +307,7 @@ def blypblypblyp (PubKey, K) :
                     ok = False
                 e += 1
             if ok :
+                print z
                 return z
     return "fail"
 
