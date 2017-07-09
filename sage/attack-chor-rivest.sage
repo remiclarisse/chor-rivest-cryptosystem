@@ -145,7 +145,9 @@ def simplifiedGoldreichAttack (c, p, h, alpha, t, pi) :
     r = int(p ** h - 1)
     K = t.parent()
     gg = K.multiplicative_generator()
+    print "Computing set of logs: ongoing"
     a = [ int(mod (log (t + alpha[pi[i]], gg), r)) for i in range (p) ]
+    print "Computing set of logs: done"
     C = [ Integer(mod (c[i]-c[0], r)) for i in range(p) ]
     A = [ int(mod (a[i]-a[0], r)) for i in range(p) ]
     pourmillage = -1

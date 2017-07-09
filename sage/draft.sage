@@ -264,6 +264,7 @@ def blypblyp (PubKey, r, ri, gpri) :
     g = K.multiplicative_generator()
     gamma = g ** ((p ** h - 1) / (p ** r - 1)) # élément primitif de GF(p^r)
     a = []
+    print "Building an almost generator of GF(" + str(p) + "^" + str(r) + ") with CRT: ongoing"
     for i in range (len (ri)) :
         l = log (gpri[i], gamma)
         d = 0
@@ -272,10 +273,16 @@ def blypblyp (PubKey, r, ri, gpri) :
         a.append((l / d) % (p ** ri[i] - 1))
     modulii = [ p ** ri[i] - 1 for i in range (len (ri)) ]
     resCRT = CRT(a, modulii)
+    print "Building an almost generator of GF(" + str(p) + "^" + str(r) + ") with CRT: done"
     beta = gamma ** resCRT
     ell = lcm (modulii)
-    possible_gpr = []
-    for x in range ((p ** r - 1) / ell) :
+    pourmillage = -1
+    maxim = ((p ** r - 1) / ell) - 1
+    x = 0
+    while x < ((p ** r - 1) / ell) :
+        if int(x * (10 ** 3) / maxim) != pourmillage :
+            pourmillage = int(x * (10 ** 3) / maxim)
+            print "Making a good generator of GF(" + str(p) + "^" + str(r) + "): \t" + str(pourmillage) + "‰"
         e = 1
         ok = True
         while e < (p - 1) * r / h and ok :
@@ -286,15 +293,21 @@ def blypblyp (PubKey, r, ri, gpri) :
                 ok = False
             e += 1
         if ok :
-            possible_gpr.append(beta * gamma ** (ell * x))
-    print possible_gpr
-    return possible_gpr[0]
+            print "Making a good generator of GF(" + str(p) + "^" + str(r) + "): \tdone"
+            return beta * gamma ** (ell * x)
+        x += 1
 
 def blypblypblyp (PubKey, K) :
     [c, p, h, Q, alpha] = PubKey
     g = K.multiplicative_generator()
     gamma = g ** ((p ** h - 1) / (p  - 1)) # élément primitif de GF(p)
-    for i in range (p) :
+    pourmillage = -1
+    maxim = p  - 1
+    i = 0
+    while i < p :
+        if int(i * (10 ** 3) / maxim) != pourmillage :
+            pourmillage = int(i * (10 ** 3) / maxim)
+            print "Picking a good generator of GF(" + str(p) + "): \t" + str(pourmillage) + "‰"
         if gcd (i, p - 1) == 1 :
             z = gamma ** i
             e = 1
@@ -307,8 +320,9 @@ def blypblypblyp (PubKey, K) :
                     ok = False
                 e += 1
             if ok :
-                print z
-                return z
+                print "Picking a good generator of GF(" + str(p) + "): \tdone"
+                return K(z)
+        i += 1
     return "fail"
 
 def find_DAG (r) :
@@ -330,26 +344,37 @@ def assault (c, p ,h, r, K) :
     return gpri[-1]
 
 def VaudenayAttack (e, PubKey) :
+    import time
     # Récuperer la clé publique
     [c, p, h, Q, alpha] = PubKey
     # Choisir un r adéquat
     for r in divisors (h) :
         if r ** 2 >= h :
             break
-    print "Chosen divisor of h: r=" + str(r)
+    print "Chosen divisor of h: r=" + str(r) + ", divisors are: " + str(divisors(r))
     K.<b> = FiniteField(p ** h)
     # Trouver un élément primitif gpr de GF(p^r) tel que les gpr^ci soient dans
     # le même sous-espace affine
+    t0 = time.time()
     gpr = assault (c, p ,h, r, K)
+    print "Wall time: " + str(time.time() - t0)
     # Trouver une permutation d'une clé équivalente
     alpha = [ K(alpha[i]) for i in range (p) ]
+    t0 = time.time()
     pi = secondVaudenayAttack (c, p, h, alpha, gpr, r, [0, 1])
+    print "Wall time: " + str(time.time() - t0)
     piInv = [pi.index(i) for i in range (p)]
     # Trouver un élément t algébrique de degré h dans GF(p^h)
+    t0 = time.time()
     t = thirdVaudenayAttack (c, p, h, alpha, pi, gpr, r)
+    print "Wall time: " + str(time.time() - t0)
+    print "Computing minimal polynomial: ongoing"
     mu = t.minimal_polynomial()
+    print "Computing minimal polynomial: done"
     # Enfin faire l'attaque de Goldreich, version simplifiée !
+    t0 = time.time()
     g, d = simplifiedGoldreichAttack (c, p, h, alpha, t, pi)
+    print "Wall time: " + str(time.time() - t0)
     # Une clé équivalente est construite : on peut déchiffrer le message comme
     # le destinataire légitime !
     # Faire le changement de base
