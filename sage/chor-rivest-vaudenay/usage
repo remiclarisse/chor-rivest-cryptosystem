@@ -1,0 +1,23 @@
+Une fois Sage lancé, attacher les deux fichiers 'chor-rivest.sage' et 'attack-chor-rivest' à Sage :
+  attach("~/chor-rivest-cryptosystem/sage/chor-rivest-vaudenay/chor-rivest.sage")
+  attach("~/chor-rivest-cryptosystem/sage/chor-rivest-vaudenay/attack-chor-rivest.sage")
+
+Définir les paramètres du cryptosystème : p un nombre premier et h un entier friable, e.g.
+  p = 197
+  h = 24
+
+Générer une paire de clé grâce à 'CRGenerateKeys' :
+  [PubKey, PrivKey] = CRGenerateKeys (p, h)
+
+Écrire le message à chiffer, puis le coder, et le transformer :
+  message = "Why did the topologist's marriage fail ? Because he thought that arbitrary unions were open !"
+  encodedMessage = encodeMessage (message)
+  message2cipher = transformMessage (encodedMessage, p, h)
+Ou utiliser directement :
+  message2cipher = [ generateRandomMessage (p, h) ]
+
+Chiffrer le message codé :
+  crypt = [ CREncrypt (m, PubKey) for m in message2cipher ]
+
+Maintenant e est le chiffré du message codé ! Pour le déchiffrer :
+  decodeMessage( recoverMessage ([ CRDecrypt (e, PubKey, PrivKey) for e in crypt ], p, h))
