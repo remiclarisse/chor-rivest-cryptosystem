@@ -1056,30 +1056,19 @@ Nous pouvons définir un algorithme pour calculer $g_{p^r}$ avec pour compléxit
 $$\O\left(\min_{\substack{r \text{ divisant } h \\ r^2 \geqslant h}} \; \min_{\substack{G \text{ est un DAG}\\p\text{-factorisant} \\ \text{ de } \gf(p^r)}} \; 
 pr^2C(G)\right)$$
 
-%\begin{algorithm}[h]
-%\caption{Algorithme pour récupérer $g_{p^r}$ à partir des $g_{p^{r_i}}$}
-%\label{algoGeneral}
-%\begin{algorithmic}[1]
-%\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, ${\{r_i\}}_{1\leqslant i\leqslant k}$ diviseurs de $r$ et $g_{p^{r_i}}$
-%\ENSURE l'ensemble des $g_{p^r}$ possibles
-%\STATE{choisir $\gamma$ un élément primitif de $\gf(p^r)$}
-%\FORALL{$i$ allant de $1$ à $k$}
-%	\STATE{résoudre l'équation $(\dagger)$ : $$x_i = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
-%\ENDFOR
-%\STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
-%\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$ où $x$ est unique modulo $\ell$}
-%\STATE{$\beta \gets \gamma^{x}$}
-%\FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}
-%	\FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}	
-%		\STATE{calculer la somme : $$\mathbf{res} \gets \sum_{i=0}^{p-1} \beta^{ec_i}\gamma^{ec_i\ell y}$$}
-%		\IF{$\mathbf{res} \neq 0$}
-%			\STATE{continuer la boucle ligne~\ref{algoNaifgprFromgpriBoucle}}
-%		\ENDIF
-%	\ENDFOR
-%	\STATE{ajouter $\beta\gamma^{\ell y}$ à la liste des $g_{p^r}$ possibles}
-%\ENDFOR
-%\end{algorithmic}
-%\end{algorithm}
+\begin{algorithm}[h]
+\caption{Attaque général}
+\label{algoGeneral}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$ et $(c_0,\dots, c_{p-1})$
+\ENSURE une clé secrète équivalente
+\STATE{pour le plus petit facteur $r$ de $h$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, trouver $G$ un DAG $p$-factorisant minimisant $C(G)$}
+\FOR{$u$ sommet de $G$, tel que pour tout $u \leftarrow u_i$, $u_i$ a été visité,}
+	\STATE{l'algorithme~\ref{algogprFromgpri} avec $\gf(p^r)=L(u)$ et $\gf(p^{r_i}) = L(u_i)$}
+\ENDFOR
+\STATE{appliquer l'algorithme~\ref{algogpr} à $g_{p^r}$}
+\end{algorithmic}
+\end{algorithm}
 
 \section{Le calcul de logarithmes dans un groupe}\label{logDiscret}
 

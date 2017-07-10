@@ -39,6 +39,7 @@
 \def\card{\operatorname{Card}}
 \def\car{\operatorname{car}}
 \def\pgcd{\operatorname{pgcd}}
+\def\ppcm{\operatorname{ppcm}}
 \def\id{\operatorname{id}}
 \def\aut{\operatorname{Aut}}
 \def\hom{\operatorname{Hom}}
@@ -103,9 +104,9 @@
 
 \section*{Introduction}
 
-Dans l'article~\cite{chorRivest1988}
+En section~\ref{sec:presInria}, nous présentons l'Inria (Institut National de Recherche en Informatique et en Automatique), ainsi que l'équipe-projet GRACE. Les section~\ref{sec:cryptosysteme} et section~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} résume le papier de Joux sur le calcul de logarithmes discrets dans des corps finis de petite caractéristique, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème.
 
-\section{Présentation de l'Inria}
+\section{La présentation de l'Inria}\label{sec:presInria}
 
 Inria emploie 2\;600 collaborateurs issus des meilleures universités mondiales, qui relèvent les défis des sciences informatiques et mathématiques. Inria est organisé en <<équipes-projets>> qui rassemblent des chercheurs aux compétences complémentaires autour d’un projet scientifique focalisé. Ce modèle ouvert et agile lui permet d’explorer des voies originales avec ses partenaires industriels et académiques. Inria répond ainsi aux enjeux pluridisciplinaires et applicatifs de la transition numérique. A l'origine de nombreuses innovations créatrices de valeur et d'emploi, Inria transfère vers les entreprises (start-up, PME et grands groupes) ses résultats et ses compétences, dans des domaines tels que la santé, les transports, l'énergie, la communication, la sécurité et la protection de la vie privée, la ville intelligente, l’usine du futur …
 
@@ -115,6 +116,584 @@ Inria emploie 2\;600 collaborateurs issus des meilleures universités mondiales,
 
 \textit{<<Le centre Inria Saclay - Île-de-France est un acteur essentiel de la recherche en sciences du numérique sur le plateau de Saclay. Il porte les valeurs et les projets qui font l’originalité d’Inria dans le paysage de la recherche : l’excellence scientifique, le transfert technologique, les partenariats pluridisciplinaires avec des établissements aux compétences complémentaires aux nôtres, afin de maximiser l’impact scientifique, économique et sociétal d’Inria.>>} \\
 Bertrand Braunschweig, directeur du centre Inria Saclay - Île-de-France.  
+
+\section{Le cryptosystème de Chor-Rivest}\label{sec:cryptosysteme}
+
+Dans leur article~\cite{chorRivest1988} publié en 1988, Benny Chor et Ronald Rivest introduisent un nouveau cryptosystème. Ils se sont inspiré du théorème de Bose-Chowla pour créer un cryptosystème reposant sur un problème de sac à dos et résistant à l'attaque Lagarias-Odlyzko~\cite{lagarias1983}.
+\begin{theo}[Théorème de Bose-Chowla]
+Soient $p$ un nombre premier et $h \geqslant 2$ un entier. Il existe une suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ d'entiers telle que : \begin{enumerate}
+\item pour tout $0 \leqslant i \leqslant p-1$, $$1 \leqslant a_i \leqslant p^h-1,$$
+\item si $(x_0, \dots, x_{p-1})$ et $(y_0, \dots, y_{p-1})$ sont deux vecteurs distincts d'entiers naturels de poids inférieur à $h$, alors 
+$$\sum_{i=0}^{p-1} x_ia_i \neq \sum_{i=0}^{p-1} y_ia_i.$$
+\end{enumerate}
+\end{theo}
+
+\subsection{Description}
+
+Soit $p^h$ une puissance de nombre premier. Considérons le corps fini $\gf(p^h)$ dont il est supposé que sa représentation est publique, i.e. il existe un polynôme unitaire $P(x)$ public de degré $h$ irréductible sur $\gf(p)$ et les éléments de $\gf(p^h)$ sont vus comme des polynômes modulo $P(x)$. Ainsi :
+$$\gf(p^h) = \frac{\gf(p)[x]}{(P(x))}.$$
+Notons $a = x \pmod{P(x)}$, la classe de $x$ modulo $P(x)$ dans $\gf(p^h)$, et choisissons $(1, a, a^2, \dots, a^{h-1})$ comme base du $\gf(p)$-espace vectoriel $\gf(p^h)$. Ainsi $\gf(p^h) = \gf(p)[a]$. Considérons aussi une numérotation publique $\alpha$ du sous-corps premier $\gf(p)$, i.e. $$\{\alpha_0,\dots, \alpha_{p-1}\} = \gf(p) \subset \gf(p^h).$$
+
+Les éléments, choisis aléatoirement, de la clé privée -- à garder secrète -- consistent en :
+\begin{itemize}
+\item un élément $t \in \gf(p^h)$ algébrique de degré $h$ sur $\gf(p)$ , et on note $\mu(x) \in \gf(p)[x]$ le polynôme minimal de $t$ sur $\gf(p)$,
+\item un générateur $g$ du groupe cyclique $\gf(p^h)^\times$,
+\item un entier $d$ tel que $0 \leqslant d \leqslant p^h-2$,
+\item une permutation $\sigma$ de l'ensemble $\{0, \dots, p-1\}$.
+\end{itemize}
+
+La clé publique -- à être publiée -- est alors composée des :
+$$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1},$$
+pour $i$ tel que $0 \leqslant i \leqslant p-1$. 
+
+\'Etant donné qu'il faut calculer des logarithmes discrets pour fabriquer la clé publique, les paramètres choisis doivent permettre d'effectuer ces logarithmes facilement dans $\gf(p^h)$. Ainsi, Chor et Rivest suggèrent de prendre un entier premier, ou une puissance de nombre premier, $p$ relativement petit et un exposant $h$ friable, permettant l'utilisation de l'algorithme de Pohlig-Hellman. En l’occurrence, ils ont proposé de se placer dans les corps tels que $\gf(197^{24})$, $\gf(211^{24})$, $\gf(243^{24})$ et $\gf(256^{25})$.
+
+L'espace des messages est l'ensemble des chaînes de $p$-bits de poids de Hamming égal à $h$. C'est-à-dire que le message à chiffrer doit d'abord être encodé en une chaîne de bits $m = [m_0\cdots m_{p-1}]$ telle que $m_0+\dots + m_{p-1} = h$. N'importe quel message peut être découpé en plusieurs messages de $p$ bits de poids $h$ en suivant un algorithme d'encodage donné en section IV.B. de \cite{chorRivest1988}.
+
+L'espace des chiffrés est $\Z/(p^h-1)\Z$ et le chiffré d'un message $m$ est :
+$$E(m) := \sum_{i=0}^{p-1} m_ic_i \pmod{p^h-1}.$$
+
+Pour déchiffrer, nous calculons :
+$$G(t) := g^{E(m) - hd}$$
+vu comme un polynôme en $t$ à coefficients dans $\gf(p)$ et de degré au plus $h-1$. Comme $g$ est primitif dans $\gf(p^h)$, i.e. l'ordre de $g$ est $p^h-1$, l'exposant $E(m) - hd$ est à déterminer modulo $p^h-1$ :
+
+\begin{align*}
+E(m) - hd &\equiv \left(\sum_{i=0}^{p-1} m_ic_i\right) - hd \pmod{p^h-1} \\
+&\equiv \left(\sum_{i=0}^{p-1} m_i\left(d + \log_g\left(t + \alpha_{\sigma(i)}\right)\right)\right) - hd \pmod{p^h-1} \\
+&\equiv \left(hd + \sum_{i=0}^{p-1} m_i\log_g\left(t + \alpha_{\sigma(i)}\right)\right) - hd \pmod{p^h-1} \\
+&\equiv  \sum_{i=0}^{p-1} m_i\log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1} \\
+\end{align*}
+D'où, l'égalité dans $\gf(p^h)$ : 
+$$G(t) = g^{E(m) - hd} = \prod_{i=0}^{p-1} \left(t+\alpha_{\sigma(i)}\right)^{m_i} = \prod_{m_i = 1} \left(t+\alpha_{\sigma(i)}\right).$$
+Cela donne l'expression de l'élément $G(t)$ dans la base $(1,t,t^2, \dots, t^{h-1})$ du $\gf(p)$-espace vectoriel $\gf(p^h)$, où $t = x \pmod{\mu(x)}$. Ainsi :
+$$G(x) \equiv \prod_{m_i = 1} \left(x+\alpha_{\sigma(i)}\right) \pmod{\mu(x)}.$$
+Il existe donc un polynôme $\lambda(x) \in \gf(p)[x]$ tel que : $$G(x) = \lambda(x) \mu(x) + \prod_{m_i = 1} \left(x+\alpha_{\sigma(i)}\right).$$
+En résonnant sur les degrés et du fait que $\mu(x)$ et $\prod \left(x+\alpha_{\sigma(i)}\right)^{m_i}$ soient unitaires, nous déduisons que $\lambda(x) = -1$, dont il découle l'égalité de polynômes :
+$$G(x) + \mu(x) = \prod_{m_i = 1} \left(x+\alpha_{\sigma(i)}\right).$$
+La factorisation de ce dernier permet de recouvrer le message $m$.
+
+\subsection{Exemple}
+Prenons $p := 17$ et $h := 6$, ainsi $p^h = 24\;137\;569$.
+\begin{verbatim}
+sage: p = 17
+sage: h = 6
+sage: q = p ** h
+\end{verbatim}
+Le corps fini $\gf(17^6)$ construit par \verb|Sage| est, en l’occurrence, 
+$$\frac{\F_{17}[x]}{(P(x))}, \text{ où } P(x) := x^6 + 2x^4 + 10 x^2 +3x +3\in  \F_{17}[x].$$
+\begin{verbatim}
+sage: K.<a> = FiniteField(q)
+sage: P = a.minimal_polynomial()
+\end{verbatim}
+La numérotation $\alpha$ du sous-corps premier choisie est :
+$$(\alpha_0, \dots, \alpha_{16}) = (2, 12, 4, 1, 0, 10, 7, 8, 15, 16, 3, 5, 13, 9, 11, 6, 14)$$
+\begin{verbatim}
+sage: alpha = [K(i) for i in range (p)]
+sage: shuffle (alpha)
+\end{verbatim}
+\subsubsection*{Génération des clés}
+Nous prenons un élément $t\in\gf(17^6)$ de degré algébrique $6$ sur $\gf(17)$. Comme plus haut, nous notons $a = x \pmod{P(x)}$, le $t$ sélectionné est alors :
+$$t := 9a^5 + 16a^4 + 10a^3 + 3a^2 + 12a + 12,$$
+de polynôme minimal :
+$$\mu(x) := x^6 + 9x^5 + 8x^4 + 14x^3 + x^2 + 11x + 6\in\gf(17)[x].$$
+\begin{verbatim}    
+sage: while True :
+sage:     t = K.random_element()
+sage:     if t.minimal_polynomial().degree() == h :
+sage:         break
+sage: mu = t.minimal_polynomial()
+\end{verbatim}
+Ensuite, comme élément primitif de $\gf(17^6)$, nous prenons :
+$$g := 2a^5 + 5a^4 + 14a^3 + 2a^2 + 10a + 16.$$
+\begin{verbatim}    
+sage: while True :
+sage:     g = K.random_element()
+sage:     if g.multiplicative_order() == q - 1 :
+sage:         break
+\end{verbatim}
+L'entier $d$ est pris égal à $1\;530\;545$.
+\begin{verbatim}
+sage: d = randint (0, q - 2)
+\end{verbatim}
+Enfin, nous choisissons une permutation $\sigma$ de l'ensemble $\{0, \dots, 16\}$ :
+$$\sigma := (0,10,8,5,1,6,14)(2,3,9,16,13)(4,12,7,15)(11).$$
+\begin{verbatim}
+sage: s = Permutations([i for i in range (p)]).random_element()
+\end{verbatim}
+Nous avons fini de fabriquer la clé privée ! Reste à construire la clé publique :
+$$\begin{array}{r c l c r c l c r c l}
+c_0 &:=& 21\;667\;185 &&
+c_1 &:=& 3\;210\;064 &&
+c_2 &:=& 6\;070\;281 \\
+c_3 &:=& 3\;093\;929 &&
+c_4 &:=& 19\;945\;987 &&
+c_5 &:=& 294\;610 \\
+c_6 &:=& 4\;230\;580 &&
+c_7 &:=& 18\;951\;770 &&
+c_8 &:=& 7\;364\;695 \\
+c_9 &:=& 23\;348\;812 &&
+c_{10} &:=& 7\;918\;908 &&
+c_{11} &:=& 3\;562\;855 \\
+c_{12} &:=& 6\;735\;636 &&
+c_{13} &:=& 13\;077\;876 &&
+c_{14} &:=& 11\;303\;489 \\
+c_{15} &:=& 22\;106\;426 &&
+c_{16} &:=& 18\;193\;975 
+\end{array}$$
+\begin{verbatim}
+sage: c = [mod (d + log (t + alpha[s[i]], g), q - 1) 
+                                              for i in range (p)]
+\end{verbatim}
+
+\subsubsection*{Chiffrement d'un message}
+Maintenant, donnons nous un message à chiffrer de longueur $17$ et de poids $6$ :
+$$m := [m_0\cdots m_{16}] = [00100101100100100].$$
+\begin{verbatim}
+sage: m = [1 for i in range (h)] + [0 for i in range (p - h)]
+sage: shuffle (m)
+\end{verbatim}
+Chiffrons $m$ :
+$$e := 23\;410\;132.$$
+\begin{verbatim}
+sage: e = mod (sum ([m[i]*c[i] for i in range (p)]), q-1)
+\end{verbatim}
+
+\subsubsection*{Déchiffrement du message}
+Nous souhaitons écrire $g^{e - hd}$ comme un polynôme en $t$. Or \verb|Sage| nous donne $g^{e - hd}$ comme polynôme en $a$ : $$g^{e - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
+Pour parvenir à exprimer $g$ comme nous le souhaitons, il faut effectuer un changement de base du $\gf(17)$-espace vectoriel $\gf(17^6)$ : passer de la base $\mathcal{A} := (1, a, a^2, \dots, a^{h-1})$ à la base $\mathcal{T} := (1, t, t^2, \dots, t^{h-1})$.
+La matrice de passage facile à calculer est celle qui passe de la base $\mathcal{T}$ à la base $\mathcal{A}$ : il suffit d'écrire dans \verb|Sage| les différentes puissances de $t$, et \verb|Sage| les exprime en fonction des puissances de $a$. Voici cette matrice :
+$$\left[\begin{array}{cccccc}
+1 & 12 & 7 & 11 & 14 & 0 \\
+0 & 12 & 9 & 12 & 6 & 12 \\
+0 & 3 & 8 & 3 & 7 & 12 \\
+0 & 10 & 0 & 15 & 15 & 14 \\
+0 & 16 & 4 & 0 & 13 & 3 \\
+0 & 9 & 15 & 10 & 5 & 6 \\
+\end{array}\right]$$
+Celle qui nous intéresse est son inverse, la matrice de passage de la base $\mathcal{A}$ à la base $\mathcal{T}$ :
+$$\left[\begin{array}{cccccc}
+1 & 5 & 10 & 12 & 15 & 11 \\
+0 & 8 & 8 & 0 & 11 & 5 \\
+0 & 13 & 13 & 9 & 5 & 1 \\
+0 & 9 & 10 & 3 & 11 & 9 \\
+0 & 12 & 6 & 2 & 16 & 8 \\
+0 & 7 & 16 & 2 & 13 & 11 \\
+\end{array}\right]$$
+\begin{verbatim}
+sage: V = K.vector_space()
+sage: M = Matrix (GF(p), 
+                      [V(t ** i) for i in range (h)]).transpose()
+sage: Minv = M.inverse()
+\end{verbatim}
+Comme $g^{e - hd}$ vaut dans la base $\mathcal{A}$ le vecteur $(1, 15, 9, 11, 0, 1)$, il est facile d'obtenir l'égalité : 
+$$g^{e - hd} = 10t^5 + 9t^4 + 12t^3 + 4t^2 + 10t + 3.$$
+Notons $G(x) := 10x^5 + 9x^4 + 12x^3 + 4x^2 + 10x + 3 \in \gf(17)[x]$.
+Ainsi le message est recouvré en factorisant le polynôme :
+$$G(x) + \mu(x) = x^6 + 2x^5 + 9x^3 + 5x^2 + 4x + 9,$$
+ce que nous faisons : 
+$$G(x) + \mu(x) = (x + 1)(x + 2)(x + 5)(x + 6)(x + 10)(x + 12)\in \gf(17)[x].$$ 
+Nous pouvons alors déterminer les $\alpha_i$ utilisés et nous savons alors que le bit $m_{\sigma^{-1}(i)}$ du message $m$ est à $1$, alors que les autres sont nuls.
+\begin{verbatim}
+sage: A.<x> = PolynomialRing (GF(p))
+sage: Q = A(list (Minv * V(g ** (e - h * d)))) + A(mu)
+sage: beta = [p - Q.roots()[i][0] for i in range (h)]
+\end{verbatim}
+Pour facilité l'explication, notons $\beta_i$, pour $i$ tel que $0\leqslant i \leqslant 5$, les éléments de $\gf(17)$ tels que $-\beta_i$ est racine de $G(x) + \mu(x)$, les $\beta_i$ étant tous distincts. Par exemple, $\beta_0 = 1$, $\beta_1 =2$, $\dots$, $\beta_5 = 12$. Ainsi, pour tout $i$ tel que $0\leqslant i \leqslant 5$, il faut déterminer l'indice $j$, où $0 \leqslant j \leqslant 16$, tel que $\alpha_j = \beta_i$, et alors nous déduisons qu'il y a un $1$ au $\sigma^{-1}(j)$ bit du message $m$.
+Par exemple, pour $\beta_0 = 1$ : nous cherchons d'abord l'indice $j$ tel que $\alpha_j = 1$, à savoir $j = 3$. Puis nous déterminons $\sigma^{-1}(3) = 2$. Et nous avons bien $m_2 = 1$. Idem, pour $\beta_2 = 5$ : $\alpha_{11} = 5$, $\sigma^{-1}(11) = 11$ et nous constatons en effet que $m_{11} = 1$. Et ainsi de suite !
+\begin{verbatim}
+sage: sInv = [s.index(i) for i in range (p)]
+sage: message = [0 for i in range (p)]
+sage: for k in beta :
+sage:     message[sInv [alpha.index(k)]] = 1
+\end{verbatim}
+
+\section{La cryptanalyse de Serge Vaudenay}\label{sec:cryptanalyse}
+
+Nous présentons ici l'attaque de Serge Vaudenay \cite{vaudenay2000}. Elle s'appuie sur la forte friabilité de $h$, i.e. sur l'existence de nombreux sous-corps de $\gf(p^h)$. Pour casser une instance du cryptosystème, l'idée est de fabriquer une clé privée qui donne la même clé publique que le cryptosystème : cela va permettre de déchiffrer comme un destinataire légitime !
+
+Ici, nous donnons l'attaque pour $p$ un nombre premier, bien qu'elle soit généralisée pour le cas $p$ puissance d'un nombre premier. Aussi, nous exposons l'attaque dans l'ordre et non à rebours, à savoir qu'on part du cas où rien n'est connu.
+
+\subsection*{Symétrie dans la clé privée}
+
+Dans le cryptosystème de Chor-Rivest, nous choisissons la clé privée de façon aléatoire puis, à partir de celle-ci, nous calculons la clé publique. Le système repose sur la difficulté de trouver une clé secrète à partir de la clé publique. Cependant, nous remarquons qu'il y a plusieurs clés privées \textit{équivalentes}, à savoir qu'il existe plusieurs jeux de clés privées qui donnent la même clé publique.
+
+Affinons. Nous pouvons remplacer $t$ et $g$ par leur puissance $p$-ième, la clé publique reste inchangée car :
+$$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g}\left(\left(t + \alpha_{\sigma(i)}\right)^p\right) = \log_{g}\left(t + \alpha_{\sigma(i)}\right).$$
+Nous pouvons aussi remplacer $(t, \alpha_{\sigma})$ par $(t + v, \alpha_{\sigma} - v)$, pour tout $v \in \gf(p)$. Et enfin, nous pouvons remplacer $(t,d,\alpha_\sigma)$ par $(ut, d - \log_g(u), u\alpha_\sigma)$, quel que soit $u \in \gf(p)^\times$.
+Cela donne donc au moins $hp(p-1)$ clés privées équivalentes. Il s'agit alors de déterminer une de ces clés.
+
+
+\begin{defi}[Clés équivalentes]
+Deux clés privées sont dites \textit{équivalentes} si elles fabriquent la même clé publique. En d'autres termes, deux clés privées $(g,t,d,\sigma)$ et $(g',t',d',\pi)$ sont équivalentes, si on a l'égalité d'ensembles :
+$$\left\{d + \log_g(t + \alpha_{\sigma(i)}) : 0\leqslant i \leqslant p-1\right\} = \left\{d' + \log_{g'}(t' + \alpha_{\pi(i)}) : 0\leqslant i \leqslant p-1\right\}.$$
+\end{defi}
+
+Pour passer d'une clé privée à une clé privée équivalente, il existe une transformation sur la permutation $\sigma$ qui permet de choisir deux images arbitrairement pour deux antécédents fixés -- ici, on prend les images de $0$ et $1$ :
+
+\begin{prop}
+Soit $\sigma$ une permutation d'une clé privée. Alors, il existe $\pi$ une permutation d'une clé privée équivalente, telle que, $$\pi(0) = i \qquad \text{et}\qquad \pi(1) = j.$$
+\end{prop}
+
+\begin{proof}
+Posons :
+$$\quad u = \frac{\alpha_i - \alpha_j}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p)^\times \quad \text{ et } \quad v =  \frac{\alpha_j\alpha_{\sigma(0)} - \alpha_i\alpha_{\sigma(1)}}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf(p).$$
+Il faut alors définir la permutation $\pi$ par
+ $$\alpha_{\pi(i)} = u\alpha_{\sigma(i)} + v,$$
+ pour tout $i$ tel que $0 \leqslant i \leqslant p-1$.
+\end{proof}
+
+\subsection*{Cléf de voûte de l'attaque}
+
+\begin{prop}\label{premierePropVaudenay}
+Pour tout facteur $r$ de $h$, il existe un générateur $g_{p^r}$ du groupe multiplicatif du sous-corps $\gf(p^r)$ de $\gf(p^h)$ et un polynôme $Q(x) \in \gf(p^r)[x]$ de degré $h/r$ et tel que $-t$ en est une racine, et pour tout $0\leqslant i \leqslant p-1$, nous avons :
+$$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
+\end{prop}
+
+\begin{proof}
+Soit 
+$$Q(x) = (g_{p^r})^d \prod_{i=0}^{h/r-1} \left(x+t^{p^{ri}}\right),
+\quad \text{ où } g_{p^r} := \prod_{i=0}^{h/r-1} g^{p^{ri}},$$
+$g_{p^r}$ peut être considérer comme la norme de $g$ considéré dans l'extension de corps $\gf(p^r) \subseteq \gf(p^h)$, ainsi $(g_{p^r})^{p^r} = g_{p^r}$ et $g_{p^r}$ est générateur de $\gf(p^r)^\times$ car $g$ est primitif dans $\gf(p^h)$. Nous remarquons que $Q\left(x^{p^r}\right) = Q(x)^{p^r}$, ainsi $Q(x) \in \gf(p^r)[x]$, en effet :
+\begin{align*}
+Q\left(x\right)^{p^r} &= (g_{p^r})^{dp^r} \prod_{i=0}^{h/r-1} \left(x+t^{p^{ri}}\right)^{p^r} \\
+&= (g_{p^r})^{d} \prod_{i=0}^{h/r-1} \left(x^{p^r} + t^{p^{ri}p^r}\right) \\
+&= (g_{p^r})^{d} \prod_{i=1}^{h/r} \left(x^{p^r} + t^{p^{ri}}\right) \\
+&= Q\left(x^{p^r}\right), \\
+\end{align*}
+car $t^{p^{r(h/r)}} = t^{p^h} = t = t^{p^0}$. Cela montre aussi que $Q(-t) = 0$. Nous avons aussi que $Q(x)$ est de degré $h/r$. Et enfin, pour $0\leqslant j \leqslant p-1$, calculons $(g_{p^r})^{c_i}$ :
+\begin{align*}
+(g_{p^r})^{c_j} &= \left(\prod_{i=0}^{h/r-1} g^{p^{ri}}\right)^{c_j}\\
+&= \prod_{i=0}^{h/r-1} \left(g^{c_j}\right)^{p^{ri}}\\
+&= \prod_{i=0}^{h/r-1} g^{dp^{ri}}\left(\alpha_{\sigma(j)} + t\right)^{p^{ri}}\\
+&= (g_{p^r})^d \prod_{i=0}^{h/r-1} \left(\alpha_{\sigma(j)} + t^{p^{ri}}\right)\\
+&= Q\left(\alpha_{\sigma(j)}\right) \\
+\end{align*}
+Cela achève la démonstration de la proposition.
+\end{proof}
+
+Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(g_{p^r}, Q)$, et $g_{p^r}$ est donc essentiellement unique.
+
+\paragraph*{Notation :} Pour $r$ divisant $h$, notons $$g_{p^r} := g^{(p^h-1)/(p^r-1)}.$$
+
+\subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$ et $\sigma$}
+
+Supposons connus $g_{p^r} = g^{(p^h-1)/(p^r-1)}$, pour $r$ divisant $h$ (comme dans la proposition~\ref{premierePropVaudenay}), ainsi que la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (g_{p^r})^{c_i})}_i$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-t$.  Par la symétrie dans la clé privée, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. Nous résolvons l'attaque en calculant $g$ et $d$ grâce à l'attaque de O.~Goldreich exposée en sous-section~\ref{attaqueOG}.
+
+\begin{algorithm}[h]
+\caption{Algorithme implémentant la première attaque de Vaudenay}
+\label{algoPremiereAttaqueVaudenay}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $\sigma$, $r$ divisant $h$ et $g^{(p^h-1)/(p^r-1)}$
+\ENSURE $t, t^{p^r}, t^{p^{2r}}, \dots, t^{p^{h - r}}$
+\STATE{$\rho \gets g^{(p^h-1)/(p^r-1)}$}
+\STATE{$n \gets h/r$}
+\STATE{$Q(x) \in \gf(p^r)[x]$ :  initialisé $Q(x) \gets 0$}
+\FOR{$i$ allant de $0$ à $n$}
+	\STATE{calculer l'interpolateur de Lagrange : $$L(x) \gets \prod_{\substack{0\leqslant k\leqslant n \\ k \neq i}}\frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}$$}
+	\STATE{$Q(x) \gets Q(x) + \rho^{c_i} L(x)$}
+\ENDFOR
+\RETURN{$[-t \in \gf(p^h)$ pour $t$ racine du polynôme $Q(x) ]$}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$}
+
+Supposons connu l'élément $g_{p^r}$, la norme de l’élément primitif $g$ considéré dans l'extension $\gf(p^r) \subseteq \gf(p^h)$, comme dans la proposition~\ref{premierePropVaudenay}.
+
+Soient $(i_0, \dots, i_{h/r})$ une famille de $h/r + 1$ indices distincts entre $0$ et $p-1$. Par la proposition~\ref{premierePropVaudenay}, nous pouvons interpoler le polynôme $Q(x)$ en les $\alpha_{\sigma(i_j)}$ :
+\begin{align*}
+Q(x) &= \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(i_j)}\right) \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}} \\
+&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}, \\
+\end{align*} 
+ce qui mène aux égalités : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
+$$(\dagger) \qquad (g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}.$$
+
+En fait, nous pouvons même écrire : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
+$$(\ddagger) \qquad (g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}.$$
+En effet, soit $i$ parmi $i_0, \dots, i_{h/r}$ :
+$$(g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
+car $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}\right) = 1.$$
+Ainsi, nous avons l'égalité de polynôme :
+$$Q(x) - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
+car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque le polynôme est évalué en les $\alpha_{\sigma(i)}$, où $0\leqslant i \leqslant p-1$.
+
+\`A cause de la symétrie de la clé privée, indiquée en sous-section~\ref{symetrieClePrivee}, nous pouvons choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$. Un algorithme naïf pour trouver la permutation $\sigma$ est de chercher exhaustivement les valeurs  $\sigma(i_j)$ pour $j=0$ et $3\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
+
+\begin{algorithm}[h]
+\caption{Algorithme pour trouver $\pi$ sachant $g_{p^r}$}
+\label{algoNaifgpr}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ et $g_{p^r}$
+\ENSURE une permutation $\pi$ d'une clé privée équivalente
+\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
+\STATE{choisir arbitrairement $\pi(i_1)$ et $\pi(i_2)$ distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$\pi(i_0), \pi(i_3), \dots, \pi(i_{h/r})$ distincts deux à deux} \label{algoNaifgprBoucle}
+	\STATE{$S \gets \left[\pi(i_0), \pi(i_3), \dots, \pi(i_{h/r})\right]$}
+	\FORALL{$\ell \not\in S$} \label{algoNaifgprBoucle2}
+		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\pi(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\pi(i_k)}}{\alpha_{\pi(i_j)}-\alpha_{\pi(i_k)}} $$}
+		\IF{il existe $i$ tel que $\mathbf{res} = (g_{p^r})^{c_i}$ et $\pi(i)$ n'est pas définie}
+			\STATE{$\pi(i) \gets \ell$}
+			\STATE{$S \gets S \cup [\pi(i)]$}
+		\ELSE
+			\STATE{continuer la boucle ligne~\ref{algoNaifgprBoucle}}
+		\ENDIF
+	\ENDFOR
+	\RETURN{$\pi$}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+La complexité de cet algorithme est grossièrement $\O(rp^{h/r})$ opérations dans $\gf(p)$ : la boucle à la ligne~\ref{algoNaifgprBoucle2} fait en moyenne $\O(pr/h)$ itérations, chacune avec une complexité $\O(h)$, et il nous avons besoin de $\O(p^{h/r}-1)$ itérations de cette boucle.
+
+La permutation $\pi$ donnée par l'algorithme~\ref{algoNaifgpr} est telle qu'il existe $u \in \gf(p)^\times$ et $v \in \gf(p)$ vérifiant pour tout $0 \leqslant i \leqslant p-1$ :
+$$\alpha_{\pi(i)} = u \alpha_{\sigma(i)} + v,$$
+où la permutation $\sigma$ est celle de la clé secrète d'origine, détenue par le destinataire légitime.
+\begin{align*}
+Q_\pi(x) &= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\pi(i_k)}}{\alpha_{\pi(i_j)}-\alpha_{\pi(i_k)}}, \\
+&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-u\alpha_{\sigma(i_k)} - v}{u\alpha_{\sigma(i_j)}-u\alpha_{\sigma(i_k)}}, \\
+&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{u^{-1}x - u^{-1}v-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}, \\
+&= Q_\sigma(u^{-1}(x -v)). \\
+\end{align*}
+Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(x)$, alors $-u^{-1}(\omega +v)$ est racine du polynôme $Q_\sigma(x)$, ainsi si on fait tourner l'algorithme~\ref{algoPremiereAttaqueVaudenay} avec la permutation $\pi$, les valeurs retournées sont :
+$$u t -v,\quad u t^{p^r} -v,\quad u t^{p^{2r}} -v,\quad \dots,\quad u t^{p^{h - r}} -v.$$
+Il est alors plus simple de déterminer un $g$ pour avoir une clé privée équivalente, que d'utiliser l'attaque de Goldreich, sous-section~\ref{attaqueOG}.
+
+En effet, pour $0 \leqslant j < h/r$, à savoir on choisit n'importe quel élément retourné par l'algorithme~\ref{algoPremiereAttaqueVaudenay}, choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}\left(u t^{p^{jr}} -v+\alpha_{\pi(i)}\right)$$
+Notons $L := \log_{g'}(g^{p^{jr}})$, de sorte que $g^{p^{jr}}=g'^L$. Alors pour tout $0 \leqslant i \leqslant p-1$ :
+\begin{align*}
+b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}} -v + \alpha_{\pi(0)}}\right) \\
+&= \log_{g'}\left(\frac{u t^{p^{jr}} -v + u \alpha_{\sigma(i)}+v}{u t^{p^{jr}} -v + u \alpha_{\sigma(0)}+v}\right)\\
+&= \log_{g'}\left(\frac{u t^{p^{jr}} + u \alpha_{\sigma(i)}}{u t^{p^{jr}} + u \alpha_{\sigma(0)}}\right)\\
+&= L\log_{g^{p^{jr}}}\left(\frac{t^{p^{jr}} + \alpha_{\sigma(i)}}{t^{p^{jr}} + \alpha_{\sigma(0)}}\right)\\
+&= L(c_i - c_0) \\
+\end{align*}
+
+\begin{algorithm}[h]
+\caption{Algorithme implémentant l'attaque de Goldreich simplifiée}
+\label{algoAttaqueGoldreichsimplifiee}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $t$ et $\pi$
+\ENSURE $g$ et $d$ ou ``échec''
+\STATE{choisir $g'$ un élément primitif arbitraire de $\gf(p^h)$}
+\STATE{calculer les $b_i := \log_{g'}(t+\alpha_{\pi(i)})$}
+\STATE{$B \gets [ b_i - b_0$ pour $i$ allant de $0$ à $p-1 ] $}
+\STATE{$C \gets [ c_i - c_0$ pour $i$ allant de $0$ à $p-1 ] $}
+\FOR{$i$ allant de $0$ à $p-1$}
+	\IF{$\pgcd(C[i], p^h-1) = 1$}
+		\STATE{$L \gets C[i]^{-1}B[i] \pmod{p^h-1}$}
+		\STATE{$\mathcal{C} \gets \{L\cdot C[n] \pmod{p^h-1}$ pour $n$ allant de $0$ à $p-1 \}$}
+		\STATE{$\mathcal{B} \gets \{B[n] \pmod{p^h-1}$ pour $n$ allant de $0$ à $p-1 \}$}	
+		\IF{$\mathcal{C} = \mathcal{B}$}
+			\STATE{$g \gets g'^L$}
+			\STATE{$d \gets c_0 - \log_g(t+\alpha_{\pi(0)}) \pmod{p^h -2}$}
+			\RETURN{$g$ et $d$}
+		\ENDIF				
+	\ENDIF
+\ENDFOR
+\RETURN{``échec''}
+\end{algorithmic}
+\end{algorithm}
+
+Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, le ``$t$'' donné est $u t^{p^{jr}} -v$, il retourne le conjugué $g^{p^{jr}}$ du $g$ d'origine et l'entier $d - \log_{g^{p^{jr}}}(u)$.
+
+Quand $r$ est suffisamment grand, il existe un meilleur algorithme. En fait, si $r \geqslant h/r$, la famille $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$ est libre (voir plus loin). Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$, pour $0\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{i_0}} - (g_{p^r})^{c_{i_0}}, \quad (g_{p^r})^{c_{i_1}} - (g_{p^r})^{c_{i_0}},\quad \dots,\quad (g_{p^r})^{c_{i_{h/r}}} - (g_{p^r})^{c_{i_0}}.$$
+
+Notons $a_j^i$ le coefficient de $(g_{p^r})^{c_{i_{j}}} - (g_{p^r})^{c_{i_0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$. Par $(\ddagger)$, nous avons :
+\begin{align*}
+\frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}} \right)^{-1} \\
+&= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
+&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right) \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
+&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right) \left(\frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}} \right) \\
+\end{align*}
+
+Ainsi, il existe $u$ dans $\gf(p)$, indépendant de $i$, tel que 
+$$(\star) \qquad\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}}.$$
+En passant toute les valeurs de $u$ en revue, nous pouvons obtenir $\sigma(i)$ de l'équation $(\star)$. Cette remarque donne naissance à l'algorithme suivant :
+
+\begin{algorithm}[h]
+\caption{Algorithme pour trouver $\pi$ sachant $g_{p^r}$ lorsque $r\geqslant \sqrt h$}
+\label{algogpr}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ tel que $r\geqslant \sqrt h$ et $g_{p^r}$
+\ENSURE une permutation $\pi$ d'une clé privée équivalente
+\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
+\STATE{pré-calculer la matrice de changement de bases de la base ``classique'' vers la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{0\leqslant j \leqslant h/r}$}
+\STATE{choisir arbitrairement $\pi(i_1)$ et $\pi(i_2)$ distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$u$ dans $\gf(p)$} 
+	\FORALL{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq i_0, i_1, i_2$} 
+		\STATE{écrire $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$ dans la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$}
+		\STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
+		\STATE{trouver la valeur de $\pi(i)$ grâce à $(\star)$}
+	\ENDFOR
+	\IF{$\pi$ est consistante}
+		\STATE{compléter $\pi(i_0)$}
+		\RETURN{$\pi$}
+	\ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+$$\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\pi(i)}-\alpha_{\pi(i_1)}}{\alpha_{\pi(i)}-\alpha_{\pi(i_2)}}
+\quad\Leftrightarrow\quad
+\alpha_{\pi(i)} = \frac{a_2^i\alpha_{\pi(i_2)}-ua_1^i\alpha_{\pi(i_1)}}{a_2^i-ua_1^i}.$$
+
+\subsection{Test pour trouver $g^{(p^h-1)/(p^r-1)}$}
+
+Les équations : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
+$$(\ddagger) \qquad (g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
+signifient que tous les $(g_{p^r})^{c_i}$ sont en fait dans un même sous-espace affine de dimension $h/r$ du $\gf(p)$-espace vectoriel $\gf(p^r)$. 
+
+Donc si on suppose que $h/r + 1 \leqslant r$, à savoir $r \geqslant \sqrt{h + 1/4} + 1/2$, on peut donner un test facile pour $g_{p^r}$.
+
+\begin{prop}
+S'il existe un facteur $r$ de $h$ de sorte que $r \geqslant \sqrt{h + 1/4} + 1/2$, et si $$g_{p^r} := g^{(p^h-1)/(p^r-1)} = g^{1+p^r+p^{2r}+\cdots+p^{h-r}},$$ alors tous les $g_{p^r}^{c_i}$ sont sur le même sous-espace affine de dimension $h/r$ de $\gf(p^r)$ lorsque celui-ci est considéré comme un espace affine de dimension $r$ sur $\gf(p)$.
+\end{prop}
+
+\begin{proof}
+To do !!
+\end{proof}
+
+L'existence d'un tel $r$ peut être considérée comme un mauvais prérequis, cependant vu que les paramètres du cryptosystème de Chor-Rivest doivent être choisis de sorte que le problème du logarithme discret soit facile, nous savons déjà que $h$ à plusieurs facteurs, et il est donc fort probable que cette hypothèse sur $r$ soit satisfaite. En fait, les $h$ sans tels facteurs sont les nombres premiers et les carrés de nombres premiers. Le vrai problème est que $r$ ne doit pas être trop grand.
+
+Nous pouvons donc écrire un algorithme qui vérifie si un candidat pour $g_{p^r}$ est bon : l'algorithme vérifie simplement si les $g_{p^r}^{c_i}$ sont affinement liés. Cet algorithme a pour complexité moyenne $\O(h^3/r)$ opérations dans $\gf(p)$. Comme il y a $\phi(p^r-1)/r$ candidats, nous pouvons chercher exhaustivement un $g_{p^r}$ avec une complexité de $\O(h^3p^r/r^2)$.
+
+\begin{algorithm}[h]
+\caption{Algorithme pour trouver $g_{p^r}$ lorsque $r\geqslant \sqrt{h + 1/4} + 1/2$}
+\label{algoTestgpr}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$ et $r$ divisant $h$ tel que $r\geqslant \sqrt{h + 1/4} + 1/2$
+\ENSURE un élément $g_{p^r}$
+\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$\zeta \in \gf(p^h)$ générateur de $\gf(p^r)^\times$} \label{algoTestgprboucle}
+	\STATE{calculer l'équation du sous-espace affine $V$ engendré par $(\zeta^{c_{i_0}}, \dots, \zeta^{c_{i_{h/r}}})$}
+	\FORALL{$i$ différent de $i_0, \dots, i_{h/r}$ }	
+		\IF{$\zeta^{c_{i}}$ ne satisfait pas à l'équation du sous-espace affine $V$}
+			\STATE{continuer la boucle ligne~\ref{algoTestgprboucle}}
+		\ENDIF
+	\ENDFOR
+	\RETURN{$\zeta$}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Utilisation des $c_i$}
+
+Nous allons améliorer l'attaque précédente en utilisant la connaissance de tous les $c_i$. Nous allons nous servir du fait suivant :
+
+\begin{prop}
+Soit $Q(x)$ un polynôme de $\gf(p^r)[x]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Nous avons $$\sum_{a \in \gf(p)} Q(a)^e = 0.$$
+\end{prop}
+
+Le lemme qui suit va permettre de démontrer cette proposition.
+
+\begin{lemm}
+Soit $k$ un entier tel que $1 \leqslant k < p-1$. Alors
+$$\sum_{a\in\gf(p)} a^k = 0.$$
+Ainsi, si $P(x) \in \gf(p^r)[x]$, pour $r \geqslant 1$, est de degré inférieur à $p-1$, alors : $$\sum_{a\in\gf(p)} P(a) = 0.$$
+\end{lemm}
+
+\begin{proof}[Démonstration du lemme]
+Tout d'abord remarquons que $0 \in \gf(p)$ ne contribue pas à la somme, et ensuite, notons $g$ un élément primitif du corps $\gf(p)$. Alors, pour $1 \leqslant k < p-1$ :
+$$\sum_{a\in\gf(p)} a^k = \sum_{a\in\gf(p)^\times} a^k = \sum_{j=0}^{p-2} g^{jk} = \frac{g^{k(p-1)} - 1}{g^{k} - 1} = \frac{1^{k} - 1}{g^{k} - 1} = 0.$$
+Soit $P(x) \in \gf(p^r)[x]$ de degré inférieur à $p-1$ :
+$$P(x) = b_{p-2}x^{p-2} + \cdots + b_1x + b_0, \qquad \text{où }b_i \in \gf(p^r).$$
+Ainsi, on obtient bien :
+\begin{align*}
+\sum_{a\in\gf(p)} P(a) &= \sum_{a\in\gf(p)} \left({b_{p-2}a^{p-2} + \cdots + b_1a + b_0}\right) \\
+&= \sum_{k=1}^{p-2} \left({ b_k\sum_{a\in\gf(p)} a^k}\right) + pb_0 \\
+&= 0.
+\end{align*}
+\end{proof}
+
+\begin{proof}[Démonstration de la proposition]
+Comme $Q(x) \in \gf(p^r)[x]$ est de degré $d$ et que $1\leqslant e < (p-1)/d$, le polynôme $Q(x)^e$ est de degré inférieur à $p-1$. Ainsi le lemme précédent permet de conclure :
+$$\sum_{a\in\gf(p)} Q(a)^e = 0.$$
+\end{proof}
+
+\begin{prop}
+Pour tout $1 \leqslant e < (p-1)r/h$, nous avons :
+$$\sum_{i=0}^{p-1} (g_{p^r})^{ec_i} = 0.$$
+\end{prop}
+
+\begin{proof}
+Considérons le polynôme $Q(x)\in\gf(p^r)[x]$ de la proposition~\ref{premierePropVaudenay} : le polynôme $Q(x)$ est de degré $h/r$, à coefficients dans $\gf(p^r)$ et tel que, pour tout $0 \leqslant i \leqslant p-1$ :
+$$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
+Ainsi par la proposition précédente, pour tout $1 \leqslant e < (p-1)r/h$ :
+$$\sum_{a\in\gf(p)} Q(a)^e = \sum_{i=0}^{p-1} Q\left(\alpha_{\sigma(i)}\right)^e = 0,$$
+d'où l'égalité souhaitée :
+$$\sum_{i=0}^{p-1} (g_{p^r})^{ec_i} = 0.$$
+\end{proof}
+
+Cela donne une façon plus simple de sélectionner tous les candidats pour $g_{p^r}$ -- que la recherche exhaustive. Son principal avantage est qu'il fonctionne dans n'importe quel sous-corps. Par exemple, ont peut considérer $r=1$ et trouver les seuls $g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$, nous avons :
+$$\sum_{i=0}^{p-1} (g_p)^{ec_i} = 0.$$
+La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf(p)$-opérations : il est peu probable qu'un mauvais candidat ne sera pas détecté par le $e = 1$. Ainsi, nous pouvons recouvrer $g_p$ en $\O(p^2)$ opérations binaires.
+
+Malheureusement, le $g_{p^r}$ ne peut pas être utilisé efficacement quand $r$ est trop petit. Cependant, on peut toujours utiliser $g_{p^r}$ des petits sous-corps pour le calculer dans des corps plus grands. Notre but est de calculer $g_{p^r}$ avec $r$ assez grand (tel que $r^2 \geqslant h$). Nous considérons le problème du calcul de $g_{p^r}$ lorsque $r_1,\dots,r_k$ sont les facteurs de $r$ et avec la connaissance de $g_{p^{r_i}}$. Comme $g_{p^{r_i}} = (g_{p^r})^{1+p^{r_i}+p^{2r_i}+\cdots+p^{r-r_i}}$, nous avons 
+$$(\dagger)\qquad\log(g_{p^r}) = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1},$$
+où la base des logarithmes est n'importe quel élément primitif $\gamma$ fixé dans le corps $\gf(p^r)$. La connaissance de tous les $g_{p^{r_i}}$ donne donc la connaissance de $\log(g_{p^r})$ modulo
+$$\ell := \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}.$$
+Nous avons donc besoin seulement de $(p^r-1)/\ell$ essais pour recouvrer $g_{p^r}$.
+
+\begin{algorithm}[h]
+\caption{Algorithme pour récupérer $g_{p^r}$ à partir des $g_{p^{r_i}}$}
+\label{algogprFromgpri}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, ${\{r_i\}}_{1\leqslant i\leqslant k}$ diviseurs de $r$ et $g_{p^{r_i}}$
+\ENSURE l'ensemble des $g_{p^r}$ possibles
+\STATE{choisir $\gamma$ un élément primitif de $\gf(p^r)$}
+\FORALL{$i$ allant de $1$ à $k$}
+	\STATE{résoudre l'équation $(\dagger)$ : $$x_i = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
+\ENDFOR
+\STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
+\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$ où $x$ est unique modulo $\ell$}
+\STATE{$\beta \gets \gamma^{x}$}
+\FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}\label{algoNaifgprFromgpriBoucle}
+	\FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}	
+		\STATE{calculer la somme : $$\mathbf{res} \gets \sum_{i=0}^{p-1} \beta^{ec_i}\gamma^{ec_i\ell y}$$}
+		\IF{$\mathbf{res} \neq 0$}
+			\STATE{continuer la boucle ligne~\ref{algoNaifgprFromgpriBoucle}}
+		\ENDIF
+	\ENDFOR
+	\STATE{ajouter $\beta\gamma^{\ell y}$ à la liste des $g_{p^r}$ possibles}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+Chaque boucle de la ligne~\ref{algoNaifgprFromgpriBoucle} demande en moyenne $\O(pr^2)$ opérations dans $\gf(p)$.
+
+Nous pouvons maintenant définir l'algorithme global de l'attaque.
+
+\begin{defi}
+Soit $G$ un graphe orienté acyclique (\textit{DAG for directed acyclic graph}) étiqueté enraciné dont la racine est étiquetée par un corps fini $\gf(p^r)$ et tel que pour chaque arête $u \rightarrow v$ de $G$, l'étiquette $l(u)$ de $u$ est un sous-corps maximal (au sens de l'inclusion) de l'étiquette $L(v)$ de $v$ et une extension de $\gf(p)$. On dit que $G$ est un DAG $p$-factorisant de $\gf(p^r)$.
+\end{defi}
+
+\begin{defi}
+\`A une extension $\gf(p^r)$ et $G$ son DAG $p$-factorisant, on associe :
+$$C(G) := \sum_{v} \frac{\#L(v) -1}{\ppcm\{\#L(w)-1 \mid v \leftarrow w\}},$$
+où nous prenons pour convention : $\ppcm(\emptyset) = 1$.
+\end{defi}
+
+Nous pouvons définir un algorithme pour calculer $g_{p^r}$ avec pour compléxité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf(p^r)$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
+$$\O\left(\min_{\substack{r \text{ divisant } h \\ r^2 \geqslant h}} \; \min_{\substack{G \text{ est un DAG}\\p\text{-factorisant} \\ \text{ de } \gf(p^r)}} \; 
+pr^2C(G)\right)$$
+
+\begin{algorithm}[h]
+\caption{Attaque général}
+\label{algoGeneral}
+\begin{algorithmic}[1]
+\REQUIRE $\gf(p^h)$ et $(c_0,\dots, c_{p-1})$
+\ENSURE une clé secrète équivalente
+\STATE{pour le plus petit facteur $r$ de $h$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, trouver $G$ un DAG $p$-factorisant minimisant $C(G)$}
+\FOR{$u$ sommet de $G$, tel que pour tout $u \leftarrow u_i$, $u_i$ a été visité,}
+	\STATE{l'algorithme~\ref{algogprFromgpri} avec $\gf(p^r)=L(u)$ et $\gf(p^{r_i}) = L(u_i)$}
+\ENDFOR
+\STATE{appliquer l'algorithme~\ref{algogpr} à $g_{p^r}$}
+\end{algorithmic}
+\end{algorithm}
+
+\section{Le calcul de logarithmes discrets par Antoine Joux}\label{sec:DLPJoux}
+
+\section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
 \newpage
 \bibliographystyle{abbrv}

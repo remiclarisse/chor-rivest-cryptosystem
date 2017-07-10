@@ -1,14 +1,15 @@
 # reset()
 # attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
+# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/attack-chor-rivest.sage")
 # attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/draft.sage")
 # p = 31
 # h = 12
-# r = 4
 # [PubKey, PrivKey] = CRGenerateKeys (p, h)
 # [c, p, h, Q, alpha] = PubKey
 # [t, g, sInv, d] = PrivKey
-# gpr = g**((p**h-1)/(p**r-1))
-# s = [sInv.index(i) for i in range (p)]
+# m = generateRandomMessage (p, h)
+# e = CREncrypt (m, PubKey)
+# %time [crackedMessage, EquivPrivKey] = VaudenayAttack (e, PubKey)
 
 def blop (t, p, h) :
     K = t.parent()
@@ -344,7 +345,6 @@ def assault (c, p ,h, r, K) :
     return gpri[-1]
 
 def VaudenayAttack (e, PubKey) :
-    import time
     # Récuperer la clé publique
     [c, p, h, Q, alpha] = PubKey
     # Choisir un r adéquat
@@ -355,26 +355,18 @@ def VaudenayAttack (e, PubKey) :
     K.<b> = FiniteField(p ** h)
     # Trouver un élément primitif gpr de GF(p^r) tel que les gpr^ci soient dans
     # le même sous-espace affine
-    t0 = time.time()
     gpr = assault (c, p ,h, r, K)
-    print "Wall time: " + str(time.time() - t0)
     # Trouver une permutation d'une clé équivalente
     alpha = [ K(alpha[i]) for i in range (p) ]
-    t0 = time.time()
     pi = secondVaudenayAttack (c, p, h, alpha, gpr, r, [0, 1])
-    print "Wall time: " + str(time.time() - t0)
     piInv = [pi.index(i) for i in range (p)]
     # Trouver un élément t algébrique de degré h dans GF(p^h)
-    t0 = time.time()
     t = thirdVaudenayAttack (c, p, h, alpha, pi, gpr, r)
-    print "Wall time: " + str(time.time() - t0)
     print "Computing minimal polynomial: ongoing"
     mu = t.minimal_polynomial()
     print "Computing minimal polynomial: done"
     # Enfin faire l'attaque de Goldreich, version simplifiée !
-    t0 = time.time()
     g, d = simplifiedGoldreichAttack (c, p, h, alpha, t, pi)
-    print "Wall time: " + str(time.time() - t0)
     # Une clé équivalente est construite : on peut déchiffrer le message comme
     # le destinataire légitime !
     # Faire le changement de base
