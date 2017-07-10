@@ -9,15 +9,17 @@ Définir les paramètres du cryptosystème : p un nombre premier et h un entier 
 Générer une paire de clé grâce à 'CRGenerateKeys' :
   [PubKey, PrivKey] = CRGenerateKeys (p, h)
 
-Écrire le message à chiffer, puis le coder, et le transformer :
-  message = "Why did the topologist's marriage fail ? Because he thought that arbitrary unions were open !"
-  encodedMessage = encodeMessage (message)
-  message2cipher = transformMessage (encodedMessage, p, h)
-Ou utiliser directement :
-  message2cipher = [ generateRandomMessage (p, h) ]
+Générer le message à chiffer, puis le coder, et le transformer :
+  m = generateRandomMessage (p, h)
 
-Chiffrer le message codé :
-  crypt = [ CREncrypt (m, PubKey) for m in message2cipher ]
+Chiffrer le message :
+  e = CREncrypt (m, PubKey)
 
 Maintenant e est le chiffré du message codé ! Pour le déchiffrer :
-  decodeMessage( recoverMessage ([ CRDecrypt (e, PubKey, PrivKey) for e in crypt ], p, h))
+  CRDecrypt (e, PubKey, PrivKey) == m
+
+Pour l'attaque de Vaudenay :
+  EquivPrivKey = VaudenayAttack (PubKey)
+  crackedMessage = CRDecrypt (e, PubKey, EquivPrivKey)
+
+Le calcul des logarithmes est (grossièrement) parallelisé ...

@@ -311,7 +311,7 @@ sage:     message[sInv [alpha.index(k)]] = 1
 
 Nous présentons ici l'attaque de Serge Vaudenay \cite{vaudenay2000}. Elle s'appuie sur la forte friabilité de $h$, i.e. sur l'existence de nombreux sous-corps de $\gf(p^h)$. Pour casser une instance du cryptosystème, l'idée est de fabriquer une clé privée qui donne la même clé publique que le cryptosystème : cela va permettre de déchiffrer comme un destinataire légitime !
 
-Ici, nous donnons l'attaque pour $p$ un nombre premier, bien qu'elle soit généralisée pour le cas $p$ puissance d'un nombre premier. Aussi, nous exposons l'attaque dans l'ordre et non à rebours, à savoir qu'on part du cas où rien n'est connu.
+Ici, nous donnons l'attaque pour $p$ un nombre premier, bien qu'elle soit généralisée pour le cas $p$ puissance d'un nombre premier. Aussi, nous exposons l'attaque à rebours, à savoir qu'on part du cas où quelques éléments de la clé privée sont connus et au fur et à mesure, nous les retirons en regardant comment les fabriquer.
 
 \subsection*{Symétrie dans la clé privée}
 
@@ -328,7 +328,7 @@ Deux clés privées sont dites \textit{équivalentes} si elles fabriquent la mê
 $$\left\{d + \log_g(t + \alpha_{\sigma(i)}) : 0\leqslant i \leqslant p-1\right\} = \left\{d' + \log_{g'}(t' + \alpha_{\pi(i)}) : 0\leqslant i \leqslant p-1\right\}.$$
 \end{defi}
 
-Pour passer d'une clé privée à une clé privée équivalente, il existe une transformation sur la permutation $\sigma$ qui permet de choisir deux images arbitrairement pour deux antécédents fixés -- ici, on prend les images de $0$ et $1$ :
+Pour passer d'une clé privée à une clé privée équivalente, il existe une transformation intéressante sur la permutation $\sigma$ qui permet de choisir deux images arbitrairement pour deux antécédents fixés -- ici, on prend les images de $0$ et $1$ :
 
 \begin{prop}
 Soit $\sigma$ une permutation d'une clé privée. Alors, il existe $\pi$ une permutation d'une clé privée équivalente, telle que, $$\pi(0) = i \qquad \text{et}\qquad \pi(1) = j.$$
@@ -344,6 +344,8 @@ Il faut alors définir la permutation $\pi$ par
 
 \subsection*{Cléf de voûte de l'attaque}
 
+Serge Vaudenay fabrique un polynôme bien particulier, qui lui sert de levier pour casser le cryptosystème. Le voici :
+
 \begin{prop}\label{premierePropVaudenay}
 Pour tout facteur $r$ de $h$, il existe un générateur $g_{p^r}$ du groupe multiplicatif du sous-corps $\gf(p^r)$ de $\gf(p^h)$ et un polynôme $Q(x) \in \gf(p^r)[x]$ de degré $h/r$ et tel que $-t$ en est une racine, et pour tout $0\leqslant i \leqslant p-1$, nous avons :
 $$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
@@ -353,14 +355,14 @@ $$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
 Soit 
 $$Q(x) = (g_{p^r})^d \prod_{i=0}^{h/r-1} \left(x+t^{p^{ri}}\right),
 \quad \text{ où } g_{p^r} := \prod_{i=0}^{h/r-1} g^{p^{ri}},$$
-$g_{p^r}$ peut être considérer comme la norme de $g$ considéré dans l'extension de corps $\gf(p^r) \subseteq \gf(p^h)$, ainsi $(g_{p^r})^{p^r} = g_{p^r}$ et $g_{p^r}$ est générateur de $\gf(p^r)^\times$ car $g$ est primitif dans $\gf(p^h)$. Nous remarquons que $Q\left(x^{p^r}\right) = Q(x)^{p^r}$, ainsi $Q(x) \in \gf(p^r)[x]$, en effet :
+$g_{p^r}$ est la norme de $g$ considéré dans l'extension de corps $\gf(p^r) \subseteq \gf(p^h)$, ainsi nous avons $(g_{p^r})^{p^r} = g_{p^r}$ et $g_{p^r}$ est générateur de $\gf(p^r)^\times$ car $g$ est primitif dans $\gf(p^h)$. Nous remarquons que $Q\left(x^{p^r}\right) = Q(x)^{p^r}$, ce qui prouve que $Q(x) \in \gf(p^r)[x]$. En effet :
 \begin{align*}
 Q\left(x\right)^{p^r} &= (g_{p^r})^{dp^r} \prod_{i=0}^{h/r-1} \left(x+t^{p^{ri}}\right)^{p^r} \\
 &= (g_{p^r})^{d} \prod_{i=0}^{h/r-1} \left(x^{p^r} + t^{p^{ri}p^r}\right) \\
 &= (g_{p^r})^{d} \prod_{i=1}^{h/r} \left(x^{p^r} + t^{p^{ri}}\right) \\
 &= Q\left(x^{p^r}\right), \\
 \end{align*}
-car $t^{p^{r(h/r)}} = t^{p^h} = t = t^{p^0}$. Cela montre aussi que $Q(-t) = 0$. Nous avons aussi que $Q(x)$ est de degré $h/r$. Et enfin, pour $0\leqslant j \leqslant p-1$, calculons $(g_{p^r})^{c_i}$ :
+car $t^{p^{r(h/r)}} = t^{p^h} = t = t^{p^0}$. Cela montre au passage que $Q(-t) = 0$. Nous avons aussi que $Q(x)$ est de degré $h/r$. Et enfin, pour $0\leqslant j \leqslant p-1$, calculons $(g_{p^r})^{c_j}$ :
 \begin{align*}
 (g_{p^r})^{c_j} &= \left(\prod_{i=0}^{h/r-1} g^{p^{ri}}\right)^{c_j}\\
 &= \prod_{i=0}^{h/r-1} \left(g^{c_j}\right)^{p^{ri}}\\
@@ -371,16 +373,20 @@ car $t^{p^{r(h/r)}} = t^{p^h} = t = t^{p^0}$. Cela montre aussi que $Q(-t) = 0$.
 Cela achève la démonstration de la proposition.
 \end{proof}
 
-Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(g_{p^r}, Q)$, et $g_{p^r}$ est donc essentiellement unique.
+Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(g_{p^r}, Q)$, et $g_{p^r}$ est donc essentiellement unique. Soulignons la particularité de ce polynôme $Q$, il est à coefficients dans $\gf(p^r)$, il est de degré $h/r$ et nous connaissons ses valeurs sur tout $\gf(p)$ : il peut donc être interpolé sur un petit ensemble de $\gf(p)$.
 
-\paragraph*{Notation :} Pour $r$ divisant $h$, notons $$g_{p^r} := g^{(p^h-1)/(p^r-1)}.$$
+\paragraph*{Notation :} Pour $r$ divisant $h$, notons $$g_{p^r} := g^{(p^h-1)/(p^r-1)} = g^{1+p^r+p^{2r}+p^{3r}+\cdots+p^{h-r}},$$
+la norme de $g$ considéré dans l'extension de corps $\gf(p^r) \subseteq \gf(p^h)$.
 
-\subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$ et $\sigma$}
+\subsection*{Attaque sachant $g_{p^r}$ et $\sigma$}
 
-Supposons connus $g_{p^r} = g^{(p^h-1)/(p^r-1)}$, pour $r$ divisant $h$ (comme dans la proposition~\ref{premierePropVaudenay}), ainsi que la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (g_{p^r})^{c_i})}_i$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-t$.  Par la symétrie dans la clé privée, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. Nous résolvons l'attaque en calculant $g$ et $d$ grâce à l'attaque de O.~Goldreich exposée en sous-section~\ref{attaqueOG}.
+Supposons connus la norme $g_{p^r}$ et la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (g_{p^r})^{c_i})}_i$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-t$.  Par la symétrie dans la clé privée, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. 
+Cet algorithme fait l'objet de la figure Algorithme~\ref{algoPremiereAttaqueVaudenay}.
+
+Nous résolvons l'attaque en calculant $g$ et $d$ grâce à l'attaque de Oded Goldreich exposée dans \cite{chorRivest1988}, une version simplifiée sera utilisée plus loin, c'est pour cela qu'elle est volontairement omise ici.
 
 \begin{algorithm}[h]
-\caption{Algorithme implémentant la première attaque de Vaudenay}
+\caption{Algorithme implémentant l'attaque sachant $g_{p^r}$ et $\sigma$}
 \label{algoPremiereAttaqueVaudenay}
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $\sigma$, $r$ divisant $h$ et $g^{(p^h-1)/(p^r-1)}$
@@ -396,28 +402,32 @@ Supposons connus $g_{p^r} = g^{(p^h-1)/(p^r-1)}$, pour $r$ divisant $h$ (comme d
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Attaque sachant $g^{(p^h-1)/(p^r-1)}$}
+\subsection*{Simplification}
 
-Supposons connu l'élément $g_{p^r}$, la norme de l’élément primitif $g$ considéré dans l'extension $\gf(p^r) \subseteq \gf(p^h)$, comme dans la proposition~\ref{premierePropVaudenay}.
+L'interpolation du polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay} se fait un ensemble quelconque de $h/r+1$ éléments de $\gf(p)$. À savoir, on choisit des indices $i_0, i_1, \dots, i_{h/r}$ pris entre $0$ et $p-1$, deux à deux distincts ; et on interpole le polynôme en les $\alpha_{i_j}$ $0 \leqslant j \leqslant h/r$. 
 
-Soient $(i_0, \dots, i_{h/r})$ une famille de $h/r + 1$ indices distincts entre $0$ et $p-1$. Par la proposition~\ref{premierePropVaudenay}, nous pouvons interpoler le polynôme $Q(x)$ en les $\alpha_{\sigma(i_j)}$ :
+Pour simplifier le propos, et surtout pour rendre plus lisible l'écriture, nous faisons le choix ici de prendre $i_j = j$, pour tout $0 \leqslant j \leqslant h/r$. Vaudenay ne cède pas à cette facilité.
+
+\subsection*{Attaque sachant $g_{p^r}$}
+
+Supposons connu l'élément $g_{p^r}$. Par la proposition~\ref{premierePropVaudenay}, nous pouvons interpoler le polynôme $Q(x)$ en les $\alpha_{\sigma(j)}$, pour $0 \leqslant j \leqslant h/r$, grâce au polynôme interpolateur de Lagrange :
 \begin{align*}
-Q(x) &= \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(i_j)}\right) \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}} \\
-&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}, \\
+Q(x) &= \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(j)}\right) \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}} \\
+&= \sum_{j=0}^{h/r} (g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}, \\
 \end{align*} 
 ce qui mène aux égalités : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
-$$(\dagger) \qquad (g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}.$$
+$$(\dagger) \qquad (g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (g_{p^r})^{c_{j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}.$$
 
 En fait, nous pouvons même écrire : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
-$$(\ddagger) \qquad (g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}.$$
-En effet, soit $i$ parmi $i_0, \dots, i_{h/r}$ :
-$$(g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
-car $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}\right) = 1.$$
+$$(\ddagger) \qquad (g_{p^r})^{c_i} - (g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}.$$
+En effet, soit $i$ tel que $0 \leqslant i \leqslant {h/r}$ :
+$$(g_{p^r})^{c_i} - (g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
+car $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}\right) = 1.$$
 Ainsi, nous avons l'égalité de polynôme :
-$$Q(x) - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
+$$Q(x) - (g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
 car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque le polynôme est évalué en les $\alpha_{\sigma(i)}$, où $0\leqslant i \leqslant p-1$.
 
-\`A cause de la symétrie de la clé privée, indiquée en sous-section~\ref{symetrieClePrivee}, nous pouvons choisir arbitrairement $\sigma(i_1)$ et $\sigma(i_2)$. Un algorithme naïf pour trouver la permutation $\sigma$ est de chercher exhaustivement les valeurs  $\sigma(i_j)$ pour $j=0$ et $3\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
+\`A cause de la symétrie de la clé privée, nous pouvons choisir arbitrairement $\sigma(0)$ et $\sigma(1)$. Un algorithme naïf pour trouver la permutation $\sigma$ est de chercher exhaustivement les valeurs $\sigma(j)$ pour $2\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
 
 \begin{algorithm}[h]
 \caption{Algorithme pour trouver $\pi$ sachant $g_{p^r}$}
@@ -425,12 +435,11 @@ car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ et $g_{p^r}$
 \ENSURE une permutation $\pi$ d'une clé privée équivalente
-\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
-\STATE{choisir arbitrairement $\pi(i_1)$ et $\pi(i_2)$ distincts dans $\{0, \dots, p-1\}$}
-\FORALL{$\pi(i_0), \pi(i_3), \dots, \pi(i_{h/r})$ distincts deux à deux} \label{algoNaifgprBoucle}
-	\STATE{$S \gets \left[\pi(i_0), \pi(i_3), \dots, \pi(i_{h/r})\right]$}
+\STATE{choisir arbitrairement $\pi(0)$ et $\pi(1)$ distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$\pi(2), \pi(3), \dots, \pi({h/r})$ distincts deux à deux} \label{algoNaifgprBoucle}
+	\STATE{$S \gets \left[\pi(2), \pi(3), \dots, \pi({h/r})\right]$}
 	\FORALL{$\ell \not\in S$} \label{algoNaifgprBoucle2}
-		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\pi(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\pi(i_k)}}{\alpha_{\pi(i_j)}-\alpha_{\pi(i_k)}} $$}
+		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\pi(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (g_{p^r})^{c_{j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\pi(k)}}{\alpha_{\pi(j)}-\alpha_{\pi(k)}} $$}
 		\IF{il existe $i$ tel que $\mathbf{res} = (g_{p^r})^{c_i}$ et $\pi(i)$ n'est pas définie}
 			\STATE{$\pi(i) \gets \ell$}
 			\STATE{$S \gets S \cup [\pi(i)]$}
@@ -447,16 +456,16 @@ La complexité de cet algorithme est grossièrement $\O(rp^{h/r})$ opérations d
 
 La permutation $\pi$ donnée par l'algorithme~\ref{algoNaifgpr} est telle qu'il existe $u \in \gf(p)^\times$ et $v \in \gf(p)$ vérifiant pour tout $0 \leqslant i \leqslant p-1$ :
 $$\alpha_{\pi(i)} = u \alpha_{\sigma(i)} + v,$$
-où la permutation $\sigma$ est celle de la clé secrète d'origine, détenue par le destinataire légitime.
+où la permutation $\sigma$ est celle de la clé secrète d'origine, détenue par le destinataire légitime. En exprimant le polynôme $Q(x)$ faisant intervenir la permutation $\pi$ par rapport au polynôme $Q(x)$ faisant intervenir la permutation $\sigma$, nous obtenons :
 \begin{align*}
 Q_\pi(x) &= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\pi(i_k)}}{\alpha_{\pi(i_j)}-\alpha_{\pi(i_k)}}, \\
 &= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-u\alpha_{\sigma(i_k)} - v}{u\alpha_{\sigma(i_j)}-u\alpha_{\sigma(i_k)}}, \\
 &= \sum_{j=0}^{h/r} (g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{u^{-1}x - u^{-1}v-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}, \\
 &= Q_\sigma(u^{-1}(x -v)). \\
 \end{align*}
-Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(x)$, alors $-u^{-1}(\omega +v)$ est racine du polynôme $Q_\sigma(x)$, ainsi si on fait tourner l'algorithme~\ref{algoPremiereAttaqueVaudenay} avec la permutation $\pi$, les valeurs retournées sont :
+Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(x)$, alors $-u^{-1}(\omega +v)$ est racine du polynôme $Q_\sigma(x)$, donc si on fait tourner l'algorithme~\ref{algoPremiereAttaqueVaudenay} avec la permutation $\pi$, les valeurs renvoyées sont :
 $$u t -v,\quad u t^{p^r} -v,\quad u t^{p^{2r}} -v,\quad \dots,\quad u t^{p^{h - r}} -v.$$
-Il est alors plus simple de déterminer un $g$ pour avoir une clé privée équivalente, que d'utiliser l'attaque de Goldreich, sous-section~\ref{attaqueOG}.
+Il est alors plus simple de déterminer un $g$ pour avoir une clé privée équivalente, que d'utiliser l'attaque de Goldreich (comme indiqué plus haut).
 
 En effet, pour $0 \leqslant j < h/r$, à savoir on choisit n'importe quel élément retourné par l'algorithme~\ref{algoPremiereAttaqueVaudenay}, choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}\left(u t^{p^{jr}} -v+\alpha_{\pi(i)}\right)$$
 Notons $L := \log_{g'}(g^{p^{jr}})$, de sorte que $g^{p^{jr}}=g'^L$. Alors pour tout $0 \leqslant i \leqslant p-1$ :
@@ -473,7 +482,7 @@ b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}
 \label{algoAttaqueGoldreichsimplifiee}
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $t$ et $\pi$
-\ENSURE $g$ et $d$ ou ``échec''
+\ENSURE $g$ et $d$
 \STATE{choisir $g'$ un élément primitif arbitraire de $\gf(p^h)$}
 \STATE{calculer les $b_i := \log_{g'}(t+\alpha_{\pi(i)})$}
 \STATE{$B \gets [ b_i - b_0$ pour $i$ allant de $0$ à $p-1 ] $}
@@ -490,15 +499,14 @@ b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}
 		\ENDIF				
 	\ENDIF
 \ENDFOR
-\RETURN{``échec''}
 \end{algorithmic}
 \end{algorithm}
 
 Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, le ``$t$'' donné est $u t^{p^{jr}} -v$, il retourne le conjugué $g^{p^{jr}}$ du $g$ d'origine et l'entier $d - \log_{g^{p^{jr}}}(u)$.
 
-Quand $r$ est suffisamment grand, il existe un meilleur algorithme. En fait, si $r \geqslant h/r$, la famille $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$ est libre (voir plus loin). Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$, pour $0\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{i_0}} - (g_{p^r})^{c_{i_0}}, \quad (g_{p^r})^{c_{i_1}} - (g_{p^r})^{c_{i_0}},\quad \dots,\quad (g_{p^r})^{c_{i_{h/r}}} - (g_{p^r})^{c_{i_0}}.$$
+Quand $r$ est suffisamment grand, il existe un meilleur algorithme. En fait, si $r \geqslant h/r$, la famille $\left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$ est affinement indépendante. Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{1}} - (g_{p^r})^{c_{0}},\quad \dots,\quad (g_{p^r})^{c_{{h/r}}} - (g_{p^r})^{c_{0}}.$$
 
-Notons $a_j^i$ le coefficient de $(g_{p^r})^{c_{i_{j}}} - (g_{p^r})^{c_{i_0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$. Par $(\ddagger)$, nous avons :
+Notons $a_j^i$ le coefficient de $(g_{p^r})^{c_{{j}}} - (g_{p^r})^{c_{0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$. Par $(\ddagger)$, nous avons :
 \begin{align*}
 \frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}} \right)^{-1} \\
 &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\

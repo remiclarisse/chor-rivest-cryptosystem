@@ -5,19 +5,18 @@
 # (essayer p = 197 et h = 24)
 
 # Pour générer les clés :
-# Keys = CRGenerateKeys (p, h)
-# Keys[0] est la clé publique à diffuser et Keys[1] est la clé privée à conserver
-# cela peut prendre du temps
+# [PubKey, PrivKey] = CRGenerateKeys (p, h)
+# PubKey est la clé publique à diffuser et PrivKey est la clé privée à conserver
+# L'exécution de cette commande peut prendre du temps
 
 # Pour générer aléatoirement un message :
 # m = generateRandomMessage (p, h)
 
 # Pour chiffrer un message :
 # e = CREncrypt (m, PubKey)
-# où PubKey est la clé publique (i.e. Keys[0])
 
 # Pour comparer le déchiffré d'un message à son clair original :
-# m == CRDecrypt (e, Keys)
+# m == CRDecrypt (e, PubKey, PrivKey)
 # affiche True si tout s'est bien passé !
 
 def CRGenerateKeys (p, h) :
@@ -51,12 +50,9 @@ def CRGenerateKeys (p, h) :
 
 def CREncrypt (m, PubKey) :
     # Récuperer la clé publique
-    c = PubKey[0]
-    p = PubKey[1]
-    h = PubKey[2]
-    q = p ** h
+    [c, p, h, Q, alpha] = PubKey
     # Retourner le sac à dos
-    return mod (sum ([int(m[i])*c[i] for i in range (p)]), q-1)
+    return mod (sum ([int(m[i])*c[i] for i in range (p)]), p ** h - 1)
 
 def CRDecrypt (e, PubKey, PrivKey) :
     # Récupérer la clé publique
@@ -79,12 +75,14 @@ def CRDecrypt (e, PubKey, PrivKey) :
     return m
 
 @parallel
-def computeLog (h, g) :
-    return log (h, g)
+def computeLog (h, g, i) :
+    return i, log (h, g)
 
 def computePubKey (d, t, alpha, s, g, p, h) :
-    talphasig = [ t + alpha[s[i]] for i in range (p) ]
-    c = list(computeLog ([ (w, g) for w in talphasig ]))
+    w = [ t + alpha[s[i]] for i in range (p) ]
+    c = list(computeLog ([ (w[i], g, i) for i in range(p) ]))
+    c = [ c[i][1] for i in range (p) ]
+    c.sort()
     modulus = p ** h - 1
     c = [ mod (d + c[i][1], modulus) for i in range (p) ]
     return c
@@ -93,62 +91,3 @@ def generateRandomMessage (p, h) :
     m = [1 for i in range (h)] + [0 for i in range (p - h)]
     shuffle (m)
     return m
-
-def transformMessage (m, p, h) :
-    b = floor( log (binomial (p, h),2))
-    n = []
-    while len (m) > 0 :
-        k = m[:b]
-        m = m[b:]
-        n.append(int(k,2))
-    for i in range (len (n)) :
-        y = ""
-        k = h
-        for j in range (p) :
-            if n[i] >= binomial (p - (j + 1), k) :
-                y = y + '1'
-                n[i] = n[i] - binomial (p - (j + 1), k)
-                k = k - 1
-            else :
-                y = y + '0'
-        n[i] = y
-    return n
-
-def recoverMessage (e, p, h) :
-    a = []
-    for i in range(len (e)) :
-        n = 0
-        k = h
-        for j in range (p) :
-            if e[i][j] == '1' :
-                n = n + binomial(p - (j + 1), k)
-                k = k - 1
-        a.append(n)
-    m = ""
-    b = floor( log (binomial (p, h),2))
-    for n in a :
-        s = bin (n)[2:]
-        l = len (s)
-        if n != a[-1] :
-            for i in range (b - l) :
-                s = '0' + s
-        m = m + s
-    return m
-
-# encodeMessage("Why did the topologist's marriage fail ? Because he thought that arbitrary unions were open !")
-def encodeMessage (m) :
-    import binascii
-    hexa = binascii.hexlify(m)
-    bina = ""
-    for chara in hexa :
-        bina = bina + '{0:08b}'.format(Integer(chara,16))
-    return bina
-
-def decodeMessage (c) :
-    import binascii
-    hexa = ""
-    while len (c) > 0 :
-        bina = c[:8]
-        c = c[8:]
-        hexa = hexa + '{0:01x}'.format(Integer(bina,2))
-    return binascii.unhexlify(hexa)

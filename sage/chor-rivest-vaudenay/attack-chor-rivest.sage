@@ -1,12 +1,115 @@
-# reset()
-# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
-# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/attack-chor-rivest.sage")
-# p = 31
-# h = 12
-# [PubKey, PrivKey] = CRGenerateKeys (p, h)
-# m = generateRandomMessage (p, h)
-# e = CREncrypt (m, PubKey)
-# %time crackedMessage, EquivPrivKey = VaudenayAttack (e, PubKey)
+def VaudenayAttack (PubKey) :
+    # Récuperer la clé publique
+    [c, p, h, Q, alpha] = PubKey
+    # Choisir un r adéquat
+    for r in divisors (h) :
+        if r ** 2 >= h :
+            break
+    print "Chosen divisor of h: r=" + str(r) + ", divisors are: " + str(divisors(r))
+    # Trouver un élément primitif gpr de GF(p^r) tel que les gpr^ci soient dans
+    # le même sous-espace affine
+    gpr = firstVaudenayAttack (PubKey, r)
+    # Trouver une permutation d'une clé équivalente
+    alpha = [ K(alpha[i]) for i in range (p) ]
+    pi = secondVaudenayAttack (PubKey, gpr, r, [0, 1])
+    piInv = [pi.index(i) for i in range (p)]
+    # Trouver un élément t algébrique de degré h dans GF(p^h)
+    t = thirdVaudenayAttack (PubKey, pi, gpr, r)
+    print "Computing minimal polynomial: ongoing"
+    mu = t.minimal_polynomial()
+    print "Computing minimal polynomial: done"
+    # Enfin faire l'attaque de Goldreich, version simplifiée !
+    g, d = simplifiedGoldreichAttack (PubKey, t, pi)
+    return [t, g, piInv, d]
+
+def firstVaudenayAttack (PubKey, r) :
+    ri = divisors(r)
+    K.<b> = FiniteField(p ** h)
+    gpri = [ compute_gp (PubKey, K) ] + [ K(1) for i in range (1, len (ri)) ]
+    for i in range (1, len (ri)) :
+        dag = find_DAG(ri[i])
+        gpri[i] = compute_gpri (PubKey, ri[i], [ ri[j] for j in range (len(ri)) if ri[j] in dag ], [ gpri[j] for j in range (len (gpri)) if ri[j] in dag ])
+    if gpri[-1] != 1 :
+        return gpri[-1]
+    else :
+        raise Exception('Unable to find a primitive element gpr in GF(p^r) such that all gpr^ci stands on the same affine sub-space !')
+
+def compute_gp (PubKey, K) :
+    [c, p, h, Q, alpha] = PubKey
+    g = K.multiplicative_generator()
+    gamma = g ** ((p ** h - 1) / (p  - 1)) # élément primitif de GF(p)
+    pourmillage = -1
+    maxim = p  - 1
+    i = 0
+    while i < p :
+        if int(i * (10 ** 3) / maxim) != pourmillage :
+            pourmillage = int(i * (10 ** 3) / maxim)
+            print "Picking a good generator of GF(" + str(p) + "): \t" + str(pourmillage) + "‰"
+        if gcd (i, p - 1) == 1 :
+            z = gamma ** i
+            e = 1
+            ok = True
+            while e < (p - 1) / h and ok :
+                res = 0
+                for j in range (p) :
+                    res += z ** (e * c[j])
+                if res != 0 :
+                    ok = False
+                e += 1
+            if ok :
+                print "Picking a good generator of GF(" + str(p) + "): \tdone"
+                return K(z)
+        i += 1
+    return "fail"
+
+def compute_gpri (PubKey, r, ri, gpri) :
+    [c, p, h, Q, alpha] = PubKey
+    n = h / r
+    K = gpri[0].parent()
+    g = K.multiplicative_generator()
+    gamma = g ** ((p ** h - 1) / (p ** r - 1)) # élément primitif de GF(p^r)
+    a = []
+    print "Building an almost generator of GF(" + str(p) + "^" + str(r) + ") with CRT: ongoing"
+    for i in range (len (ri)) :
+        l = log (gpri[i], gamma)
+        d = 0
+        for k in range (int(r / ri[i])) :
+            d += p ** (k * ri[i])
+        a.append((l / d) % (p ** ri[i] - 1))
+    modulii = [ p ** ri[i] - 1 for i in range (len (ri)) ]
+    resCRT = CRT(a, modulii)
+    print "Building an almost generator of GF(" + str(p) + "^" + str(r) + ") with CRT: done"
+    beta = gamma ** resCRT
+    ell = lcm (modulii)
+    pourmillage = -1
+    maxim = ((p ** r - 1) / ell) - 1
+    x = 0
+    while x < ((p ** r - 1) / ell) :
+        if int(x * (10 ** 3) / maxim) != pourmillage :
+            pourmillage = int(x * (10 ** 3) / maxim)
+            print "Making a good generator of GF(" + str(p) + "^" + str(r) + "): \t" + str(pourmillage) + "‰"
+        e = 1
+        ok = True
+        while e < (p - 1) * r / h and ok :
+            res = 0
+            for i in range (p) :
+                res += beta ** (e * c[i]) * gamma ** (e * c[i] * ell * x)
+            if res != 0 :
+                ok = False
+            e += 1
+        if ok :
+            print "Making a good generator of GF(" + str(p) + "^" + str(r) + "): \tdone"
+            return beta * gamma ** (ell * x)
+        x += 1
+
+def find_DAG (r) :
+    if r.is_prime() or r == 1:
+        return [1]
+    divs = []
+    for k, i in list (factor (r))[::-1] :
+        if k != 1 and k != r :
+            divs.append(r / k)
+    return divs
 
 def in_spaned_subspace (v, M) :
     value = True
@@ -16,35 +119,6 @@ def in_spaned_subspace (v, M) :
         value = False
     finally :
         return value
-
-def firstVaudenayAttack (z, c, p, h, r) :
-    n = h / r
-    order = p ** r - 1
-    K = z.parent()
-    V = K.vector_space()
-    pourmillage = -1
-    maxim = p ** r - 1
-    zeta = 1
-    i = 1
-    while i < p ** r - 1 :
-        zeta *= z
-        if int(i * (10 ** 3) / maxim) != pourmillage :
-            pourmillage = int(i * (10 ** 3) / maxim)
-            print "Picking a good generator of GF(" + str(p) + "^" + str(r) + "): \t" + str(pourmillage) + "‰"
-        if zeta.multiplicative_order() ==  order :
-            G = [ V(zeta**c[w] - zeta**c[0]) for w in range (1, n + 1) ]
-            M = Matrix(G).transpose()
-            j = 1
-            ok = True
-            while ok and j < p :
-                if not in_spaned_subspace (V(zeta**c[j] - zeta**c[0]), M) :
-                    ok = False
-                j = j + 1
-            if ok :
-                print "Picking a good generator of GF(" + str(p) + "^" + str(r) + "): \tdone"
-                return zeta
-        i += 1
-    raise Exception('Unable to find a primitive element gpr in GF(p^r) such that all gpr^ci stands on the same affine sub-space !')
 
 def next_value (array, i, p) :
     array[i] = array[i] + 1
@@ -73,7 +147,8 @@ def increment (array, stone, p) :
     else :
         return True
 
-def secondVaudenayAttack (c, p, h, alpha, gpr, r, data) : # data === array of size two (e.g. [0, 1])
+def secondVaudenayAttack (PubKey, gpr, r, data) : # data === array of size two (e.g. [0, 1])
+    [c, p, h, Q, alpha] = PubKey
     n = h / r
     K = gpr.parent()
     newnbs = data + [i for i in range (2, n)] + [n - 1]
@@ -123,7 +198,8 @@ def secondVaudenayAttack (c, p, h, alpha, gpr, r, data) : # data === array of si
         print "Picking a permutation such that π(0)=" + str(data[0]) + " and π(1)=" + str(data[1]) + " : \tdone"
         return sig
 
-def thirdVaudenayAttack (c, p, h, alpha, pi, gpr, r) :
+def thirdVaudenayAttack (PubKey, pi, gpr, r) :
+    [c, p, h, Q, alpha] = PubKey
     n = h / r
     K = gpr.parent()
     A.<X> = PolynomialRing(K)
@@ -141,12 +217,13 @@ def thirdVaudenayAttack (c, p, h, alpha, pi, gpr, r) :
     else :
         return -R[0][0]
 
-def simplifiedGoldreichAttack (c, p, h, alpha, t, pi) :
+def simplifiedGoldreichAttack (PubKey, t, pi) :
+    [c, p, h, Q, alpha] = PubKey
     r = int(p ** h - 1)
     K = t.parent()
     gg = K.multiplicative_generator()
     print "Computing set of logs: ongoing"
-    a = [ int(mod (log (t + alpha[pi[i]], gg), r)) for i in range (p) ]
+    a = computePubKey (0, t, alpha, pi, gg, p, h)
     print "Computing set of logs: done"
     C = [ Integer(mod (c[i]-c[0], r)) for i in range(p) ]
     A = [ int(mod (a[i]-a[0], r)) for i in range(p) ]
@@ -165,44 +242,3 @@ def simplifiedGoldreichAttack (c, p, h, alpha, t, pi) :
                 return gg**L, int(mod(c[0] - log(t + alpha[pi[0]], gg**L), r - 1))
         tracker += 1
     raise Exception('Unable to find primitive element g and integer d!')
-
-# def VaudenayAttack (e, PubKey) :
-#     # Récuperer la clé publique
-#     [c, p, h, Q, alpha] = PubKey
-#     # Choisir un r adéquat
-#     for r in divisors (h) :
-#         if r ** 2 >= h :
-#             break
-#     print "Chosen divisor of h: r=" + str(r)
-#     K.<b> = FiniteField(p ** h)
-#     # Trouver un élément primitif gpr de GF(p^r) tel que les gpr^ci soient dans
-#     # le même sous-espace affine
-#     g = K.multiplicative_generator()
-#     z = g ** ((p ** h - 1) / (p ** r - 1))
-#     gpr = firstVaudenayAttack (z, c, p, h, r)
-#     # Trouver une permutation d'une clé équivalente
-#     alpha = [ K(alpha[i]) for i in range (p) ]
-#     pi = secondVaudenayAttack (c, p, h, alpha, gpr, r, [0, 1])
-#     piInv = [pi.index(i) for i in range (p)]
-#     # Trouver un élément t algébrique de degré h dans GF(p^h)
-#     t = thirdVaudenayAttack (c, p, h, alpha, pi, gpr, r)
-#     mu = t.minimal_polynomial()
-#     # Enfin faire l'attaque de Goldreich, version simplifiée !
-#     g, d = simplifiedGoldreichAttack (c, p, h, alpha, t, pi)
-#     # Une clé équivalente est construite : on peut déchiffrer le message comme
-#     # le destinataire légitime !
-#     # Faire le changement de base
-#     print "Decrypting the ciphertext"
-#     V = t.parent().vector_space()
-#     Minv = Matrix (GF(p), [V(t ** i) for i in range (h)]).transpose().inverse()
-#     # Calculer le polynôme à factoriser (i.e. G(x) + mu(x))
-#     A.<x> = PolynomialRing (GF(p))
-#     poly = A(list (Minv * V(g ** (e - h * d)))) + A(mu)
-#     # Récupérer les opposés des racines
-#     beta = [p - poly.roots()[i][0] for i in range (h)]
-#     # Recouvrer le message clair
-#     m = [0 for i in range (p)]
-#     for k in beta :
-#         m[piInv [alpha.index(k)]] = 1
-#     print "JOB DONE!!"
-#     return m, [t, g, piInv, d]
