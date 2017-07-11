@@ -9,6 +9,7 @@ def VaudenayAttack (PubKey) :
     # Trouver un élément primitif gpr de GF(p^r) tel que les gpr^ci soient dans
     # le même sous-espace affine
     gpr = firstVaudenayAttack (PubKey, r)
+    K = gpr.parent()
     # Trouver une permutation d'une clé équivalente
     alpha = [ K(alpha[i]) for i in range (p) ]
     pi = secondVaudenayAttack (PubKey, gpr, r, [0, 1])

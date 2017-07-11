@@ -1,7 +1,7 @@
 # reset()
-# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/chor-rivest.sage")
-# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/attack-chor-rivest.sage")
-# attach("/home/grace/rclariss/chor-rivest-cryptosystem/sage/draft.sage")
+# attach("~/chor-rivest-cryptosystem/sage/chor-rivest-vaudenay/chor-rivest.sage")
+# attach("~/chor-rivest-cryptosystem/sage/chor-rivest-vaudenay/attack-chor-rivest.sage")
+# attach("~/chor-rivest-cryptosystem/sage/draft.sage")
 # p = 31
 # h = 12
 # [PubKey, PrivKey] = CRGenerateKeys (p, h)
@@ -212,7 +212,7 @@ def blapblap (c, p, h, alpha, gpr, r, data) :
                 if is_not_consistent (pi) :
                     ok = False
             i = i + 1
-            print "\t" + str(pi)
+            print "\t count: " + str(pi.count(-1)) + "\t" + str(pi)
         # if ok :
         #     found = True
         u = u + 1
