@@ -253,13 +253,13 @@ sage: m = [1 for i in range (h)] + [0 for i in range (p - h)]
 sage: shuffle (m)
 \end{verbatim}
 Chiffrons $m$ :
-$$e := 23\;410\;132.$$
+$$E(m) := 23\;410\;132.$$
 \begin{verbatim}
 sage: e = mod (sum ([m[i]*c[i] for i in range (p)]), q-1)
 \end{verbatim}
 
 \subsubsection*{Déchiffrement du message}
-Nous souhaitons écrire $g^{e - hd}$ comme un polynôme en $t$. Or \verb|Sage| nous donne $g^{e - hd}$ comme polynôme en $a$ : $$g^{e - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
+Nous souhaitons écrire $g^{E(m) - hd}$ comme un polynôme en $t$. Or \verb|Sage| nous donne $g^{E(m) - hd}$ comme polynôme en $a$ : $$g^{E(m) - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
 Pour parvenir à exprimer $g$ comme nous le souhaitons, il faut effectuer un changement de base du $\gf(17)$-espace vectoriel $\gf(17^6)$ : passer de la base $\mathcal{A} := (1, a, a^2, \dots, a^{h-1})$ à la base $\mathcal{T} := (1, t, t^2, \dots, t^{h-1})$.
 La matrice de passage facile à calculer est celle qui passe de la base $\mathcal{T}$ à la base $\mathcal{A}$ : il suffit d'écrire dans \verb|Sage| les différentes puissances de $t$, et \verb|Sage| les exprime en fonction des puissances de $a$. Voici cette matrice :
 $$\left[\begin{array}{cccccc}
@@ -285,8 +285,8 @@ sage: M = Matrix (GF(p),
                       [V(t ** i) for i in range (h)]).transpose()
 sage: Minv = M.inverse()
 \end{verbatim}
-Comme $g^{e - hd}$ vaut dans la base $\mathcal{A}$ le vecteur $(1, 15, 9, 11, 0, 1)$, il est facile d'obtenir l'égalité : 
-$$g^{e - hd} = 10t^5 + 9t^4 + 12t^3 + 4t^2 + 10t + 3.$$
+Comme $g^{E(m) - hd}$ vaut dans la base $\mathcal{A}$ le vecteur $(1, 15, 9, 11, 0, 1)$, il est facile d'obtenir l'égalité : 
+$$g^{E(m) - hd} = 10t^5 + 9t^4 + 12t^3 + 4t^2 + 10t + 3.$$
 Notons $G(x) := 10x^5 + 9x^4 + 12x^3 + 4x^2 + 10x + 3 \in \gf(17)[x]$.
 Ainsi le message est recouvré en factorisant le polynôme :
 $$G(x) + \mu(x) = x^6 + 2x^5 + 9x^3 + 5x^2 + 4x + 9,$$
@@ -538,18 +538,20 @@ En passant toute les valeurs de $\mu$ en revue, nous pouvons obtenir $\pi(i)$ de
 \STATE{pré-calculer la matrice de changement de bases de la ``base classique'' vers la ``base'' $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$}
 \STATE{choisir arbitrairement $\pi(1)$ et $\pi(2)$ distincts dans $\{0, \dots, p-1\}$}
 \FORALL{$\mu$ dans $\gf(p)$} 
-	\FORALL{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq 0, 1, \dots, h/r$} 
+	\FOR{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq 0, 1, \dots, h/r$} 
 		\STATE{écrire $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$ dans la ``base'' $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$}
 		\STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
 		\STATE{trouver la valeur de $\pi(i)$ grâce à $(\star)$}
 	\ENDFOR
+	\STATE{essayer de compléter $\pi$ en cherchant exhaustivement les images $\pi(0)$ et $\pi(j)$ pour $3 \leqslant j \leqslant h/r$, comme dans l'algorithme~\ref{algoNaifgpr}}
+	\IF{$\pi$ vérifie les relations $(\dagger)$}
+		\RETURN{$\pi$}
+	\ENDIF
 \ENDFOR
-\STATE{compléter $\pi$ en cherchant de manière exhaustive les images $\pi(0), \pi(3), \dots, \pi(h/r)$}
-\RETURN{$\pi$}
 \end{algorithmic}
 \end{algorithm}
 
-\subsection*{Test pour trouver $\mbf g_{p^r}$}
+\subsection*{Comment trouver $\mbf g_{p^r}$}
 
 Les équations : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
 $$(\ddagger) \qquad (\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
@@ -561,20 +563,19 @@ Donc si on suppose que $h/r + 1 \leqslant r$, à savoir $r \geqslant \sqrt{h + 1
 S'il existe un facteur $r$ de $h$ de sorte que $r \geqslant \sqrt{h + 1/4} + 1/2$, alors tous les $\mbf g_{p^r}^{c_i}$ sont sur le même sous-espace affine de dimension $h/r$ de $\gf(p^r)$ lorsque celui-ci est considéré comme un espace affine de dimension $r$ sur $\gf(p)$.
 \end{prop}
 
-L'existence d'un tel $r$ peut être considérée comme un mauvais prérequis, cependant vu que les paramètres du cryptosystème de Chor-Rivest doivent être choisis de sorte que le problème du logarithme discret soit facile, nous savons déjà que $h$ à plusieurs facteurs, et il est donc fort probable que cette hypothèse sur $r$ soit satisfaite. En fait, les $h$ sans tels facteurs sont les nombres premiers et les carrés de nombres premiers. Le vrai problème est que $r$ ne doit pas être trop grand.
+L'existence d'un tel $r$ peut être considérée comme un mauvais prérequis, cependant vu que les paramètres du cryptosystème de Chor-Rivest doivent être choisis de sorte que le problème du logarithme discret soit facile, nous savons déjà que $h$ à plusieurs facteurs, et il est donc fort probable que cette hypothèse sur $r$ soit satisfaite. En fait, les $h$ sans de tels facteurs sont les nombres premiers et les carrés de nombres premiers. Le vrai problème est que $r$ ne doit pas être trop grand.
 
-Nous pouvons donc écrire un algorithme qui vérifie si un candidat pour $g_{p^r}$ est bon : l'algorithme vérifie simplement si les $g_{p^r}^{c_i}$ sont affinement liés. Cet algorithme a pour complexité moyenne $\O(h^3/r)$ opérations dans $\gf(p)$. Comme il y a $\phi(p^r-1)/r$ candidats, nous pouvons chercher exhaustivement un $g_{p^r}$ avec une complexité de $\O(h^3p^r/r^2)$.
+Nous pouvons donc écrire un algorithme qui vérifie si un candidat pour $\mbf g_{p^r}$ est bon : l'algorithme vérifie simplement si les $\mbf g_{p^r}^{c_i}$ sont affinement liés. Cet algorithme a pour complexité moyenne $\O(h^3/r)$ opérations dans $\gf(p)$. Comme il y a $\phi(p^r-1)/r$ candidats, nous pouvons chercher exhaustivement un $g_{p^r}$ avec une complexité de $\O(h^3p^r/r^2)$.
 
 \begin{algorithm}[h]
-\caption{Algorithme pour trouver $g_{p^r}$ lorsque $r\geqslant \sqrt{h + 1/4} + 1/2$}
+\caption{Algorithme pour trouver $\mbf g_{p^r}$ lorsque $r\geqslant \sqrt{h + 1/4} + 1/2$}
 \label{algoTestgpr}
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$ et $r$ divisant $h$ tel que $r\geqslant \sqrt{h + 1/4} + 1/2$
-\ENSURE un élément $g_{p^r}$
-\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
+\ENSURE un élément $g = \mbf g_{p^r}$
 \FORALL{$\zeta \in \gf(p^h)$ générateur de $\gf(p^r)^\times$} \label{algoTestgprboucle}
-	\STATE{calculer l'équation du sous-espace affine $V$ engendré par $(\zeta^{c_{i_0}}, \dots, \zeta^{c_{i_{h/r}}})$}
-	\FORALL{$i$ différent de $i_0, \dots, i_{h/r}$ }	
+	\STATE{calculer l'équation du sous-espace affine $V$ engendré par $(\zeta^{c_{0}}, \dots, \zeta^{c_{{h/r}}})$}
+	\FORALL{$i$ différent de $0, 1, \dots, {h/r}$ }	
 		\IF{$\zeta^{c_{i}}$ ne satisfait pas à l'équation du sous-espace affine $V$}
 			\STATE{continuer la boucle ligne~\ref{algoTestgprboucle}}
 		\ENDIF
@@ -584,11 +585,13 @@ Nous pouvons donc écrire un algorithme qui vérifie si un candidat pour $g_{p^r
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Utilisation des $c_i$}
+\subsection*{Utiliser les $c_i$ pour trouver plus rapidement $\mbf g_{p^r}$}
 
-Nous allons améliorer l'attaque précédente en utilisant la connaissance de tous les $c_i$. Nous allons nous servir du fait suivant :
+En 1991, Hendrik Lenstra soupçonnait que qu'inclure tous les $c_i$ dans la clé publique était dangereux pour la sécurité du système. En effet, Serge Vaudenay a amélioré l'attaque précédente en utilisant la connaissance de tous les $c_i$. 
 
-\begin{prop}
+Avant de voir comment il a procédé, voici un fait dont nous allons nous servir :
+
+\begin{prop}\label{prop:faitCool}
 Soit $Q(x)$ un polynôme de $\gf(p^r)[x]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Nous avons $$\sum_{a \in \gf(p)} Q(a)^e = 0.$$
 \end{prop}
 
@@ -597,7 +600,7 @@ Le lemme qui suit va permettre de démontrer cette proposition.
 \begin{lemm}
 Soit $k$ un entier tel que $1 \leqslant k < p-1$. Alors
 $$\sum_{a\in\gf(p)} a^k = 0.$$
-Ainsi, si $P(x) \in \gf(p^r)[x]$, pour $r \geqslant 1$, est de degré inférieur à $p-1$, alors : $$\sum_{a\in\gf(p)} P(a) = 0.$$
+Ainsi, si $P(x) \in \gf(p^r)[x]$ est de degré inférieur à $p-1$, alors : $$\sum_{a\in\gf(p)} P(a) = 0.$$
 \end{lemm}
 
 \begin{proof}[Démonstration du lemme]
@@ -614,65 +617,72 @@ Ainsi, on obtient bien :
 \end{proof}
 
 \begin{proof}[Démonstration de la proposition]
-Comme $Q(x) \in \gf(p^r)[x]$ est de degré $d$ et que $1\leqslant e < (p-1)/d$, le polynôme $Q(x)^e$ est de degré inférieur à $p-1$. Ainsi le lemme précédent permet de conclure :
+Comme $Q(x) \in \gf(p^r)[x]$ est de degré $d$ et que $e$ est tel que $1\leqslant e < (p-1)/d$, le polynôme $Q(x)^e$ est de degré inférieur à $p-1$. Ainsi le lemme précédent permet de conclure :
 $$\sum_{a\in\gf(p)} Q(a)^e = 0.$$
 \end{proof}
 
+Cela nous donne un critère particulièrement intéressant pour $\mbf g_{p^r}$ :
+
 \begin{prop}
-Pour tout $1 \leqslant e < (p-1)r/h$, nous avons :
-$$\sum_{i=0}^{p-1} (g_{p^r})^{ec_i} = 0.$$
+Pour tout $1 \leqslant e < (p-1)r/h$ :
+$$\sum_{i=0}^{p-1} (\mbf g_{p^r})^{ec_i} = 0.$$
 \end{prop}
 
 \begin{proof}
 Considérons le polynôme $Q(x)\in\gf(p^r)[x]$ de la proposition~\ref{premierePropVaudenay} : le polynôme $Q(x)$ est de degré $h/r$, à coefficients dans $\gf(p^r)$ et tel que, pour tout $0 \leqslant i \leqslant p-1$ :
 $$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
-Ainsi par la proposition précédente, pour tout $1 \leqslant e < (p-1)r/h$ :
+Ainsi par la proposition~\ref{prop:faitCool}, pour tout $1 \leqslant e < (p-1)r/h$ :
 $$\sum_{a\in\gf(p)} Q(a)^e = \sum_{i=0}^{p-1} Q\left(\alpha_{\sigma(i)}\right)^e = 0,$$
 d'où l'égalité souhaitée :
-$$\sum_{i=0}^{p-1} (g_{p^r})^{ec_i} = 0.$$
+$$\sum_{i=0}^{p-1} (\mbf g_{p^r})^{ec_i} = 0.$$
 \end{proof}
 
-Cela donne une façon plus simple de sélectionner tous les candidats pour $g_{p^r}$ -- que la recherche exhaustive. Son principal avantage est qu'il fonctionne dans n'importe quel sous-corps. Par exemple, ont peut considérer $r=1$ et trouver les seuls $g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$, nous avons :
-$$\sum_{i=0}^{p-1} (g_p)^{ec_i} = 0.$$
-La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf(p)$-opérations : il est peu probable qu'un mauvais candidat ne sera pas détecté par le $e = 1$. Ainsi, nous pouvons recouvrer $g_p$ en $\O(p^2)$ opérations binaires.
+Cela donne une façon plus simple de sélectionner tous les candidats pour $\mbf g_{p^r}$ -- par rapport à la recherche exhaustive. Son principal avantage est que cette sélection fonctionne dans n'importe quel sous-corps. Par exemple, ont peut considérer $r=1$ et trouver les seuls $\mbf g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$ :
+$$\sum_{i=0}^{p-1} (\mbf g_p)^{ec_i} = 0.$$
+La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf(p)$-opérations : il est peu probable qu'un mauvais candidat ne soit pas détecté par le cas $e = 1$. Ainsi, nous pouvons recouvrer $\mbf g_p$ en $\O(p^2)$ opérations binaires.
 
-Malheureusement, le $g_{p^r}$ ne peut pas être utilisé efficacement quand $r$ est trop petit. Cependant, on peut toujours utiliser $g_{p^r}$ des petits sous-corps pour le calculer dans des corps plus grands. Notre but est de calculer $g_{p^r}$ avec $r$ assez grand (tel que $r^2 \geqslant h$). Nous considérons le problème du calcul de $g_{p^r}$ lorsque $r_1,\dots,r_k$ sont les facteurs de $r$ et avec la connaissance de $g_{p^{r_i}}$. Comme $g_{p^{r_i}} = (g_{p^r})^{1+p^{r_i}+p^{2r_i}+\cdots+p^{r-r_i}}$, nous avons 
-$$(\dagger)\qquad\log(g_{p^r}) = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1},$$
-où la base des logarithmes est n'importe quel élément primitif $\gamma$ fixé dans le corps $\gf(p^r)$. La connaissance de tous les $g_{p^{r_i}}$ donne donc la connaissance de $\log(g_{p^r})$ modulo
+Malheureusement, le $\mbf g_{p^r}$ ne peut pas être utilisé efficacement quand $r$ est trop petit. Cependant, on peut toujours utiliser le $\mbf g_{p^r}$ des petits sous-corps pour le calculer dans des corps plus grands. Notre but est donc de calculer $\mbf g_{p^r}$ avec $r$ assez grand (tel que $r^2 \geqslant h$). 
+
+Considérons le problème du calcul de $\mbf g_{p^r}$ lorsque les facteurs $r_1,\dots,r_k$  de $r$ sont connus, et aussi en sachant les $\mbf g_{p^{r_i}}$. Comme $\mbf g_{p^{r_i}} = (\mbf g_{p^r})^{1+p^{r_i}+p^{2r_i}+\cdots+p^{r-r_i}}$, nous avons 
+$$(\ast)\qquad\log(\mbf g_{p^r}) = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1},$$
+où la base des logarithmes est n'importe quel élément primitif $\gamma$ fixé dans le corps $\gf(p^r)$. La connaissance de tous les $\mbf g_{p^{r_i}}$ donne donc la connaissance de $\log(\mbf g_{p^r})$ modulo
 $$\ell := \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}.$$
-Nous avons donc besoin seulement de $(p^r-1)/\ell$ essais pour recouvrer $g_{p^r}$.
+Nous avons donc besoin seulement de $(p^r-1)/\ell$ essais pour recouvrer $\mbf g_{p^r}$.
+Cela permet d'écrire l'algorithme~\ref{algogprFromgpri}, recouvrant $\mbf g_{p^r}$ à partir des $\mbf g_{p^{r_i}}$.
 
 \begin{algorithm}[h]
-\caption{Algorithme pour récupérer $g_{p^r}$ à partir des $g_{p^{r_i}}$}
+\caption{Algorithme pour récupérer $\mbf g_{p^r}$ à partir des $\mbf g_{p^{r_i}}$}
 \label{algogprFromgpri}
 \begin{algorithmic}[1]
-\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, ${\{r_i\}}_{1\leqslant i\leqslant k}$ diviseurs de $r$ et $g_{p^{r_i}}$
-\ENSURE l'ensemble des $g_{p^r}$ possibles
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, ${\{r_i\}}_{1\leqslant i\leqslant k}$ diviseurs de $r$ et $\mbf g_{p^{r_i}}$
+\ENSURE l'ensemble des $\mbf g_{p^r}$ possibles
 \STATE{choisir $\gamma$ un élément primitif de $\gf(p^r)$}
 \FORALL{$i$ allant de $1$ à $k$}
-	\STATE{résoudre l'équation $(\dagger)$ : $$x_i = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
+	\STATE{résoudre l'équation $(\ast)$ : $$x_i = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
 \ENDFOR
 \STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
-\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$ où $x$ est unique modulo $\ell$}
+\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$, pour $1 \leqslant i \leqslant k$ et où $x$ est unique modulo $\ell$}
 \STATE{$\beta \gets \gamma^{x}$}
-\FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}\label{algoNaifgprFromgpriBoucle}
+\FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}\label{algogprFromgpriBoucle}
 	\FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}	
 		\STATE{calculer la somme : $$\mathbf{res} \gets \sum_{i=0}^{p-1} \beta^{ec_i}\gamma^{ec_i\ell y}$$}
 		\IF{$\mathbf{res} \neq 0$}
-			\STATE{continuer la boucle ligne~\ref{algoNaifgprFromgpriBoucle}}
+			\STATE{continuer la boucle ligne~\ref{algogprFromgpriBoucle}}
 		\ENDIF
 	\ENDFOR
-	\STATE{ajouter $\beta\gamma^{\ell y}$ à la liste des $g_{p^r}$ possibles}
+	\STATE{ajouter $\beta\gamma^{\ell y}$ à la liste des $\mbf  g_{p^r}$ possibles}
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
 
-Chaque boucle de la ligne~\ref{algoNaifgprFromgpriBoucle} demande en moyenne $\O(pr^2)$ opérations dans $\gf(p)$.
+Chaque boucle de la ligne~\ref{algogprFromgpriBoucle} de l'algorithme~\ref{algogprFromgpri} demande en moyenne $\O(pr^2)$ opérations dans $\gf(p)$.
 
-Nous pouvons maintenant définir l'algorithme global de l'attaque.
+\subsection*{Attaque globale}
+
+Pour l'attaque générale, on s'intéresse aux sous-corps de $\gf(p^r)$.
 
 \begin{defi}
-Soit $G$ un graphe orienté acyclique (\textit{DAG for directed acyclic graph}) étiqueté enraciné dont la racine est étiquetée par un corps fini $\gf(p^r)$ et tel que pour chaque arête $u \rightarrow v$ de $G$, l'étiquette $l(u)$ de $u$ est un sous-corps maximal (au sens de l'inclusion) de l'étiquette $L(v)$ de $v$ et une extension de $\gf(p)$. On dit que $G$ est un DAG $p$-factorisant de $\gf(p^r)$.
+Soit $G$ un graphe orienté acyclique (\textit{DAG for directed acyclic graph}) étiqueté enraciné dont la racine est étiquetée par un corps fini $\gf(p^r)$ et tel que pour chaque arête $u \rightarrow v$ de $G$, l'étiquette $L(u)$ de $u$ est un sous-corps maximal (au sens de l'inclusion) de l'étiquette $L(v)$ de $v$ et est une extension du corps $\gf(p)$. On dit que $G$ est un \textit{DAG $p$-factorisant} de $\gf(p^r)$.
 \end{defi}
 
 \begin{defi}
@@ -681,9 +691,11 @@ $$C(G) := \sum_{v} \frac{\#L(v) -1}{\ppcm\{\#L(w)-1 \mid v \leftarrow w\}},$$
 où nous prenons pour convention : $\ppcm(\emptyset) = 1$.
 \end{defi}
 
-Nous pouvons définir un algorithme pour calculer $g_{p^r}$ avec pour compléxité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf(p^r)$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
+Nous pouvons définir un algorithme pour calculer $\mbf g_{p^r}$ avec pour compléxité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf(p^r)$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
 $$\O\left(\min_{\substack{r \text{ divisant } h \\ r^2 \geqslant h}} \; \min_{\substack{G \text{ est un DAG}\\p\text{-factorisant} \\ \text{ de } \gf(p^r)}} \; 
-pr^2C(G)\right)$$
+pr^2C(G)\right).$$
+
+L'algorithme~\ref{algoGeneral} achève l'attaque de Serge Vaudenay.
 
 \begin{algorithm}[h]
 \caption{Attaque général}
@@ -695,9 +707,14 @@ pr^2C(G)\right)$$
 \FOR{$u$ sommet de $G$, tel que pour tout $u \leftarrow u_i$, $u_i$ a été visité,}
 	\STATE{l'algorithme~\ref{algogprFromgpri} avec $\gf(p^r)=L(u)$ et $\gf(p^{r_i}) = L(u_i)$}
 \ENDFOR
-\STATE{appliquer l'algorithme~\ref{algogpr} à $g_{p^r}$}
+\STATE{$\pi \gets$ appliquer l'algorithme~\ref{algogpr} à $\mbf g_{p^r}$}
+\STATE{$t \gets$ appliquer l'algorithme~\ref{algoPremiereAttaqueVaudenay} à $\mbf g_{p^r}$ et $\pi$}
+\STATE{$g, d \gets$ appliquer l'algorithme~\ref{algoAttaqueGoldreichsimplifiee} à $t$ et $\pi$}
+\RETURN{$(g,t,\pi,d)$}
 \end{algorithmic}
 \end{algorithm}
+
+\subsection*{Conclusion}
 
 \section{Le calcul de logarithmes discrets par Antoine Joux}\label{sec:DLPJoux}
 
