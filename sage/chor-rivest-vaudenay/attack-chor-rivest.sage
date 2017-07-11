@@ -150,6 +150,66 @@ def increment (array, stone, p) :
 
 def secondVaudenayAttack (PubKey, gpr, r, data) : # data === array of size two (e.g. [0, 1])
     [c, p, h, Q, alpha] = PubKey
+    if r ** 2 < h :
+        print "r too small, expected at least " + str(int(sqrt(h) + 1))
+        return None
+    n = h / r
+    K = gpr.parent()
+    V = K.vector_space()
+    pi = [ -1 ] + data + [ -1 for i in range (p - 3) ]
+    found = False
+    G = [ V(gpr**c[i] - gpr**c[0]) for i in range (n + 1) ]
+    M = Matrix(G).transpose()
+    X = [ M.solve_right(V(gpr**c[i] - gpr**c[0])) for i in range (p) ]
+    u = 0
+    piBest = pi
+    while not found and u < p :
+        ok = True
+        pi = [ -1 ] + data + [ -1 for i in range (p - 3) ]
+        i = 3
+        while ok and i < p :
+            a1 = X[i][1]
+            a2 = X[i][2]
+            if gcd (int(a2 - u * a1), p) == 1 and a1 != 0 :
+                aa = mod (a2 * alpha[pi[2]] - u * a1 * alpha[pi[1]], p) *  mod (a2 - u * a1, p) ** (-1)
+                pi[i] = alpha.index(aa)
+                if is_not_consistent (pi) :
+                    ok = False
+            i = i + 1
+        if ok :
+            if pi.count(-1) == n - 1 :
+                piBest = pi
+                found = True
+            else :
+                if pi.count(-1) < piBest.count(-1) :
+                    piBest = pi
+        u = u + 1
+    I = [ i for i in range (p) if piBest[i] == -1 ]
+    S = [ i for i in range (p) if i not in piBest ]
+    count  = len (I)
+    G = Permutations([ i for i  in range (count) ])
+    for el in G :
+        pi = piBest
+        for i in range (count) :
+            pi[I[i]] = S[el[i]]
+        i = 0
+        ok = True
+        while ok and i < count :
+            Q = K(0)
+            for j in range (n + 1) :
+                L = K(1)
+                for k in range (n + 1) :
+                    if k != j :
+                        L = L * (alpha[pi[j]] - alpha[pi[k]]) ** (-1) * (alpha[pi[I[i]]] - alpha[pi[k]])
+                Q = Q + gpr ** c[j] * L
+            if gpr ** c[I[i]] != Q :
+                ok = False
+            i += 1
+        if ok :
+            return pi
+    raise Exception('Unable to find a permutation!')
+
+    [c, p, h, Q, alpha] = PubKey
     n = h / r
     K = gpr.parent()
     newnbs = data + [i for i in range (2, n)] + [n - 1]

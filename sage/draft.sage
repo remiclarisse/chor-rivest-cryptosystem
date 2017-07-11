@@ -4,9 +4,11 @@
 # attach("~/chor-rivest-cryptosystem/sage/draft.sage")
 # p = 31
 # h = 12
+# r = 4
 # [PubKey, PrivKey] = CRGenerateKeys (p, h)
 # [c, p, h, Q, alpha] = PubKey
 # [t, g, sInv, d] = PrivKey
+# gpr = g ** ((p ** h - 1) / (p ** r - 1))
 # m = generateRandomMessage (p, h)
 # e = CREncrypt (m, PubKey)
 # %time [crackedMessage, EquivPrivKey] = VaudenayAttack (e, PubKey)
@@ -160,7 +162,7 @@ def crackMessage (PubKey, e, gpr, r) :
     K = gpr.parent()
     alpha = [ K(PubKey[4][i]) for i in range (p) ]
     # Générer une clé privée équivalente
-    pi = blap (c, p, h, alpha, gpr, r, [0, 1])
+    pi = blapblap (c, p, h, alpha, gpr, r, [0, 1])
     piInv = [pi.index(i) for i in range (p)]
     T = blup (c, p, h, alpha, pi, gpr, r)
     t = T[0]
@@ -198,6 +200,7 @@ def blapblap (c, p, h, alpha, gpr, r, data) :
     M = Matrix(G).transpose()
     X = [ M.solve_right(V(gpr**c[i] - gpr**c[0])) for i in range (p) ]
     u = 0
+    piBest = pi
     while not found and u < p :
         print "u=" + str(u)
         ok = True
@@ -213,13 +216,38 @@ def blapblap (c, p, h, alpha, gpr, r, data) :
                     ok = False
             i = i + 1
             print "\t count: " + str(pi.count(-1)) + "\t" + str(pi)
-        # if ok :
-        #     found = True
+        if ok :
+            if pi.count(-1) == n - 1 :
+                piBest = pi
+                found = True
+            else :
+                if pi.count(-1) < piBest.count(-1) :
+                    piBest = pi
         u = u + 1
-    if not found :
-        return "fail"
-    else :
-        return "MUY BIEN!"
+    I = [ i for i in range (p) if piBest[i] == -1 ]
+    S = [ i for i in range (p) if i not in piBest ]
+    count  = len (I)
+    G = Permutations([ i for i  in range (count) ])
+    for el in G :
+        pi = piBest
+        for i in range (count) :
+            pi[I[i]] = S[el[i]]
+        i = 0
+        ok = True
+        while ok and i < count :
+            Q = K(0)
+            for j in range (n + 1) :
+                L = K(1)
+                for k in range (n + 1) :
+                    if k != j :
+                        L = L * (alpha[pi[j]] - alpha[pi[k]]) ** (-1) * (alpha[pi[I[i]]] - alpha[pi[k]])
+                Q = Q + gpr ** c[j] * L
+            if gpr ** c[I[i]] != Q :
+                ok = False
+            i += 1
+        if ok :
+            return pi
+    return "fail"
 
 def in_spaned_subspace (v, M) :
     value = True

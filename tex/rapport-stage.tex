@@ -468,9 +468,9 @@ Bien entendu, les éléments $u$ et $v$ sont liés à $\sigma$, ainsi, si $\sigm
 
 En exprimant le polynôme $Q(x)$ faisant intervenir la permutation $\pi$ par rapport au polynôme $Q(x)$ faisant intervenir la permutation $\sigma$, nous obtenons :
 \begin{align*}
-Q_\pi(x) &= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\pi(i_k)}}{\alpha_{\pi(i_j)}-\alpha_{\pi(i_k)}}, \\
-&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-u\alpha_{\sigma(i_k)} - v}{u\alpha_{\sigma(i_j)}-u\alpha_{\sigma(i_k)}}, \\
-&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{i_j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{u^{-1}x - u^{-1}v-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}}, \\
+Q_\pi(x) &= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\pi(k)}}{\alpha_{\pi(j)}-\alpha_{\pi(k)}}, \\
+&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-u\alpha_{\sigma(k)} - v}{u\alpha_{\sigma(j)}-u\alpha_{\sigma(k)}}, \\
+&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{u^{-1}x - u^{-1}v-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}, \\
 &= Q_\sigma(u^{-1}(x -v)). \\
 \end{align*}
 Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(x)$, alors $-u^{-1}(\omega +v)$ est racine du polynôme $Q_\sigma(x)$, donc si on fait tourner l'algorithme~\ref{algoPremiereAttaqueVaudenay} avec la permutation $\pi$, les valeurs renvoyées sont :
@@ -516,17 +516,18 @@ Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, l
 
 Cependant, quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\pi$. En fait, si $r \geqslant h/r$, alors la famille $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$ est affinement indépendante. Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(\mbf g_{p^r})^{c_{1}} - (\mbf g_{p^r})^{c_{0}},\quad \dots,\quad (\mbf g_{p^r})^{c_{{h/r}}} - (\mbf g_{p^r})^{c_{0}}.$$
 
-Notons $a_j^i$ le coefficient de $(\mbf g_{p^r})^{c_{{j}}} - (\mbf g_{p^r})^{c_{0}}$ pour $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$. Par $(\ddagger)$, nous avons :
+Notons $a_j^i$ le coefficient de $(\mbf g_{p^r})^{c_{{j}}} - (\mbf g_{p^r})^{c_{0}}$ pour $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, où $i , j\geqslant 1$. Alors, par $(\ddagger)$, nous avons, si $a_1^i \neq 0$ :
 \begin{align*}
-\frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}} \right)^{-1} \\
-&= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
-&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right) \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
-&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right) \left(\frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}} \right) \\
+\frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(2)}-\alpha_{\sigma(k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma({k'})}}{\alpha_{\sigma(1)}-\alpha_{\sigma({k'})}} \right)^{-1} \\
+&= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(2)}-\alpha_{\sigma(k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(1)}-\alpha_{\sigma({k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma({k'})}} \right) \\
+&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(1)}-\alpha_{\sigma({k'})}}{\alpha_{\sigma(2)}-\alpha_{\sigma(k)}} \right) \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(i)}-\alpha_{\sigma({k'})}} \right) \\
+&= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(1)}-\alpha_{\sigma({k'})}}{\alpha_{\sigma(2)}-\alpha_{\sigma(k)}} \right) \left(\frac{\alpha_{\sigma(i)}-\alpha_{\sigma(1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(2)}} \right) \\
 \end{align*}
 
 Ainsi, il existe $\mu$ dans $\gf(p)$, indépendant de $i$, tel que 
-$$(\star) \qquad\frac{a_2^i}{a_1^i} = \mu \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}}.$$
-En passant toute les valeurs de $\mu$ en revue, nous pouvons obtenir $\sigma(i)$ de l'équation $(\star)$. Cette remarque donne naissance à l'algorithme~\ref{algogpr} suivant :
+$$(\star) \qquad\frac{a_2^i}{a_1^i} = \mu \frac{\alpha_{\pi(i)}-\alpha_{\pi(1)}}{\alpha_{\pi(i)}-\alpha_{\pi(2)}}\quad\Leftrightarrow\quad
+\alpha_{\pi(i)} = \frac{a_2^i\alpha_{\pi(2)}-\mu a_1^i\alpha_{\pi(1)}}{a_2^i-\mu a_1^i}.$$
+En passant toute les valeurs de $\mu$ en revue, nous pouvons obtenir $\pi(i)$ de l'équation $(\star)$. Cependant, cela ne permet pas de déterminer $\pi(0)$ et $\pi(j)$ pour $3 \leqslant j \leqslant h/r$. Il reste alors à les chercher de manière exhaustive. Cette remarque donne naissance à l'algorithme~\ref{algogpr}.
 
 \begin{algorithm}[h]
 \caption{Algorithme pour trouver $\pi$ sachant $\mbf g_{p^r}$ lorsque $r\geqslant \sqrt h$}
@@ -534,27 +535,21 @@ En passant toute les valeurs de $\mu$ en revue, nous pouvons obtenir $\sigma(i)$
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ tel que $r\geqslant \sqrt h$ et $\mbf g_{p^r}$
 \ENSURE une permutation $\pi$ d'une clé privée équivalente
-\STATE{pré-calculer la matrice de changement de bases de la base ``classique'' vers la ``base'' $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$}
+\STATE{pré-calculer la matrice de changement de bases de la ``base classique'' vers la ``base'' $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$}
 \STATE{choisir arbitrairement $\pi(1)$ et $\pi(2)$ distincts dans $\{0, \dots, p-1\}$}
 \FORALL{$\mu$ dans $\gf(p)$} 
 	\FORALL{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq 0, 1, \dots, h/r$} 
-		\STATE{écrire $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$ dans la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$}
+		\STATE{écrire $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$ dans la ``base'' $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$}
 		\STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
 		\STATE{trouver la valeur de $\pi(i)$ grâce à $(\star)$}
 	\ENDFOR
-	\IF{$\pi$ est consistante}
-		\STATE{compléter $\pi(i_0)$}
-		\RETURN{$\pi$}
-	\ENDIF
 \ENDFOR
+\STATE{compléter $\pi$ en cherchant de manière exhaustive les images $\pi(0), \pi(3), \dots, \pi(h/r)$}
+\RETURN{$\pi$}
 \end{algorithmic}
 \end{algorithm}
 
-$$\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\pi(i)}-\alpha_{\pi(i_1)}}{\alpha_{\pi(i)}-\alpha_{\pi(i_2)}}
-\quad\Leftrightarrow\quad
-\alpha_{\pi(i)} = \frac{a_2^i\alpha_{\pi(i_2)}-ua_1^i\alpha_{\pi(i_1)}}{a_2^i-ua_1^i}.$$
-
-\subsection{Test pour trouver $g^{(p^h-1)/(p^r-1)}$}
+\subsection*{Test pour trouver $\mbf g_{p^r}$}
 
 Les équations : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
 $$(\ddagger) \qquad (g_{p^r})^{c_i} - (g_{p^r})^{c_{i_0}} = \sum_{j=1}^{h/r} \left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_j)}-\alpha_{\sigma(i_k)}},$$
