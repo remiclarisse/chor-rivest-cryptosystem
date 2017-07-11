@@ -148,7 +148,7 @@ pour $i$ tel que $0 \leqslant i \leqslant p-1$.
 
 \'Etant donné qu'il faut calculer des logarithmes discrets pour fabriquer la clé publique, les paramètres choisis doivent permettre d'effectuer ces logarithmes facilement dans $\gf(p^h)$. Ainsi, Chor et Rivest suggèrent de prendre un entier premier, ou une puissance de nombre premier, $p$ relativement petit et un exposant $h$ friable, permettant l'utilisation de l'algorithme de Pohlig-Hellman. En l’occurrence, ils ont proposé de se placer dans les corps tels que $\gf(197^{24})$, $\gf(211^{24})$, $\gf(243^{24})$ et $\gf(256^{25})$.
 
-L'espace des messages est l'ensemble des chaînes de $p$-bits de poids de Hamming égal à $h$. C'est-à-dire que le message à chiffrer doit d'abord être encodé en une chaîne de bits $m = [m_0\cdots m_{p-1}]$ telle que $m_0+\dots + m_{p-1} = h$. N'importe quel message peut être découpé en plusieurs messages de $p$ bits de poids $h$ en suivant un algorithme d'encodage donné en section IV.B. de \cite{chorRivest1988}.
+L'espace des messages est l'ensemble des chaînes de $p$ bits et de poids de Hamming égal à $h$. C'est-à-dire que le message à chiffrer doit être une chaîne de bits $m = [m_0\cdots m_{p-1}]$ telle que $m_0+\dots + m_{p-1} = h$. N'importe quel message peut être découpé en plusieurs messages de $p$ bits et de poids $h$ en suivant un algorithme d'encodage donné dans \cite[IV.B.]{chorRivest1988}.
 
 L'espace des chiffrés est $\Z/(p^h-1)\Z$ et le chiffré d'un message $m$ est :
 $$E(m) := \sum_{i=0}^{p-1} m_ic_i \pmod{p^h-1}.$$
@@ -311,7 +311,7 @@ sage:     message[sInv [alpha.index(k)]] = 1
 
 Nous présentons ici l'attaque de Serge Vaudenay \cite{vaudenay2000}. Elle s'appuie sur la forte friabilité de $h$, i.e. sur l'existence de nombreux sous-corps de $\gf(p^h)$. Pour casser une instance du cryptosystème, l'idée est de fabriquer une clé privée qui donne la même clé publique que le cryptosystème : cela va permettre de déchiffrer comme un destinataire légitime !
 
-Ici, nous donnons l'attaque pour $p$ un nombre premier, bien qu'elle soit généralisée pour le cas $p$ puissance d'un nombre premier. Aussi, nous exposons l'attaque à rebours, à savoir qu'on part du cas où quelques éléments de la clé privée sont connus et au fur et à mesure, nous les retirons en regardant comment les fabriquer.
+Ici, nous donnons l'attaque pour $p$ un nombre premier, bien qu'elle soit généralisée pour le cas $p$ puissance d'un nombre premier. Aussi, nous exposons l'attaque à rebours, à savoir qu'on part du cas où quelques éléments de la clé privée sont connus et, au fur et à mesure, nous les retirons en regardant comment les fabriquer.
 
 \subsection*{Symétrie dans la clé privée}
 
@@ -326,11 +326,11 @@ Cela donne donc au moins $hp(p-1)$ clés privées équivalentes.
 
 
 \begin{defi}[Clés équivalentes]
-Deux clés privées sont dites \textit{équivalentes} si elles fabriquent la même clé publique. En d'autres termes, deux clés privées $(g,t,d,\sigma)$ et $(g',t',d',\pi)$ sont équivalentes, si on a l'égalité d'ensembles :
+Deux clés privées sont dites \textit{équivalentes} si elles fabriquent la même clé publique. En d'autres termes, deux clés privées $(g,t,\sigma,d)$ et $(g',t',\pi ,d')$ sont équivalentes, si on a l'égalité d'ensembles :
 $$\left\{d + \log_g(t + \alpha_{\sigma(i)}) : 0\leqslant i \leqslant p-1\right\} = \left\{d' + \log_{g'}(t' + \alpha_{\pi(i)}) : 0\leqslant i \leqslant p-1\right\}.$$
 \end{defi}
 
-Pour passer d'une clé privée à une clé privée équivalente, il existe une transformation intéressante sur la permutation $\sigma$ qui permet de choisir deux images arbitrairement pour deux antécédents fixés -- ici, on prend les images de $0$ et $1$ :
+Pour passer d'une clé privée à une clé privée équivalente, il existe une transformation intéressante sur la permutation $\sigma$ qui permet de choisir arbitrairement deux images pour deux antécédents fixés -- ici, on prend les images de $0$ et $1$ :
 
 \begin{prop}\label{prop:permutation}
 Soit $\sigma$ une permutation d'une clé privée. Alors, il existe $\pi$ une permutation d'une clé privée équivalente, telle que, $$\pi(0) = i \qquad \text{et}\qquad \pi(1) = j.$$
@@ -347,7 +347,7 @@ Il faut alors définir la permutation $\pi$ par
 \paragraph*{Notation :} Le discours qui suit porte sur la recherche de clés privées équivalentes. Souvent, elles sont exprimées en fonction de la clé privée possédée par le destinataire légitime. On note en lettre grasse la clé privée d'origine $(\mbf{g}, \mbf{t}, \sigma, \mbf{d})$ et en police ordinaire une clé privée équivalente $(g, t, \pi, d)$ -- la permutation d'une clé équivalente est notée $\pi$.
 
 \begin{rema}
-Aussi, nous faisons (parfois implicitement) le raccourci de << trouver \underline{une} clé privée équivalente >> à << trouver \underline{la} clé privée équivalente >>. Les algorithmes présentés donnent (quasiment) tous des listes d'éléments possibles en sortie, alors qu'un seul de ceux-ci nous suffit.
+Aussi, nous faisons (parfois implicitement) le raccourci de << trouver \underline{une} clé privée équivalente >> à << trouver \underline{la} clé privée équivalente >>. Les algorithmes présentés donnent (quasiment) tous des listes d'éléments possibles en sortie, alors qu'un seul nous suffit.
 \end{rema}
 
 \subsection*{Cléf de voûte de l'attaque}
@@ -381,14 +381,14 @@ car $\mbf t^{p^{r(h/r)}} = \mbf t^{p^h} = \mbf t = \mbf t^{p^0}$. Cela montre au
 Cela achève la démonstration de la proposition.
 \end{proof}
 
-Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(\mbf g_{p^r}, Q)$, et $\mbf g_{p^r}$ est donc essentiellement unique. Soulignons la particularité de ce polynôme $Q$, il est à coefficients dans $\gf(p^r)$, il est de degré $h/r$ et nous connaissons ses valeurs sur tout $\gf(p)$ : il peut donc être interpolé sur un petit ensemble de $\gf(p)$.
+Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(\mbf g_{p^r}, Q)$, et $\mbf g_{p^r}$ est donc essentiellement unique. Soulignons la particularité de ce polynôme $Q$, il est à coefficients dans $\gf(p^r)$, il est de degré $h/r$ et nous connaissons ses images sur tout $\gf(p)$ : il peut donc être interpolé sur un petit sous-ensemble de $\gf(p)$.
 
 \paragraph*{Notation :} Pour $r$ divisant $h$ et $\omega$ élément primitif de $\gf(p^h)$, notons $$\omega_{p^r} := \omega^{(p^h-1)/(p^r-1)} = \omega^{1+p^r+p^{2r}+p^{3r}+\cdots+p^{h-r}},$$
 la norme de $\omega$ considéré dans l'extension de corps $\gf(p^r) \subseteq \gf(p^h)$.
 
 \subsection*{Attaque sachant $\mbf g_{p^r}$ et $\sigma$}
 
-Supposons connus la norme $\mbf g_{p^r}$ et la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (\mbf g_{p^r})^{c_i})}_i$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-\mbf t$.  Par la symétrie dans la clé privée, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. 
+Supposons connus la norme $\mbf g_{p^r}$ et la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (\mbf g_{p^r})^{c_i})}$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-\mbf t$.  Par la symétrie dans la clé privée, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. 
 Cet algorithme fait l'objet de la figure Algorithme~\ref{algoPremiereAttaqueVaudenay}.
 
 Nous résolvons l'attaque en calculant $g$ et $d$ -- d'une clé équivalente donc -- grâce à l'attaque de Oded Goldreich exposée dans \cite{chorRivest1988}, une version simplifiée sera utilisée plus loin, c'est pour cela qu'elle est volontairement omise ici.
@@ -512,7 +512,7 @@ b_i - b_0 &= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} -v + \alpha_{\pi(i)}}{u 
 \end{algorithmic}
 \end{algorithm}
 
-Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, le $t$ donné est $u \mbf t^{p^{jr}} -v$, il retourne le conjugué $\mbf g^{p^{jr}}$ du $\mbf g$ d'origine et l'entier $\mbf d - \log_{\mbf g^{p^{jr}}}(u)$.
+Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, le $t$ donné est $u \mbf t^{p^{jr}} -v$, il retourne le conjugué $\mbf g^{p^{jr}}$ de $\mbf g$ et l'entier $\mbf d - \log_{\mbf g^{p^{jr}}}(u)$.
 
 Cependant, quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\pi$. En fait, si $r \geqslant h/r$, alors la famille $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$ est affinement indépendante. Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(\mbf g_{p^r})^{c_{1}} - (\mbf g_{p^r})^{c_{0}},\quad \dots,\quad (\mbf g_{p^r})^{c_{{h/r}}} - (\mbf g_{p^r})^{c_{0}}.$$
 
@@ -560,14 +560,6 @@ Donc si on suppose que $h/r + 1 \leqslant r$, à savoir $r \geqslant \sqrt{h + 1
 \begin{prop}
 S'il existe un facteur $r$ de $h$ de sorte que $r \geqslant \sqrt{h + 1/4} + 1/2$, alors tous les $\mbf g_{p^r}^{c_i}$ sont sur le même sous-espace affine de dimension $h/r$ de $\gf(p^r)$ lorsque celui-ci est considéré comme un espace affine de dimension $r$ sur $\gf(p)$.
 \end{prop}
-
-\begin{proof}
-Le point non-évident est de montrer que les points $\mbf g_{p^r}^{c_j}$ pour $0\leqslant j \leqslant h/r$ forment une famille affinement libre, le reste étant essentiellement à déduire de $(\ddagger)$.
-
-Montrons que les vecteurs $\mbf g_{p^r}^{c_j} - \mbf g_{p^r}^{c_0}$ pour $1\leqslant j \leqslant h/r$ sont linéairement indépendants. Par l'absurde, supposons qu'il existe $\lambda_1, \dots, \lambda_{h/r}$ tels que :
-$$\lambda_1 \left(\mbf g_{p^r}^{c_1} - \mbf g_{p^r}^{c_0}\right) + \cdots +
-\lambda_{h/r} \left(\mbf g_{p^r}^{c_{h/r}} - \mbf g_{p^r}^{c_0}\right) = 0$$
-\end{proof}
 
 L'existence d'un tel $r$ peut être considérée comme un mauvais prérequis, cependant vu que les paramètres du cryptosystème de Chor-Rivest doivent être choisis de sorte que le problème du logarithme discret soit facile, nous savons déjà que $h$ à plusieurs facteurs, et il est donc fort probable que cette hypothèse sur $r$ soit satisfaite. En fait, les $h$ sans tels facteurs sont les nombres premiers et les carrés de nombres premiers. Le vrai problème est que $r$ ne doit pas être trop grand.
 

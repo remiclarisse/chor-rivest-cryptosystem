@@ -12,7 +12,7 @@ def VaudenayAttack (PubKey) :
     gpr = firstVaudenayAttack (PubKey, r)
     K = gpr.parent()
     # Trouver une permutation d'une clé équivalente
-    alpha = [ K(alpha[i]) for i in range (p) ]
+    PubKey[4] = [ K(alpha[i]) for i in range (p) ]
     print "Computing permutation pi..."
     pi = secondVaudenayAttack (PubKey, gpr, r, [0, 1])
     piInv = [pi.index(i) for i in range (p)]
@@ -117,13 +117,11 @@ def secondVaudenayAttack (PubKey, gpr, r, data) : # data === array of size two (
     K = gpr.parent()
     V = K.vector_space()
     pi = [ -1 ] + data + [ -1 for i in range (p - 3) ]
-    found = False
     G = [ V(gpr**c[i] - gpr**c[0]) for i in range (n + 1) ]
     M = Matrix(G).transpose()
     X = [ M.solve_right(V(gpr**c[i] - gpr**c[0])) for i in range (p) ]
     u = 0
-    piBest = pi
-    while not found and u < p :
+    while u < p :
         ok = True
         pi = [ -1 ] + data + [ -1 for i in range (p - 3) ]
         i = 3
@@ -137,37 +135,35 @@ def secondVaudenayAttack (PubKey, gpr, r, data) : # data === array of size two (
                     ok = False
             i = i + 1
         if ok :
-            if pi.count(-1) == n - 1 :
-                piBest = pi
-                found = True
-            else :
-                if pi.count(-1) < piBest.count(-1) :
-                    piBest = pi
+            I = [ i for i in range (p) if pi[i] == -1 ]
+            S = [ i for i in range (p) if i not in pi ]
+            count  = len (I)
+            G = Permutations([ i for i  in range (count) ])
+            for el in G :
+                for i in range (count) :
+                    pi[I[i]] = S[el[i]]
+                i = 0
+                sure = True
+                while sure and i < p :
+                    Q = K(0)
+                    for j in range (n + 1) :
+                        L = K(1)
+                        for k in range (n + 1) :
+                            if k != j :
+                                L = L * (alpha[pi[j]] - alpha[pi[k]]) ** (-1) * (alpha[pi[i]] - alpha[pi[k]])
+                        Q = Q + gpr ** c[j] * L
+                    if gpr ** c[i] != Q :
+                        sure = False
+                    i += 1
+                if sure :
+                    return pi
         u = u + 1
-    I = [ i for i in range (p) if piBest[i] == -1 ]
-    S = [ i for i in range (p) if i not in piBest ]
-    count  = len (I)
-    G = Permutations([ i for i  in range (count) ])
-    for el in G :
-        pi = piBest
-        for i in range (count) :
-            pi[I[i]] = S[el[i]]
-        i = 0
-        ok = True
-        while ok and i < count :
-            Q = K(0)
-            for j in range (n + 1) :
-                L = K(1)
-                for k in range (n + 1) :
-                    if k != j :
-                        L = L * (alpha[pi[j]] - alpha[pi[k]]) ** (-1) * (alpha[pi[I[i]]] - alpha[pi[k]])
-                Q = Q + gpr ** c[j] * L
-            if gpr ** c[I[i]] != Q :
-                ok = False
-            i += 1
-        if ok :
-            return pi
     raise Exception('Unable to find a permutation!')
+
+def is_not_consistent (pi) :
+    size = len(pi) - pi.count(-1)
+    s = set(pi) - {-1}
+    return size != len(s)
 
 def thirdVaudenayAttack (PubKey, pi, gpr, r) :
     [c, p, h, Q, alpha] = PubKey
