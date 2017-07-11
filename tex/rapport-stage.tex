@@ -477,13 +477,13 @@ Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(x)$, alors $-u^{-1}(\omega +v
 $$u \mbf t -v,\quad u \mbf t^{p^r} -v,\quad u \mbf t^{p^{2r}} -v,\quad \dots,\quad u \mbf t^{p^{h - r}} -v.$$
 Il existe alors un façon plus simple de déterminer $g$, que d'utiliser l'attaque de Goldreich (comme indiqué plus haut).
 
-En effet, pour $0 \leqslant j < h/r$, à savoir on choisit n'importe quel élément retourné par l'algorithme~\ref{algoPremiereAttaqueVaudenay}, choisissons un générateur arbitraire $g'$ de $\gf(p^h)^\times$ et calculons $$b_i := \log_{g'}\left(u t^{p^{jr}} -v+\alpha_{\pi(i)}\right)$$
-Notons $L := \log_{g'}(g^{p^{jr}})$, de sorte que $g^{p^{jr}}=g'^L$. Alors pour tout $0 \leqslant i \leqslant p-1$ :
+En effet : choisissons un générateur arbitraire $\gamma$ de $\gf(p^h)^\times$, et pour un $j$ tel que $0 \leqslant j < h/r$, à savoir on choisit n'importe quel élément retourné par l'algorithme~\ref{algoPremiereAttaqueVaudenay}, calculons $$b_i := \log_{\gamma}\left(u \mbf t^{p^{jr}} -v+\alpha_{\pi(i)}\right)$$
+Notons $L := \log_{\gamma}(\mbf g^{p^{jr}})$, de sorte que $\mbf g^{p^{jr}}=\gamma^L$. Alors pour tout $0 \leqslant i \leqslant p-1$ :
 \begin{align*}
-b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}} -v + \alpha_{\pi(0)}}\right) \\
-&= \log_{g'}\left(\frac{u t^{p^{jr}} -v + u \alpha_{\sigma(i)}+v}{u t^{p^{jr}} -v + u \alpha_{\sigma(0)}+v}\right)\\
-&= \log_{g'}\left(\frac{u t^{p^{jr}} + u \alpha_{\sigma(i)}}{u t^{p^{jr}} + u \alpha_{\sigma(0)}}\right)\\
-&= L\log_{g^{p^{jr}}}\left(\frac{t^{p^{jr}} + \alpha_{\sigma(i)}}{t^{p^{jr}} + \alpha_{\sigma(0)}}\right)\\
+b_i - b_0 &= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} -v + \alpha_{\pi(i)}}{u \mbf t^{p^{jr}} -v + \alpha_{\pi(0)}}\right) \\
+&= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} -v + u \alpha_{\sigma(i)}+v}{u \mbf t^{p^{jr}} -v + u \alpha_{\sigma(0)}+v}\right)\\
+&= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} + u \alpha_{\sigma(i)}}{u \mbf t^{p^{jr}} + u \alpha_{\sigma(0)}}\right)\\
+&= L\log_{\mbf g^{p^{jr}}}\left(\frac{\mbf t^{p^{jr}} + \alpha_{\sigma(i)}}{\mbf t^{p^{jr}} + \alpha_{\sigma(0)}}\right)\\
 &= L(c_i - c_0) \\
 \end{align*}
 
@@ -493,8 +493,8 @@ b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $t$ et $\pi$
 \ENSURE $g$ et $d$
-\STATE{choisir $g'$ un élément primitif arbitraire de $\gf(p^h)$}
-\STATE{calculer les $b_i := \log_{g'}(t+\alpha_{\pi(i)})$}
+\STATE{choisir $\gamma$ un élément primitif arbitraire de $\gf(p^h)$}
+\STATE{calculer les $b_i := \log_{\gamma}(t+\alpha_{\pi(i)})$}
 \STATE{$B \gets [ b_i - b_0$ pour $i$ allant de $0$ à $p-1 ] $}
 \STATE{$C \gets [ c_i - c_0$ pour $i$ allant de $0$ à $p-1 ] $}
 \FOR{$i$ allant de $0$ à $p-1$}
@@ -503,7 +503,7 @@ b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}
 		\STATE{$\mathcal{C} \gets \{L\cdot C[n] \pmod{p^h-1}$ pour $n$ allant de $0$ à $p-1 \}$}
 		\STATE{$\mathcal{B} \gets \{B[n] \pmod{p^h-1}$ pour $n$ allant de $0$ à $p-1 \}$}	
 		\IF{$\mathcal{C} = \mathcal{B}$}
-			\STATE{$g \gets g'^L$}
+			\STATE{$g \gets \gamma^L$}
 			\STATE{$d \gets c_0 - \log_g(t+\alpha_{\pi(0)}) \pmod{p^h -2}$}
 			\RETURN{$g$ et $d$}
 		\ENDIF				
@@ -512,11 +512,11 @@ b_i - b_0 &= \log_{g'}\left(\frac{u t^{p^{jr}} -v + \alpha_{\pi(i)}}{u t^{p^{jr}
 \end{algorithmic}
 \end{algorithm}
 
-Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, le ``$t$'' donné est $u t^{p^{jr}} -v$, il retourne le conjugué $g^{p^{jr}}$ du $g$ d'origine et l'entier $d - \log_{g^{p^{jr}}}(u)$.
+Bien sûr, si en entrée de l'algorithme~\ref{algoAttaqueGoldreichsimplifiee}, le $t$ donné est $u \mbf t^{p^{jr}} -v$, il retourne le conjugué $\mbf g^{p^{jr}}$ du $\mbf g$ d'origine et l'entier $\mbf d - \log_{\mbf g^{p^{jr}}}(u)$.
 
-Quand $r$ est suffisamment grand, il existe un meilleur algorithme. En fait, si $r \geqslant h/r$, la famille $\left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$ est affinement indépendante. Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{1}} - (g_{p^r})^{c_{0}},\quad \dots,\quad (g_{p^r})^{c_{{h/r}}} - (g_{p^r})^{c_{0}}.$$
+Cependant, quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\pi$. En fait, si $r \geqslant h/r$, alors la famille $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$ est affinement indépendante. Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf(p)$ de l'écriture de $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(\mbf g_{p^r})^{c_{1}} - (\mbf g_{p^r})^{c_{0}},\quad \dots,\quad (\mbf g_{p^r})^{c_{{h/r}}} - (\mbf g_{p^r})^{c_{0}}.$$
 
-Notons $a_j^i$ le coefficient de $(g_{p^r})^{c_{{j}}} - (g_{p^r})^{c_{0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$. Par $(\ddagger)$, nous avons :
+Notons $a_j^i$ le coefficient de $(\mbf g_{p^r})^{c_{{j}}} - (\mbf g_{p^r})^{c_{0}}$ pour $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$. Par $(\ddagger)$, nous avons :
 \begin{align*}
 \frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}} \right)^{-1} \\
 &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_k)}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_{k'})}} \right) \\
@@ -524,21 +524,20 @@ Notons $a_j^i$ le coefficient de $(g_{p^r})^{c_{{j}}} - (g_{p^r})^{c_{0}}$ pour 
 &= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(i_1)}-\alpha_{\sigma(i_{k'})}}{\alpha_{\sigma(i_2)}-\alpha_{\sigma(i_k)}} \right) \left(\frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}} \right) \\
 \end{align*}
 
-Ainsi, il existe $u$ dans $\gf(p)$, indépendant de $i$, tel que 
-$$(\star) \qquad\frac{a_2^i}{a_1^i} = u \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}}.$$
-En passant toute les valeurs de $u$ en revue, nous pouvons obtenir $\sigma(i)$ de l'équation $(\star)$. Cette remarque donne naissance à l'algorithme suivant :
+Ainsi, il existe $\mu$ dans $\gf(p)$, indépendant de $i$, tel que 
+$$(\star) \qquad\frac{a_2^i}{a_1^i} = \mu \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(i_1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(i_2)}}.$$
+En passant toute les valeurs de $\mu$ en revue, nous pouvons obtenir $\sigma(i)$ de l'équation $(\star)$. Cette remarque donne naissance à l'algorithme~\ref{algogpr} suivant :
 
 \begin{algorithm}[h]
-\caption{Algorithme pour trouver $\pi$ sachant $g_{p^r}$ lorsque $r\geqslant \sqrt h$}
+\caption{Algorithme pour trouver $\pi$ sachant $\mbf g_{p^r}$ lorsque $r\geqslant \sqrt h$}
 \label{algogpr}
 \begin{algorithmic}[1]
-\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ tel que $r\geqslant \sqrt h$ et $g_{p^r}$
+\REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ tel que $r\geqslant \sqrt h$ et $\mbf g_{p^r}$
 \ENSURE une permutation $\pi$ d'une clé privée équivalente
-\STATE{choisir des $i_0, \dots, i_{h/r}$ deux à deux distincts dans $\{0, \dots, p-1\}$}
-\STATE{pré-calculer la matrice de changement de bases de la base ``classique'' vers la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{0\leqslant j \leqslant h/r}$}
-\STATE{choisir arbitrairement $\pi(i_1)$ et $\pi(i_2)$ distincts dans $\{0, \dots, p-1\}$}
-\FORALL{$u$ dans $\gf(p)$} 
-	\FORALL{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq i_0, i_1, i_2$} 
+\STATE{pré-calculer la matrice de changement de bases de la base ``classique'' vers la ``base'' $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$}
+\STATE{choisir arbitrairement $\pi(1)$ et $\pi(2)$ distincts dans $\{0, \dots, p-1\}$}
+\FORALL{$\mu$ dans $\gf(p)$} 
+	\FORALL{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq 0, 1, \dots, h/r$} 
 		\STATE{écrire $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{i_0}}$ dans la ``base'' $\left((g_{p^r})^{c_{i_j}} - (g_{p^r})^{c_{i_0}} \right)_{1\leqslant j \leqslant h/r}$}
 		\STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
 		\STATE{trouver la valeur de $\pi(i)$ grâce à $(\star)$}
