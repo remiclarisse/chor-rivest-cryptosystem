@@ -488,7 +488,7 @@ b_i - b_0 &= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} -v + \alpha_{\pi(i)}}{u 
 \end{align*}
 
 \begin{algorithm}[h]
-\caption{Algorithme implémentant l'attaque de Goldreich simplifiée}
+\caption{Attaque de Goldreich simplifiée}
 \label{algoAttaqueGoldreichsimplifiee}
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$, $(c_0,\dots, c_{p-1})$, $t$ et $\pi$
@@ -587,15 +587,15 @@ Nous pouvons donc écrire un algorithme (\ref{algoTestgpr}) qui vérifie si un c
 
 \subsection*{Utilisation des $c_i$ pour trouver $\mbf g_{p^r}$}
 
-En 1991, Hendrik Lenstra soupçonnait que qu'inclure tous les $c_i$ dans la clé publique était dangereux pour la sécurité du système. En effet, Serge Vaudenay a amélioré l'attaque précédente en utilisant la connaissance de tous les $c_i$. 
+En 1991, Hendrik Lenstra \cite{lenstra1991} soupçonnait qu'inclure tous les $c_i$ dans la clé publique était dangereux pour la sécurité du système. Et en effet, Serge Vaudenay a amélioré l'attaque précédente en utilisant la connaissance de tous les $c_i$. 
 
 Avant de voir comment il a procédé, voici un fait dont nous allons nous servir :
 
 \begin{prop}\label{prop:faitCool}
-Soit $Q(x)$ un polynôme de $\gf(p^r)[x]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Nous avons $$\sum_{a \in \gf(p)} Q(a)^e = 0.$$
+Soit $Q(x)$ un polynôme de $\gf(p^r)[x]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Alors : $$\sum_{a \in \gf(p)} Q(a)^e = 0.$$
 \end{prop}
 
-Le lemme qui suit va permettre de démontrer cette proposition.
+Le lemme qui suit permet de démontrer cette proposition.
 
 \begin{lemm}
 Soit $k$ un entier tel que $1 \leqslant k < p-1$. Alors
@@ -607,17 +607,17 @@ Ainsi, si $P(x) \in \gf(p^r)[x]$ est de degré inférieur à $p-1$, alors : $$\s
 Tout d'abord remarquons que $0 \in \gf(p)$ ne contribue pas à la somme, et ensuite, notons $g$ un élément primitif du corps $\gf(p)$. Alors, pour $1 \leqslant k < p-1$ :
 $$\sum_{a\in\gf(p)} a^k = \sum_{a\in\gf(p)^\times} a^k = \sum_{j=0}^{p-2} g^{jk} = \frac{g^{k(p-1)} - 1}{g^{k} - 1} = \frac{1^{k} - 1}{g^{k} - 1} = 0.$$
 Soit $P(x) \in \gf(p^r)[x]$ de degré inférieur à $p-1$ :
-$$P(x) = b_{p-2}x^{p-2} + \cdots + b_1x + b_0, \qquad \text{où }b_i \in \gf(p^r).$$
+$$P(x) = b_{p-2}x^{p-2} + \cdots + b_1x + b_0, \qquad \text{où }b_i \in \gf(p^r) \text{ pour } 0 \leqslant i \leqslant p-1.$$
 Ainsi, on obtient bien :
 \begin{align*}
-\sum_{a\in\gf(p)} P(a) &= \sum_{a\in\gf(p)} \left({b_{p-2}a^{p-2} + \cdots + b_1a + b_0}\right) \\
-&= \sum_{k=1}^{p-2} \left({ b_k\sum_{a\in\gf(p)} a^k}\right) + pb_0 \\
+\sum_{a\in\gf(p)} P(a) &= \sum_{a\in\gf(p)} \left({b_{p-2}a^{p-2} + \cdots + b_1a + b_0}\right), \\
+&= \sum_{k=1}^{p-2} \left({ b_k\sum_{a\in\gf(p)} a^k}\right) + pb_0, \\
 &= 0.
 \end{align*}
 \end{proof}
 
 \begin{proof}[Démonstration de la proposition]
-Comme $Q(x) \in \gf(p^r)[x]$ est de degré $d$ et que $e$ est tel que $1\leqslant e < (p-1)/d$, le polynôme $Q(x)^e$ est de degré inférieur à $p-1$. Ainsi le lemme précédent permet de conclure :
+Comme $Q(x) \in \gf(p^r)[x]$ est de degré $d$ et que $e$ est tel que $1\leqslant e < (p-1)/d$, le polynôme $Q(x)^e$ est de degré inférieur à $p-1$. Le lemme précédent conclut :
 $$\sum_{a\in\gf(p)} Q(a)^e = 0.$$
 \end{proof}
 
@@ -630,20 +630,20 @@ $$\sum_{i=0}^{p-1} (\mbf g_{p^r})^{ec_i} = 0.$$
 
 \begin{proof}
 Considérons le polynôme $Q(x)\in\gf(p^r)[x]$ de la proposition~\ref{premierePropVaudenay} : le polynôme $Q(x)$ est de degré $h/r$, à coefficients dans $\gf(p^r)$ et tel que, pour tout $0 \leqslant i \leqslant p-1$ :
-$$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i}.$$
+$$Q\left(\alpha_{\sigma(i)}\right) = (\mbf g_{p^r})^{c_i}.$$
 Ainsi par la proposition~\ref{prop:faitCool}, pour tout $1 \leqslant e < (p-1)r/h$ :
 $$\sum_{a\in\gf(p)} Q(a)^e = \sum_{i=0}^{p-1} Q\left(\alpha_{\sigma(i)}\right)^e = 0,$$
 d'où l'égalité souhaitée :
 $$\sum_{i=0}^{p-1} (\mbf g_{p^r})^{ec_i} = 0.$$
 \end{proof}
 
-Cela donne une façon plus simple de sélectionner tous les candidats pour $\mbf g_{p^r}$ -- par rapport à la recherche exhaustive. Son principal avantage est que cette sélection fonctionne dans n'importe quel sous-corps. Par exemple, ont peut considérer $r=1$ et trouver les seuls $\mbf g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$ :
+Cela donne une façon plus simple de sélectionner tous les candidats pour $\mbf g_{p^r}$ -- par rapport à la recherche exhaustive. Son principal avantage est qu'elle fonctionne dans n'importe quel sous-corps. Par exemple, on peut considérer $r=1$ et trouver les seuls $\mbf g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$ :
 $$\sum_{i=0}^{p-1} (\mbf g_p)^{ec_i} = 0.$$
-La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf(p)$-opérations : il est peu probable qu'un mauvais candidat ne soit pas détecté par le cas $e = 1$. Ainsi, nous pouvons recouvrer $\mbf g_p$ en $\O(p^2)$ opérations binaires.
+La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf(p)$-opérations : il est peu probable qu'un mauvais candidat ne soit pas détecté par le cas $e = 1$. Ainsi, nous pouvons recouvrer $\mbf g_p$ en $\O(p^2)$ opérations élémentaires.
 
 Malheureusement, le $\mbf g_{p^r}$ ne peut pas être utilisé efficacement quand $r$ est trop petit. Cependant, on peut toujours utiliser le $\mbf g_{p^r}$ des petits sous-corps pour le calculer dans des corps plus grands. Notre but est donc de calculer $\mbf g_{p^r}$ avec $r$ assez grand (tel que $r^2 \geqslant h$). 
 
-Considérons le problème du calcul de $\mbf g_{p^r}$ lorsque les facteurs $r_1,\dots,r_k$  de $r$ sont connus, et aussi en sachant les $\mbf g_{p^{r_i}}$. Comme $\mbf g_{p^{r_i}} = (\mbf g_{p^r})^{1+p^{r_i}+p^{2r_i}+\cdots+p^{r-r_i}}$, nous avons 
+Considérons le problème du calcul de $\mbf g_{p^r}$ lorsque les facteurs $r_1,\dots,r_k$  de $r$ sont connus, et les $\mbf g_{p^{r_i}}$ pour $1 \leqslant i \leqslant k$, sont connus. Comme $\mbf g_{p^{r_i}} = (\mbf g_{p^r})^{1+p^{r_i}+p^{2r_i}+\cdots+p^{r-r_i}}$, nous avons 
 $$(\ast)\qquad\log(\mbf g_{p^r}) = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1},$$
 où la base des logarithmes est n'importe quel élément primitif $\gamma$ fixé dans le corps $\gf(p^r)$. La connaissance de tous les $\mbf g_{p^{r_i}}$ donne donc la connaissance de $\log(\mbf g_{p^r})$ modulo
 $$\ell := \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}.$$
@@ -661,7 +661,7 @@ Cela permet d'écrire l'algorithme~\ref{algogprFromgpri}, recouvrant $\mbf g_{p^
 	\STATE{résoudre l'équation $(\ast)$ : $$x_i = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
 \ENDFOR
 \STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
-\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$, pour $1 \leqslant i \leqslant k$ et où $x$ est unique modulo $\ell$}
+\STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$, pour $1 \leqslant i \leqslant k$ et où $x$ est unique modulo $\ell$ (CRT)}
 \STATE{$\beta \gets \gamma^{x}$}
 \FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}\label{algogprFromgpriBoucle}
 	\FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}	
@@ -688,24 +688,24 @@ Soit $G$ un graphe orienté acyclique (\textit{DAG for directed acyclic graph}) 
 \begin{defi}
 \`A une extension $\gf(p^r)$ et $G$ son DAG $p$-factorisant, on associe :
 $$C(G) := \sum_{v} \frac{\#L(v) -1}{\ppcm\{\#L(w)-1 \mid v \leftarrow w\}},$$
-où nous prenons pour convention : $\ppcm(\emptyset) = 1$.
+où on prend pour convention : $\ppcm(\emptyset) = 1$.
 \end{defi}
 
 Nous pouvons définir un algorithme pour calculer $\mbf g_{p^r}$ avec pour compléxité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf(p^r)$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
 $$\O\left(\min_{\substack{r \text{ divisant } h \\ r^2 \geqslant h}} \; \min_{\substack{G \text{ est un DAG}\\p\text{-factorisant} \\ \text{ de } \gf(p^r)}} \; 
 pr^2C(G)\right).$$
 
-L'algorithme~\ref{algoGeneral} achève l'attaque de Serge Vaudenay.
+L'algorithme~\ref{algoGeneral} illustre l'attaque complète de Serge Vaudenay.
 
 \begin{algorithm}[h]
-\caption{Attaque général}
+\caption{Attaque de Vaudenay}
 \label{algoGeneral}
 \begin{algorithmic}[1]
 \REQUIRE $\gf(p^h)$ et $(c_0,\dots, c_{p-1})$
 \ENSURE une clé secrète équivalente
 \STATE{pour le plus petit facteur $r$ de $h$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, trouver $G$ un DAG $p$-factorisant minimisant $C(G)$}
-\FOR{$u$ sommet de $G$, tel que pour tout $u \leftarrow u_i$, $u_i$ a été visité,}
-	\STATE{l'algorithme~\ref{algogprFromgpri} avec $\gf(p^r)=L(u)$ et $\gf(p^{r_i}) = L(u_i)$}
+\FORALL{$s$ sommet de $G$, tel que pour tout $s \leftarrow s_i$, $s_i$ a été visité,}
+	\STATE{l'algorithme~\ref{algogprFromgpri} avec $\gf(p^r)=L(s)$ et $\gf(p^{r_i}) = L(s_i)$}
 \ENDFOR
 \STATE{$\pi \gets$ appliquer l'algorithme~\ref{algogpr} à $\mbf g_{p^r}$}
 \STATE{$t \gets$ appliquer l'algorithme~\ref{algoPremiereAttaqueVaudenay} à $\mbf g_{p^r}$ et $\pi$}
@@ -715,6 +715,15 @@ L'algorithme~\ref{algoGeneral} achève l'attaque de Serge Vaudenay.
 \end{algorithm}
 
 \subsection*{Conclusion}
+
+Serge Vaudenay a décrit une attaque du cryptosystème, lorsque $h$ admet un facteur $r$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, ayant pour complexité $\O(h^3p^r/r^2)$.
+
+L'attaque a été implémentée en \verb|Sage|, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 2 heures et 45 minutes en moyenne contre 15 minutes, pour le cas $\gf(197^{24})$.
+
+Les préconisations pour réparer le cryptosystème de Chor-Rivest sont : \begin{itemize}
+\item choisir un corps fini $\gf(p^h)$ avec $p$ et $h$ tous les deux premiers,
+\item ne pas inclure tous les $c_i$ dans la clé publique.
+\end{itemize}
 
 \section{Le calcul de logarithmes discrets par Antoine Joux}\label{sec:DLPJoux}
 
