@@ -1505,12 +1505,23 @@ $$(x_{i+1}, a_{i+1}, b_{b+1}) = \verb|walk| (x_i, a_i, b_i).$$
 
 \section{L'algorithme $L(1/4 + \o(1))$ de Joux}
 
-Soit $p$ un nombre premier et $n$ un entier. Notons :
+\subsection{Préliminaires}
+
+Soient $p$ un nombre premier, $q$ une puissance non-nulle de $p$ et $k$ un entier naturel non-nul. On souhaite dans la suite résoudre le problème du logarithme discret dans $\gf(q^k)$. On adopte la notation suivante pour donner la complexité d'un algorithme :
 $$L_Q(\alpha, c) := \exp\left({(c+\o(1))(\log Q)^\alpha(\log\log Q)^{1 - \alpha}}\right),$$
-où $Q:= p^n$, $0 \leqslant \alpha\leqslant 1$ et $c \geqslant 0$.
+où $Q = q^k$, $0 \leqslant \alpha\leqslant 1$ et $c > 0$.
 
-\subsection{Travaux précédents le logarithme discret en petite caractéristique}
+\begin{defi}
+Un polynôme $P(X) \in \gf(q^k)[X]$ est dit \textit{$d$-friable} s'il est produit de polynômes de $\gf(q^k)[X]$ de degré au plus $d$.
+\end{defi}
 
+Selon un résultat de Daniel Panario, Xavier Gourdon et Philippe Flajolet \cite{PGF98}, une estimation de la probabilité qu'un polynôme aléatoire de degré inférieur à $n$ soit $d$-friable est :
+$${(n/d)}^{-n/d + \o(1)}.$$
+
+Dans un corps fini, le logarithme discret de $h \in \gf(p^k)$ en base $g \in \gf(p^k)$, où $g$ est primitif, est l'entier $a$, déterminé modulo l'ordre de $g$, tel que $h = g^a$. Concrètement, on s'est donné une représentation du corps fini $\gf(p^k)$, à savoir un polynôme irréductible de degré $k$, noté $I_k(X) \in \gf(q)[X]$. Et les éléments de $\gf(p^k)$ sont alors vus comme des polynômes modulo $I_k(X)$ : $$\gf(q^k) \cong \frac{\gf(q)[X]}{(I_k(X))}.$$
+La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une autre représentation du corps $\gf(q^k)$. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, noté $J_k(X) \in \gf(q)[X]$. Le changement de représentation se fait de la façon suivante : soit $\beta$ une racine du polynôme $J_k(X)$ et considérons $I_k(X)$ comme un polynôme à coefficients dans $\gf(q^k) \cong \gf(q)[\beta]$. Ainsi $I_k(X) \in \gf(q)[\beta]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\beta$. Choisissons l'une d'entre elles au hasard et notons la $\alpha$. Il est possible d'écrire $\alpha = f(\beta)$, où $f(X) \in \gf(q)[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\alpha$, disons $G(\alpha)$ et $H(\alpha)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\beta))$ en base $G(f(\beta))$.
+
+\subsection{Algorithme de Hellman-Reyneri en $L(1/2)$}
 
 \section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
 
