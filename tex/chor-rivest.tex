@@ -1516,12 +1516,15 @@ Un polynôme $P(X) \in \gf(q^k)[X]$ est dit \textit{$d$-friable} s'il est produi
 \end{defi}
 
 Selon un résultat de Daniel Panario, Xavier Gourdon et Philippe Flajolet \cite{PGF98}, une estimation de la probabilité qu'un polynôme aléatoire de degré inférieur à $n$ soit $d$-friable est :
-$${(n/d)}^{-n/d + \o(1)}.$$
+$${(n/d)}^{-n/d + \o(1)},$$
+pour certaines valeurs de $n$ et $d$ non détaillées ici.
 
-Dans un corps fini, le logarithme discret de $h \in \gf(p^k)$ en base $g \in \gf(p^k)$, où $g$ est primitif, est l'entier $a$, déterminé modulo l'ordre de $g$, tel que $h = g^a$. Concrètement, on s'est donné une représentation du corps fini $\gf(p^k)$, à savoir un polynôme irréductible de degré $k$, noté $I_k(X) \in \gf(q)[X]$. Et les éléments de $\gf(p^k)$ sont alors vus comme des polynômes modulo $I_k(X)$ : $$\gf(q^k) \cong \frac{\gf(q)[X]}{(I_k(X))}.$$
-La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une autre représentation du corps $\gf(q^k)$. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, noté $J_k(X) \in \gf(q)[X]$. Le changement de représentation se fait de la façon suivante : soit $\beta$ une racine du polynôme $J_k(X)$ et considérons $I_k(X)$ comme un polynôme à coefficients dans $\gf(q^k) \cong \gf(q)[\beta]$. Ainsi $I_k(X) \in \gf(q)[\beta]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\beta$. Choisissons l'une d'entre elles au hasard et notons la $\alpha$. Il est possible d'écrire $\alpha = f(\beta)$, où $f(X) \in \gf(q)[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\alpha$, disons $G(\alpha)$ et $H(\alpha)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\beta))$ en base $G(f(\beta))$.
+Dans un corps fini, le logarithme discret de $h \in \gf(q^k)$ en base $g \in \gf(q^k)$, où $g$ est primitif, est l'entier $a$, déterminé modulo l'ordre de $g$, tel que $h = g^a$. Concrètement, on s'est donné une représentation du corps fini $\gf(q^k)$, à savoir un polynôme irréductible de degré $k$, noté $I_k(X) \in \gf(q)[X]$. Et les éléments de $\gf(q^k)$ sont alors vus comme des polynômes modulo $I_k(X)$ : $$\gf(q^k) \cong \frac{\gf(q)[X]}{(I_k(X))}.$$
+La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une autre représentation du corps $\gf(q^k)$. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, notons le $J_k(X) \in \gf(q)[X]$. Le changement de représentation se fait de la façon suivante : soit $\beta$ une racine du polynôme $J_k(X)$ et considérons $I_k(X)$ comme un polynôme à coefficients dans $\gf(q^k) \cong \gf(q)[\beta]$. Ainsi $I_k(X) \in \gf(q)[\beta]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\beta$. Choisissons l'une d'entre elles au hasard et notons la $\alpha$. Il est possible d'écrire $\alpha = f(\beta)$, où $f(X) \in \gf(q)[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\alpha$, disons $G(\alpha)$ et $H(\alpha)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\beta))$ en base $G(f(\beta))$.
 
 \subsection{Algorithme de Hellman-Reyneri en $L(1/2)$}
+
+L'algorithme de Martin Hellman et Justin Reyneri \cite{hellman82} commence par sélectionner un polynôme $I_k(X) \in \gf(q)[X]$ unitaire irréductible de degré $k$, afin de représenter $\gf(q^k)$ comme $\gf(q)[\alpha]$, où $\alpha$ est une racine fixée de $I_k(X)$.
 
 \section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
 
