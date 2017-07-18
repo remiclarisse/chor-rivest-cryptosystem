@@ -8,13 +8,13 @@ RAPPORT=rapport-stage
 # Rules and targets
 all: clean $(LOGBOOK) $(RAPPORT)
 
-$(LOGBOOK):
+$(LOGBOOK): clean
 	pdflatex $(LOGBOOK).tex > /dev/null
 	bibtex $(LOGBOOK).aux > /dev/null
 	pdflatex $(LOGBOOK).tex > /dev/null
 	pdflatex $(LOGBOOK).tex > /dev/null
 
-$(RAPPORT):
+$(RAPPORT): clean
 	pdflatex $(RAPPORT).tex > /dev/null
 	bibtex $(RAPPORT).aux > /dev/null
 	pdflatex $(RAPPORT).tex > /dev/null

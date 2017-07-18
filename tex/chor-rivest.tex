@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc} 
 \usepackage[T1]{fontenc}      
 \usepackage[francais]{babel}
-\usepackage{amsmath, amsthm, amssymb}
+\usepackage{amsmath, amsthm, amssymb, mathabx}
 \usepackage{tikz}
 \usepackage{algorithm, algorithmic}
 \usepackage{array}
@@ -22,6 +22,7 @@
 \newtheorem{rema}[theo]{Remarque}
 \newtheorem{exem}[theo]{Exemple}
 \newtheorem{appl}[theo]{Application}
+\newtheorem{heur}[theo]{Heuristique}
 
 \def\N{\mathbb N}
 \def\A{\mathbb A}
@@ -1503,7 +1504,9 @@ b_i + v_{S(x_i)} \pmod{r}.$$
 Nous rassemblons cela sous la notation :
 $$(x_{i+1}, a_{i+1}, b_{b+1}) = \verb|walk| (x_i, a_i, b_i).$$
 
-\section{L'algorithme $L(1/4 + \o(1))$ de Joux}
+\section{L'algorithme $L_Q(1/4)$ de Joux}
+
+Les éléments présentés ici sont soit tirés de la thèse de Cécile Pierrot \cite{pierrot2016} soutenu en 2016, soit de l'article d'Antoine Joux \cite{joux2013} publié en 2013.
 
 \subsection{Préliminaires}
 
@@ -1522,9 +1525,37 @@ pour certaines valeurs de $n$ et $d$ non détaillées ici.
 Dans un corps fini, le logarithme discret de $h \in \gf(q^k)$ en base $g \in \gf(q^k)$, où $g$ est primitif, est l'entier $a$, déterminé modulo l'ordre de $g$, tel que $h = g^a$. Concrètement, on s'est donné une représentation du corps fini $\gf(q^k)$, à savoir un polynôme irréductible de degré $k$, noté $I_k(X) \in \gf(q)[X]$. Et les éléments de $\gf(q^k)$ sont alors vus comme des polynômes modulo $I_k(X)$ : $$\gf(q^k) \cong \frac{\gf(q)[X]}{(I_k(X))}.$$
 La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une autre représentation du corps $\gf(q^k)$. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, notons le $J_k(X) \in \gf(q)[X]$. Le changement de représentation se fait de la façon suivante : soit $\beta$ une racine du polynôme $J_k(X)$ et considérons $I_k(X)$ comme un polynôme à coefficients dans $\gf(q^k) \cong \gf(q)[\beta]$. Ainsi $I_k(X) \in \gf(q)[\beta]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\beta$. Choisissons l'une d'entre elles au hasard et notons la $\alpha$. Il est possible d'écrire $\alpha = f(\beta)$, où $f(X) \in \gf(q)[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\alpha$, disons $G(\alpha)$ et $H(\alpha)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\beta))$ en base $G(f(\beta))$.
 
-\subsection{Algorithme de Hellman-Reyneri en $L(1/2)$}
+\subsection{Algorithme de Hellman-Reyneri en $L_Q(1/2)$}
 
-L'algorithme de Martin Hellman et Justin Reyneri \cite{hellman82} commence par sélectionner un polynôme $I_k(X) \in \gf(q)[X]$ unitaire irréductible de degré $k$, afin de représenter $\gf(q^k)$ comme $\gf(q)[\alpha]$, où $\alpha$ est une racine fixée de $I_k(X)$.
+Choisissons $g$ un générateur du groupe multiplicatif $\gf(q^k)^\times$ et un entier $d$ tel que $1 < d < k$, qui est le degré maximum des polynômes de notre base de friabilité.
+
+L'algorithme de Martin Hellman et Justin Reyneri \cite{hellman1982} commence par sélectionner un polynôme $I_k(X) \in \gf(q)[X]$ unitaire irréductible de degré $k$, afin de représenter $\gf(q^k)$ comme $\gf(q)[\alpha]$, où $\alpha$ est une racine fixée de $I_k(X)$.
+
+Pour $r \in \ldbrack 0, q^k - 2 \rdbrack$ choisi aléatoirement de façon uniforme, $g^r$ est aussi un élément choisi aléatoirement de façon uniforme de $\gf(q^k)^\times$. Cet élément peut être représente comme un polynôme $G_r(X) \in \gf(q)[X]$ de degré au plus $k-1$. Si $G_r(X)$ est $d$-friable, nous écrivons :
+$$g^r = \beta \prod_{i=1}^{t} F_i(\alpha)^{e_i},$$
+où les $F_i(X)\in \gf(q)[X]$ sont des polynômes irréductibles unitaires de degré au plus $d$ qui apparaissent dans la factorisation de $G_r(X)$ et $\beta$ est le coefficient dominant du polynôme $G_r(X)$. 
+
+En prenant les logarithmes discrets, nous obtenons :
+$$(\dagger) \qquad r = \log_g(\beta) + \sum_{i=1}^t e_i\log_g\big(F_i(\alpha)\big) \pmod{q^k - 1}.$$
+En faisant varier $r$, on obtient d'autres équations ($\beta$, $t$, $e_i$ et $F_i(X)$ dépendent de $r$), les inconnues étant les logarithmes des éléments de l'ensemble :
+$$\mathcal{F} =  \gf(q) \cup \{F(\alpha) : F(X) \in \gf(q)[X] \text{ irréd. unitaire de degré au plus } d \}.$$
+$\mathcal{F}$ est notre base de friabilité, son cardinal est plus petit que $q^{d+1}$.
+\begin{heur}[Heuristique de l'algorithme de Hellman-Reyneri]
+La création de $q^{d+1}$ équations de la forme $(\dagger)$ permettent d'écrire un système n'admettant qu'une unique solution, formée des logarithmes en base $g$ des éléments de $\mathcal{F}$.
+\end{heur}
+
+Une fois que les logarithmes de la base $\mathcal{F}$ sont connus, i.e. déjà calculés, nous cherchons le logarithme d'un élément arbitraire $h \in \gf(q^k)$ : il suffit d'avoir une relation de la même forme que $(\dagger)$ faisant intervenir $h$. On peut, par exemple, chercher le logarithme d'un élément $hg^r$ qui se factorise en éléments de la base $\mathcal{F}$ et déduire le logarithme de $h$ en soustrayant $r$ au résultat.
+
+\begin{rema}
+Normalement, les éléments de $\gf(q^k)$ dont l'ordre est un petit diviseur de $q^k-1$ -- comme les éléments de $\gf(q)$ -- sont écartés lors du crible : ils augmentent la possibilité d'apparition d'éléments non inversibles pour déterminer les logarithmes de la base de friabilité, et des algorithmes tel que Pohlig-Hellman \cite{pohligHellman1978} ou rho de Pollard \cite{pollard1978} permettent déjà de les calculer facilement.
+\end{rema}
+
+Puisque la phase de calcul de logarithme discret indivisuel est négligeable comparée aux précalculs, il suffit, pour analyser la compléxité asymptotique d'un tel algorithme, d'exprimer le coût de la collecte des relations et de l'algèbre linéaire en fonction du paramètre $d$. En majorant par $q^{d+1}$ la cardinalité de $\mathcal{F}$ et en désignant par $\mathbb{P}$ la probabilité qu'un polynôme aléatoire $G_r(X)$ soit $d$-fiable, le coût de l'exécution de la phase de collecte des relations est alors majoré par $q^{d+1}/\mathbb{P}$. En ce qui concerne l'algèbre linéaire, on remarque que le nombre d'éléments de la base de fiabilité dans n'importe laquelle des relations formées est majorée par $k$. Ceci provient du fait que le nombre de polynômes irréductibles qui apparaissent lorsque l'on factorise un polynôme est toujours inférieur à son degré. Aussi, l’algèbre linéaire que l'on exécute s'attache toujours à une matrice très creuse qui ne contient au plus que $k$ termes non nuls par ligne. Le coût d'une telle méthode est alors quadratique en la taille de $\mathcal{F}$, si on utilise des techniques de calculs sur matrices creuses, comme la méthode du gradient conjugué. Plus précisément, le temps de calcul de cette étape est majoré par $kq^{2d+2}$. De l'estimation de Panario-Gourdon-Flojolet, on écrit :
+$$-\log_q(\mathbb{P}) \leqslant\frac{k}{d}\log_q(k/d).$$
+Par conséquent, si on choisit le paramètre :
+$$d = \left\lceil \sqrt{ \frac{k\log_q k}{2} } \right\rceil,$$
+on obtient comme complexité finale :
+$$q^{\sqrt{(2+\o(1))k\log_qk}} = L_{q^k}(1/2,\sqrt 2).$$
 
 \section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
 
