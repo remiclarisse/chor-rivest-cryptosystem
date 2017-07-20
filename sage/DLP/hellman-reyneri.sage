@@ -5,7 +5,7 @@
 # R.<x> = PolynomialRing (F)
 # mu = R(x^5 + a*x^3 + a); mu.is_irreducible()
 # K.<u> = R.quotient_ring (mu)
-# hellman_reyneri (q, k, F, None, None, mu)
+# t, P, M, Ik = hellman_reyneri (q, k, F, None, None, mu)
 
 def hellman_reyneri (q, k, F, g, h, mu) :
     b = min (k, 10)
@@ -16,13 +16,15 @@ def hellman_reyneri (q, k, F, g, h, mu) :
     u = K.gen()
     v = Q.gen()
     i = 0
-    while (v ** i).minpoly() != mu and i < q**k :
+    P = [ F(0) for i in range (k) ]
+    while (R(P)(u)).minpoly() != Ik and i < q**k :
         i += 1
+        P = next_poly(P)
     if i == q ** k :
         return "fail"
-    t = v ** i
+    t = R(P)(u)
     M = Matrix( [ list(t**i) for i in range (k) ] ).transpose() # matrice de t à u (exprime t dans la nase 1, u, u^2, ..., u^{k-1})
-    return K(t), M, Ik
+    return t, R(P), M, Ik
 
 def find_good_irreducible_poly_S (q, k, b, F, R) :
     x = R.gen()
