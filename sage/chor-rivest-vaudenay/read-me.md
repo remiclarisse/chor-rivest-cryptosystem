@@ -6,7 +6,7 @@ Launch `sage` in your favorite shell and attach or load the files `chor-rivest.s
     sage: load("chor-rivest.sage")
     sage: load("attack-chor-rivest.sage")
 
-Define parameters for the cryptosystem: p a prime number and h a smooth integer, e.g.
+Define parameters for the cryptosystem: `p` a prime number and `h` a smooth integer, e.g.
 
     sage: p = 197
     sage: h = 24
