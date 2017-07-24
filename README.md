@@ -7,7 +7,7 @@ intership and supervised by Daniel Augot and Luca De Feo.
 Because Chor-Rivest cryptosystem uses discreet logarithms in finite fields, we have
 encountered severeal algorithms solving the discreet logarithm problem.
 ### Polhig-Hellman Method and Baby-Step-Giant-Step Algorithm
-The `./sage/DLP` folder contains an implementation of *Pohlig-Hellman* : Given a field Z/pZ
+The `./sage/DLP/` folder contains an implementation of *Pohlig-Hellman* : Given a field Z/pZ
 and **knowing the factorisation of p-1** (strong assumption), solve the DLP for each maximal sub-r-group of
 (Z/pZ)\*, where r is a divisor of p-1, and reconstruct the original log. `pohlig-hellman.sage` uses
 an exhaustive seach in the cyclic sub-r-groups. There is also an implementation of the
@@ -27,7 +27,7 @@ for finding logarithms in the field Z/pZ, with p prime.
 
 ## The Chor-Rivest Cryptosystem
 ### Cryptosystem
-The `./sage/chor-rivest-vaudenay` folder contains an implementation `chor-rivest.sage` of the *Chor-Rivest cryptosystem*.
+The `./sage/chor-rivest-vaudenay/` folder contains an implementation `chor-rivest.sage` of the *Chor-Rivest cryptosystem*.
 Be thorough when choosing the parameters : p is a prime number and h is a smooth number.
 The **DLP must be reasonanbly solvable in GF(p^h)** : the generation of the public key depends on it.
 Regarding the usage, the names are eloquent enough : `CRGenerateKeys(p, h)` returns `[PubKey, PrivKey]`,
