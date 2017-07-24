@@ -1,12 +1,30 @@
 # Variables
 EXE=rho-pollard
 FILE=rapport-stage
+DLP=calculs-dlp
+IMPLEMCHORRIVEST=implementation-chor-rivest
 
 # Special rules and targets
 .PHONY: all clean help info open
 
 # Rules and tagets
-all: $(EXE) pdf
+all: clean
+	@mkdir $(FILE)
+	@cd tex && $(MAKE) $(FILE)
+	@cp -f tex/$(FILE).pdf ./$(FILE)/
+	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)
+	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/vaudenay
+	@cp -f sage/chor-rivest-vaudenay/* ./$(FILE)/$(IMPLEMCHORRIVEST)/vaudenay
+	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/joux
+	@cp -f sage/chor-rivest-joux/* ./$(FILE)/$(IMPLEMCHORRIVEST)/joux
+	@mkdir $(FILE)/$(DLP)
+	@cp -f sage/DLP/hellman-reyneri.sage ./$(FILE)/$(DLP)/
+	@cp -f sage/DLP/read-me ./$(FILE)/$(DLP)/
+	@cd c && $(MAKE) nodebug
+	@mkdir $(FILE)/$(EXE)
+	@cp -f c/$(EXE) ./$(FILE)/$(EXE)/
+	@cp -f c/read-me ./$(FILE)/$(EXE)/
+	@cp -f c/test/primes ./$(FILE)/$(EXE)/
 
 $(EXE):
 	@cd c && $(MAKE) nodebug
@@ -21,6 +39,7 @@ clean:
 	@cd tex && $(MAKE) clean
 	@echo "./ : Cleaning..."
 	@rm -f *~ $(EXE) $(FILE).pdf
+	@rm -rf ./$(FILE)
 
 open: pdf
 	@evince $(FILE).pdf&
