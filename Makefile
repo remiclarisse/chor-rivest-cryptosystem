@@ -1,7 +1,7 @@
 # Variables
 EXE=rho-pollard
 FILE=rapport-stage
-DLP=calculs-dlp
+DLP=computing-dlp
 IMPLEMCHORRIVEST=implementation-chor-rivest
 
 # Special rules and targets
