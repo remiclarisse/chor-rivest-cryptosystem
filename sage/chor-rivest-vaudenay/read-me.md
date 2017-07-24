@@ -2,8 +2,10 @@
 
 ## How it works
 Launch `sage` in your favorite shell and attach or load the files `chor-rivest.sage` and `attack-chor-rivest.sage`, like so :
+
     sage: load("chor-rivest.sage")
     sage: load("attack-chor-rivest.sage")
+    
  Définir les paramètres du cryptosystème : p un nombre premier et h un entier friable, e.g.
     sage: p = 197
     sage: h = 24
