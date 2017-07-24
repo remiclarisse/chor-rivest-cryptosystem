@@ -15,15 +15,10 @@ an exhaustive seach in the cyclic sub-r-groups. There is also an implementation 
 #### What can be improved:
 1. use Pohlig-Hellman with field extension of Z/pZ.
 2. use BSGS in Pohlig-Hellman.
+
 ### Pollard's Rho Algorithm
 The `./c/` folder contains an implementation `rho-pollard` of *Pollard's rho algorithm*
 for finding logarithms in the field Z/pZ, with p prime.
-#### What can be improved:
-1. use integers of size 128 ou 258 bits instead of 64 bits.
-2. remove the 'talkative' parts, i.e. no verbose, the program just outputs the log.
-3. return 'EXIT_FAILURE' instead of '0'.
-4. remove the condition testing the gcd: it is useless (see Pollard paper from '78).
-5. improve (?) the search for the right d-th root of unity, or have (?) a smaller d.
 
 ## The Chor-Rivest Cryptosystem
 ### Cryptosystem
