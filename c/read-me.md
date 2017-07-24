@@ -11,8 +11,12 @@ The file `primes` contains a list of entries for `rho-pollard`. It is formed of
 
 > Try `rho-pollard --help` for more info.
 
-## What can be improved:
+## What can be improved
 
 1. use integers of size 128 ou 258 bits instead of 64 bits.
 2. remove the condition testing the gcd: it is useless (see Pollard paper from '78).
 3. improve (?) the search for the right d-th root of unity, or have (?) a smaller d.
+
+### Bibliography
+
+John Michael Pollard, **Monte Carlo Methods for Index Computation mod p**, in *Mathematics of Computation*, 1978
