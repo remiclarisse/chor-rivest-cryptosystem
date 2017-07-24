@@ -1504,15 +1504,15 @@ b_i + v_{S(x_i)} \pmod{r}.$$
 Nous rassemblons cela sous la notation :
 $$(x_{i+1}, a_{i+1}, b_{b+1}) = \verb|walk| (x_i, a_i, b_i).$$
 
-\section{L'algorithme $L_Q(1/4)$ de Joux}
+\section{L'algorithme $L_{q^k}(1/4)$ de Joux}
 
 Les éléments présentés ici sont soit tirés de la thèse de Cécile Pierrot \cite{pierrot2016} soutenu en 2016, soit de l'article d'Antoine Joux \cite{joux2013} publié en 2013.
 
 \subsection{Préliminaires}
 
 Soient $p$ un nombre premier, $q$ une puissance non-nulle de $p$ et $k$ un entier naturel non-nul. On souhaite dans la suite résoudre le problème du logarithme discret dans $\gf(q^k)$. On adopte la notation suivante pour donner la complexité d'un algorithme :
-$$L_Q(\alpha, c) := \exp\left({(c+\o(1))(\log Q)^\alpha(\log\log Q)^{1 - \alpha}}\right),$$
-où $Q = q^k$, $0 \leqslant \alpha\leqslant 1$ et $c > 0$.
+$$L_{q^k}(\alpha, c) := \exp\left({(c+\o(1))(\log Q)^\alpha(\log\log Q)^{1 - \alpha}}\right),$$
+où $0 \leqslant \alpha\leqslant 1$ et $c > 0$.
 
 \begin{defi}
 Un polynôme $P(X) \in \gf(q^k)[X]$ est dit \textit{$d$-friable} s'il est produit de polynômes de $\gf(q^k)[X]$ de degré au plus $d$.
@@ -1525,11 +1525,11 @@ pour certaines valeurs de $n$ et $d$ non détaillées ici.
 Dans un corps fini, le logarithme discret de $h \in \gf(q^k)$ en base $g \in \gf(q^k)$, où $g$ est primitif, est l'entier $a$, déterminé modulo l'ordre de $g$, tel que $h = g^a$. Concrètement, on s'est donné une représentation du corps fini $\gf(q^k)$, à savoir un polynôme irréductible de degré $k$, noté $I_k(X) \in \gf(q)[X]$. Et les éléments de $\gf(q^k)$ sont alors vus comme des polynômes modulo $I_k(X)$ : $$\gf(q^k) \cong \frac{\gf(q)[X]}{(I_k(X))}.$$
 La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une autre représentation du corps $\gf(q^k)$. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, notons le $J_k(X) \in \gf(q)[X]$. Le changement de représentation se fait de la façon suivante : soit $\beta$ une racine du polynôme $J_k(X)$ et considérons $I_k(X)$ comme un polynôme à coefficients dans $\gf(q^k) \cong \gf(q)[\beta]$. Ainsi $I_k(X) \in \gf(q)[\beta]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\beta$. Choisissons l'une d'entre elles au hasard et notons la $\alpha$. Il est possible d'écrire $\alpha = f(\beta)$, où $f(X) \in \gf(q)[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\alpha$, disons $G(\alpha)$ et $H(\alpha)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\beta))$ en base $G(f(\beta))$.
 
-\subsection{Algorithme de Hellman-Reyneri en $L_Q(1/2)$}
+\subsection{Algorithme de Hellman-Reyneri en $L_{q^k}(1/2)$}
 
 Choisissons $g$ un générateur du groupe multiplicatif $\gf(q^k)^\times$ et un entier $d$ tel que $1 < d < k$, qui est le degré maximum des polynômes de notre base de friabilité.
 
-L'algorithme de Martin Hellman et Justin Reyneri \cite{hellman1982} commence par sélectionner un polynôme $I_k(X) \in \gf(q)[X]$ unitaire irréductible de degré $k$, afin de représenter $\gf(q^k)$ comme $\gf(q)[\alpha]$, où $\alpha$ est une racine fixée de $I_k(X)$.
+L'algorithme de Martin Hellman et Justin Reyneri \cite{hellman1982} commence par sélectionner arbitrairement un polynôme $I_k(X) \in \gf(q)[X]$ unitaire irréductible de degré $k$, afin de représenter $\gf(q^k)$ comme $\gf(q)[\alpha]$, où $\alpha$ est une racine fixée de $I_k(X)$.
 
 Pour $r \in \ldbrack 0, q^k - 2 \rdbrack$ choisi aléatoirement de façon uniforme, $g^r$ est aussi un élément choisi aléatoirement de façon uniforme de $\gf(q^k)^\times$. Cet élément peut être représente comme un polynôme $G_r(X) \in \gf(q)[X]$ de degré au plus $k-1$. Si $G_r(X)$ est $d$-friable, nous écrivons :
 $$g^r = \beta \prod_{i=1}^{t} F_i(\alpha)^{e_i},$$
@@ -1550,12 +1550,83 @@ Une fois que les logarithmes de la base $\mathcal{F}$ sont connus, i.e. déjà c
 Normalement, les éléments de $\gf(q^k)$ dont l'ordre est un petit diviseur de $q^k-1$ -- comme les éléments de $\gf(q)$ -- sont écartés lors du crible : ils augmentent la possibilité d'apparition d'éléments non inversibles pour déterminer les logarithmes de la base de friabilité, et des algorithmes tel que Pohlig-Hellman \cite{pohligHellman1978} ou rho de Pollard \cite{pollard1978} permettent déjà de les calculer facilement.
 \end{rema}
 
-Puisque la phase de calcul de logarithme discret indivisuel est négligeable comparée aux précalculs, il suffit, pour analyser la compléxité asymptotique d'un tel algorithme, d'exprimer le coût de la collecte des relations et de l'algèbre linéaire en fonction du paramètre $d$. En majorant par $q^{d+1}$ la cardinalité de $\mathcal{F}$ et en désignant par $\mathbb{P}$ la probabilité qu'un polynôme aléatoire $G_r(X)$ soit $d$-fiable, le coût de l'exécution de la phase de collecte des relations est alors majoré par $q^{d+1}/\mathbb{P}$. En ce qui concerne l'algèbre linéaire, on remarque que le nombre d'éléments de la base de fiabilité dans n'importe laquelle des relations formées est majorée par $k$. Ceci provient du fait que le nombre de polynômes irréductibles qui apparaissent lorsque l'on factorise un polynôme est toujours inférieur à son degré. Aussi, l’algèbre linéaire que l'on exécute s'attache toujours à une matrice très creuse qui ne contient au plus que $k$ termes non nuls par ligne. Le coût d'une telle méthode est alors quadratique en la taille de $\mathcal{F}$, si on utilise des techniques de calculs sur matrices creuses, comme par exemple la méthode du gradient conjugué. Plus précisément, le temps de calcul est majoré par $kq^{2d+2}$. De l'estimation de Panario-Gourdon-Flojolet, on écrit :
+Puisque la phase de calcul de logarithme discret indivisuel est négligeable comparée aux précalculs, il suffit, pour analyser la compléxité asymptotique d'un tel algorithme, d'exprimer le coût de la collecte des relations et de l'algèbre linéaire en fonction du paramètre $d$. En majorant par $q^{d+1}$ la cardinalité de $\mathcal{F}$ et en désignant par $\mathbb{P}$ la probabilité qu'un polynôme aléatoire $G_r(X)$ soit $d$-fiable, le coût de l'exécution de la phase de collecte des relations est alors majoré par $q^{d+1}/\mathbb{P}$. En ce qui concerne l'algèbre linéaire, on remarque que le nombre d'éléments de la base de fiabilité dans n'importe laquelle des relations formées est majorée par $k$. Ceci provient du fait que le nombre de polynômes irréductibles qui apparaissent lorsque l'on factorise un polynôme est toujours inférieur à son degré. Aussi, l’algèbre linéaire que l'on exécute s'attache toujours à une matrice très creuse qui ne contient au plus que $k$ termes non nuls par ligne. Le coût d'une telle méthode est alors quadratique en la taille de $\mathcal{F}$, si on utilise des techniques de calculs sur matrices creuses, comme par exemple la méthode du gradient conjugué. Plus précisément, le temps de calcul est majoré par $kq^{2d+2}$. De l'estimation de Panario-Gourdon-Flajolet, on écrit :
 $$-\log_q(\mathbb{P}) \leqslant\frac{k}{d}\log_q(k/d).$$
 Par conséquent, si on choisit le paramètre :
 $$d = \left\lceil \sqrt{ \frac{k\log_q k}{2} } \right\rceil,$$
 on obtient comme complexité finale :
 $$q^{\sqrt{(2+\o(1))k\log_qk}} = L_{q^k}(1/2,\sqrt 2).$$
+
+\subsection{Algorithme de Coppersmith en $L_{q^k}(1/3)$}
+
+L'algorithme de Don Coppersmith \cite{coppersmith1984} est plus efficace que l'algorithme de Hellman-Reyneri car il prend une représentation de $\gf(q^k)$ qui facilite la création des relations.
+
+Coppersmith propose de choisir un polynôme irréductible $I_k(X)$ de la forme : $$X^k - S(X),$$ où $S(X)$ est un polynôme de degré $d_S$ aussi petit que possible. 
+
+Cependant, Cécile Pierrot \cite{pierrot2016} s'inspire des travaux d'Antoine Joux \cite{joux2013} et suggère de choisir $I_k(X)$ comme facteur irréductible de $X^{q^n}-S(X)$. Développons : soit $n$ l'unique entier tel que $q^{n-1} < k \leqslant q^n$ et choisissons $S(X)$ de petit degré tel que $X^{q^n}-S(X)$ ait un unique facteur irréductible de degré $k$. Nous prenons alors ce facteur pour définir notre corps $\gf(q^k)$.
+
+Décomposons $n = n_1 + n_2$ pour des valeurs $n_1$ et $n_2$ que l'on déterminera plus tard. L'idée pour la construction des relations est que pour chaque paire de polynôme $A(X)$ et $B(X)$ de $\gf(q)[X]$, on a l'égalité :
+$$(\dagger) \qquad {\left( A(X) + X^{q^{n_1}}B(X)\right)}^{q^{n_2}} = A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}}) \pmod{I_k(X)},$$
+grâce à la linéarité de l'élévation à la puissance $q$ (c'est l'automorphisme de Frobenius de $\gf(q)$) et à l'égalité $X^{q^n} = S(X) \pmod{I_k(X)}$.
+
+Choisissons $g$ un générateur du groupe multiplicatif $\gf(q^k)^\times$ et un entier $d$ tel que $1 < d < k$. Prenons comme base de friabilité :
+$$\mathcal{F} =  \{F(\alpha) : F(X) \in \gf(q)[X] \text{ irréductible unitaire de degré au plus } d \}.$$
+
+L'équation $(\dagger)$ donne une relation multiplicative satisfaisante si les polynômes $A(X) + X^{q^{n_1}}B(X)$ et $A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}})$ sont $d$-friables, ou de manière équivalente, si le produit :
+$$\left( A(X) + X^{q^{n_1}}B(X)\right)\left( A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}})\right)$$
+est $d$-friable.
+
+\begin{heur}\label{heur:polydfriable}
+La probabilité que le produit $$\left( A(X) + X^{q^{n_1}}B(X)\right)\left( A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}})\right)$$ soit $d$-friable est identique à celle d'un polynôme aléatoire de même degré.
+\end{heur}
+
+Nous pouvons étudier les paires de polynômes non nuls $A(X)$ et $B(X)$ de degré au plus $d$, avec $A(X)$ unitaire (car multiplier par un élément de $\gf(q)$ donne une équation identique). On cherche un couple $(n_1, n_2)$ d'entiers naturels minimisant le degré du produit de l'heuristique~\ref{heur:polydfriable}, i.e. :
+$$d + q^{n_1} + d_S + \frac{dq^n}{q^{n_1}}.$$
+Il est donc minimisé lorsque $q^{n_1}$ est aussi proche que possible de $\sqrt{dq^n}$. Un tel choix entraîne un degré asympototique de l'ordre de $(2+\o(1))\sqrt{dq^n}$, ce qui donne en fonction de $k$, un degré variant entre $(2+\o(1))\sqrt{dk}$ et $(2\sqrt{q}+\o(1))\sqrt{dk}$.
+Si $d$ est choisi comme suit :
+$$d = (4/3)^{1/3}q^{n/3}n^{2/3},$$
+alors la complexité est $L_{q^{q^n}}(1/3, (32/9)^{1/3})$, ce qui donne en fonction de $k$ une complexité variant entre $L_{q^k}(1/3, (32/9)^{1/3})$ et $L_{q^k}(1/3, (32q/9)^{1/3})$.
+
+Chaque relation multiplicative de la forme $(\dagger)$ donne une équation du type :
+$$q^{n_2} \sum_{F(\alpha) \in \mathcal{F}} e_i \log_g(F(\alpha)) = \sum_{F(\alpha) \in \mathcal{F}} e'_i \log_g(F(\alpha)) \pmod{q^k-1}.$$
+Le système admet plusieurs solutions, et à l'exception du vecteur nul, n'importe laquelle de celles-ci permet de recouvrer les logarithmes de la base de friabilité. En effet, si l'élément $g$ lui-même est dans la base $\mathcal{F}$, il est facile de normaliser le vecteur solution pour avoir les logarithmes en base $g$. En revanche, si $g$ n'appartient à $\mathcal{F}$, nous procédons à une phase de logarithme individuel sur $g$ pour déterminer la valeur de la constante de normalisation.
+
+Par ailleurs, comme indiqué par Cécile Pierrot \cite{pierrot2016}, les gros coefficients $q^{n_2}$ ont un impact sur la performance des multiplications, mais dans de bonnes conditions (comme par exemple être en caractéristique 2) et avec un peu de ruse sur les multiplication matrice-vecteur, le procédé d'algèbre linéaire n'est pas sensiblement ralenti.
+
+Contrairement à l'algorithme de Hellman-Reyneri, la génération d'une relation faisant intervenir le logarithme d'un élément arbitraire du corps et ceux de la base de friabilité n'est pas aussi facile dans la méthode de Coppersmith. Aussi apparaît une nouvelle notion essentielle : il s'agit de la notion de descente. Ce procédé commence par écrire une relation entre notre élément arbitraire $h := H(\alpha)$ vu comme un polynôme en $\alpha$, l'élément primitif du corps cible $g := G(\alpha)$, et un petit nombre d'autres polynômes auxiliaires de petit degré évalués en $\alpha$. Par itérations successives, il devient alors possible d'exprimer le polynôme initial en produit d'éléments de la base de friabilité $\mathcal{F}$.
+
+Par conséquent, le calcul d'un logarithme discret est maintenant représenté par un arbre dont les fils d'un n\oe ud, qui correspond à un polynôme, sont les n\oe uds des polynômes de lus bas degré apparaissant dans la relation associée. Toutes les feuilles de l'arbre doivent être dans $\mathcal{F}$.
+
+Pour trouver une relation impliquant un polynôme $H(X)$ (où $H(\alpha) = h$ l'élément cible dans $\gf(q^k)$), qui peut être supposé irréductible sans perte de généralité, nous procédons alors de la façon suivante : \begin{itemize}
+\item Choisir $n_1$ et $n_2$ deux entiers adaptés au degré de $H(X)$, et tel que $n = n_1 + n_2$,
+\item Calculer une base $((A_1(X), B_1(X)), (A_2(X), B_2(X)))$ du réseau formé par l'ensemble des couples de polynômes $(A(X),B(X))$ tel que $H(X)$ divise $A(X) + X^{q^{n_1}}B(X)$.
+\item Pour une paire de polynômes de petit degré $(\lambda_1(X), \lambda_2(X))$, poser $A(X) = \lambda_1(X)A_1(X) + \lambda_2(X)A_2(X)$ et $B(X) = \lambda_1(X)B_1(X) + \lambda_2(X)B_2(X)$ et considérer :
+$${\left( A(X) + X^{q^{n_1}}B(X)\right)}^{q^{n_2}} = A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}}) \pmod{I_k(X)}.$$
+Par linéarité, $H(X)$ divise le polynôme $A(X) + X^{q^{n_1}}B(X)$.
+\item Parmi ces relations candidates, contenant toutes $H(X)$, garder seulement celles dont le degré de tous les polynômes irréductibles impliqués est plus petit que $\kappa \deg H(X)$, pour une certaine constante $\kappa$ (un choix classique est $\kappa = 3/4$).
+\end{itemize}
+La descente procède ainsi récursivement jusqu'à atteindre uniquement des éléments de la base de friabilité, à savoir des polynômes de degré inférieur ou égal à $d$.
+
+\subsection{Crible par corps de fonctions}
+
+Le crible par corps de fonctions est proposé en 1999 par Leonard Adleman et Ming-Deh Huang \cite{adleman1999}. Sans dénaturer l'idée des auteurs, nous présentons l'algorithme en utilisant des anneaux de polynômes et non des corps de fonctions.
+
+Le point de départ de l'algorithme réside une nouvelle fois dans la manière de définir le corps cible. L'idée consiste à construire l'extension à l'aide de deux relations polynômiales bivariées sur $\gf(q)$ : $$Y = f(X) \quad \text{et}\quad X = (Y).$$
+En assemblant ces deux relations, nous obtenons $X = g(f(X))$ Ainsi, si le polynôme $g(f(X)) - X$ possède un facteur irréductible $I_k(X)$ de degré $k$, nous pouvons représenter $\gf(q^k)$ à l'aide de celui-ci.
+\begin{heur}
+Il existe de tels polynômes $f(X)$ et $g(Y)$ dans $\gf(q)[X, Y]$.
+\end{heur}
+La représentation étant fixée, nous désignons par $\alpha$ l'une des racines dans $\gf(q^k)$ du polynôme $I_k(X)$ et nous posons $\beta = f(\alpha)$. Par construction nous avons $\alpha = g(\beta)$ dans $\gf(q^k)$. À partit de n'importe quelle paire de polynômes $A(X)$ et $B(X)$ univariés, nous pouvons écrire :
+$$A(\alpha) + f(\alpha)B(\alpha) = A(g(\beta)) + \beta B(g(\beta)).$$
+Nous obtenons ainsi une égalité dans $\gf(q^k)$ entre un polynôme en $\alpha$ et un second en $\beta$. De plus, chacun de ces deux polynômes est de degré relativement petit, si les paramètres sont bien choisis. Par conséquent, si chacun d'entre eux se factorise en produits de polynômes irréductibles de degrés au plus $d$, nous pouvons exploiter cette relation multiplicative. Soulignons que nous avons ici doublé la taille de la base de friabilité, puisqu'elle contient maintenant l'évaluation de chaque polynôme irréductible de petit degré en $\alpha$ et en $\beta$.
+
+Les polynômes $A(x)$ et $B(X)$ sont à choisir de sorte que leur degré soit au plus $d$, tandis le degré de $f(X)$ et $g(Y)$ est choisi de sorte que $$\deg(f(X)) \deg(g(Y)) \approx k \quad\text{et}\quad \frac{\deg(f(X))}{\deg(g(Y))} \approx d.$$
+L'optimisation non détaillée ici, donne une complexité asymptotique heuristique de :
+$$L_{q^k}(1/3, (32/9)^{1/3}).$$
+
+\subsection{Algorithme de Joux}
+
+
 
 \section{La réduction de réseau Lenstra-Lenstra-Lov\'asz}
 
