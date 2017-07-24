@@ -102,16 +102,20 @@
 {\large Tuteurs: Daniel {\sc Augot} et Luca {\sc De Feo}}
 \end{center}
 \newpage
-
+\thispagestyle{empty}
 \section*{Introduction}
 
 En section~\ref{sec:presInria}, nous présentons l'Inria (Institut National de Recherche en Informatique et en Automatique), ainsi que l'équipe-projet GRACE. Les section~\ref{sec:cryptosysteme} et section~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} résume le papier de Joux sur le calcul de logarithmes discrets dans des corps finis de petite caractéristique, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+\newpage
 
 \section{La présentation de l'Inria}\label{sec:presInria}
 
 Inria emploie 2\;600 collaborateurs issus des meilleures universités mondiales, qui relèvent les défis des sciences informatiques et mathématiques. Inria est organisé en <<équipes-projets>> qui rassemblent des chercheurs aux compétences complémentaires autour d’un projet scientifique focalisé. Ce modèle ouvert et agile lui permet d’explorer des voies originales avec ses partenaires industriels et académiques. Inria répond ainsi aux enjeux pluridisciplinaires et applicatifs de la transition numérique. À l'origine de nombreuses innovations créatrices de valeur et d'emploi, Inria transfère vers les entreprises (start-up, PME et grands groupes) ses résultats et ses compétences, dans des domaines tels que la santé, les transports, l'énergie, la communication, la sécurité et la protection de la vie privée, la ville intelligente, l’usine du futur …
 
-\subsection*{Centre Inria Saclay - Île-de-France}
+\subsection{Centre Inria Saclay - Île-de-France}
 
 À Paris-Saclay, Inria développe des recherches à fort impact sociétal pour inventer le monde de demain. Créé en 2008, le centre de recherche Inria Saclay - Île-de-France accueille 450 scientifiques et 100 membres des services d’appui à la recherche. Les scientifiques sont organisés en 31 équipes de recherche dont 26 sont communes avec des partenaires du plateau de Saclay. Le centre accueille également le Joint Lab Inria / Microsoft Research.
 
@@ -122,8 +126,8 @@ Inria emploie 2\;600 collaborateurs issus des meilleures universités mondiales,
 
 \section{Le cryptosystème de Chor-Rivest}\label{sec:cryptosysteme}
 
-Dans leur article~\cite{chorRivest1988} publié en 1988, Benny Chor et Ronald Rivest introduisent un nouveau cryptosystème. Ils se sont inspirés du théorème de Bose-Chowla \cite[III]{chorRivest1988} pour créer un cryptosystème reposant sur un problème de sac à dos et résistant à l'attaque de Jeffrey Lagarias et Andrew Odlyzko \cite{lagarias1983}.
-\begin{theo}[Théorème de Bose-Chowla \cite{bose1962}]
+Dans leur article~\cite{chorRivest1988} publié en 1988, Benny Chor et Ronald Rivest introduisent un nouveau cryptosystème. Ils se sont inspirés du théorème de Bose-Chowla \cite{bose1962} pour créer un cryptosystème reposant sur un problème de sac à dos et résistant à l'attaque de Jeffrey Lagarias et Andrew Odlyzko \cite{lagarias1983}.
+\begin{theo}[Théorème de Bose-Chowla]
 Soient $p$ un nombre premier et $h \geqslant 2$ un entier. Il existe une suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ d'entiers telle que : \begin{enumerate}
 \item pour tout $0 \leqslant i \leqslant p-1$, $$1 \leqslant a_i \leqslant p^h-1,$$
 \item si $(x_0, \dots, x_{p-1})$ et $(y_0, \dots, y_{p-1})$ sont deux vecteurs distincts d'entiers naturels de poids inférieur à $h$, alors 
@@ -133,8 +137,8 @@ $$\sum_{i=0}^{p-1} x_ia_i \neq \sum_{i=0}^{p-1} y_ia_i.$$
 
 Cela permet de construire une instance de sac à dos ne reposant pas sur une suite super-croissante, qui sont faciles à résoudre.
 
-\subsection*{Description}
-
+\subsection{Description}
+  
 Soit $p^h$ une puissance de nombre premier. Considérons le corps fini $\gf(p^h)$ dont il est supposé que sa représentation est publique, i.e. il existe un polynôme unitaire $P(x)$ public de degré $h$ irréductible sur $\gf(p)$ et les éléments de $\gf(p^h)$ sont vus comme des polynômes modulo $P(x)$ :
 $$\gf(p^h) = \frac{\gf(p)[x]}{(P(x))}.$$
 Notons $a = x \pmod{P(x)}$, la classe de $x$ modulo $P(x)$ dans $\gf(p^h)$, et choisissons $(1, a, a^2, \dots, a^{h-1})$ comme base du $\gf(p)$-espace vectoriel $\gf(p^h)$. Ainsi $\gf(p^h) = \gf(p)[a]$. Considérons aussi une numérotation publique $\alpha$ du sous-corps premier $\gf(p)$, i.e. $$\{\alpha_0,\dots, \alpha_{p-1}\} = \gf(p) \subset \gf(p^h).$$
@@ -175,7 +179,7 @@ En résonnant sur les degrés et du fait que $\mu(x)$ et $\prod \left(x+\alpha_{
 $$G(x) + \mu(x) = \prod_{m_i = 1} \left(x+\alpha_{\sigma(i)}\right).$$
 Ainsi, la factorisation de $G(x)+\mu(x)$ permet de recouvrer le message $m$.
 
-\subsection*{Exemple}
+\subsection{Exemple}
 Prenons $p := 17$ et $h := 6$, ainsi $p^h = 24\;137\;569$.
 \begin{verbatim}
 sage: p = 17
@@ -194,7 +198,7 @@ $$(\alpha_0, \dots, \alpha_{16}) = (2, 12, 4, 1, 0, 10, 7, 8, 15, 16, 3, 5, 13, 
 sage: alpha = [K(i) for i in range (p)]
 sage: shuffle (alpha)
 \end{verbatim}
-\subsubsection*{Génération des clés}
+\subsubsection{Génération des clés}
 Nous prenons un élément $t\in\gf(17^6)$ de degré algébrique $6$ sur $\gf(17)$. Comme plus haut, nous notons $a = x \pmod{P(x)}$, et l'élément primitif de $\gf(17^6)$ sélectionné est :
 $$g := 2a^5 + 5a^4 + 14a^3 + 2a^2 + 10a + 16.$$
 \begin{verbatim}    
@@ -248,7 +252,7 @@ sage: c = [mod (d + log (t + alpha[s[i]], g), q - 1)
                                               for i in range (p)]
 \end{verbatim}
 
-\subsubsection*{Chiffrement d'un message}
+\subsubsection{Chiffrement d'un message}
 Maintenant, donnons nous un message à chiffrer de longueur $17$ et de poids $6$ :
 $$m := [m_0\cdots m_{16}] = [00100101100100100].$$
 \begin{verbatim}
@@ -261,7 +265,7 @@ $$E(m) := 23\;410\;132.$$
 sage: e = mod (sum ([m[i]*c[i] for i in range (p)]), q-1)
 \end{verbatim}
 
-\subsubsection*{Déchiffrement du message}
+\subsubsection{Déchiffrement du message}
 Nous souhaitons écrire $g^{E(m) - hd}$ comme un polynôme en $t$. Or \verb|Sage| nous donne $g^{E(m) - hd}$ comme polynôme en $a$ : $$g^{E(m) - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
 Pour parvenir à exprimer $g$ comme nous le souhaitons, il faut effectuer un changement de base du $\gf(17)$-espace vectoriel $\gf(17^6)$ : passer de la base $\mathcal{A} := (1, a, a^2, \dots, a^{h-1})$ à la base $\mathcal{T} := (1, t, t^2, \dots, t^{h-1})$.
 La matrice de passage facile à calculer est celle qui passe de la base $\mathcal{T}$ à la base $\mathcal{A}$ : il suffit d'écrire dans \verb|Sage| les différentes puissances de $t$, et \verb|Sage| les exprime en fonction des puissances de $a$. Voici cette matrice :
@@ -318,7 +322,7 @@ Nous présentons ici l'attaque de Serge Vaudenay \cite{vaudenay2000}, publiée e
 
 Ici, nous donnons l'attaque pour $p$ un nombre premier, bien qu'elle soit valable pour le cas où $p$ est une puissance d'un nombre premier, modulo quelques détails. Aussi, nous exposons l'attaque à rebours, à savoir qu'on part du cas où quelques éléments de la clé privée sont connus et, au fur et à mesure, nous les retirons en regardant comment les fabriquer. Les algorithmes sont égrainés au fils des attaques.
 
-\subsection*{Notion de clés privées équivalentes}
+\subsection{Notion de clés privées équivalentes}
 
 Dans le cryptosystème de Chor-Rivest, nous choisissons la clé privée de façon aléatoire puis, à partir de celle-ci, nous calculons la clé publique. Le système repose sur la difficulté de trouver une clé secrète à partir de la clé publique. Cependant, nous remarquons qu'il y a plusieurs clés privées \textit{équivalentes}, à savoir qu'il existe plusieurs jeux de clés privées qui donnent la même clé publique.
 
@@ -355,7 +359,7 @@ Il faut alors définir la permutation $\pi$ par
 Aussi, nous faisons (parfois implicitement) le raccourci de << trouver \underline{une} clé privée équivalente >> à << trouver \underline{la} clé privée équivalente >>. Les algorithmes présentés donnent quasi-tous une liste d'éléments possibles en sortie, alors qu'un seul nous suffit.
 \end{rema}
 
-\subsection*{Cléf de voûte de l'attaque}
+\subsection{Cléf de voûte de l'attaque}
 
 Serge Vaudenay construit -- il s'est appuyé sur ses travaux précédents -- un polynôme bien particulier, qui la pierre angulaire de son attaque pour casser le cryptosystème.
 
@@ -391,7 +395,7 @@ Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions
 \paragraph*{Notation :} Pour $r$ divisant $h$ et $\omega$ élément primitif de $\gf(p^h)$, notons $$\omega_{p^r} := \omega^{(p^h-1)/(p^r-1)} = \omega^{1+p^r+p^{2r}+p^{3r}+\cdots+p^{h-r}},$$
 la norme de $\omega$ considéré dans l'extension de corps $\gf(p^r) \subseteq \gf(p^h)$.
 
-\subsection*{Attaque sachant $\mbf g_{p^r}$ et $\sigma$}
+\subsection{Attaque sachant $\mbf g_{p^r}$ et $\sigma$}
 
 Supposons connus la norme $\mbf g_{p^r}$ et la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (\mbf g_{p^r})^{c_i})}$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-\mbf t$.  Par équivalence de clés privées, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. Cet algorithme est l'objet de la figure Algorithme~\ref{algoPremiereAttaqueVaudenay}.
 
@@ -412,13 +416,13 @@ Nous résolvons l'attaque en calculant $g$ et $d$ -- d'une clé équivalente don
 \end{algorithmic}
 \end{algorithm}
 
-\subsection*{Simplification : choix des points d'interpolation}
+\subsection{Simplification : choix des points d'interpolation}
 
 Dans son papier, Serge Vaudenay interpole le polynôme $Q(x)$ de la proposition~\ref{premierePropVaudenay} sur un ensemble quelconque de $h/r+1$ éléments de $\gf(p)$. À savoir, il choisit des indices $i_0, i_1, \dots, i_{h/r}$ pris entre $0$ et $p-1$, deux à deux distincts ; et interpole le polynôme en les éléments $\alpha_{i_j}$ pour $j$ tel que $0 \leqslant j \leqslant h/r$. 
 
 Pour simplifier le propos, et surtout pour rendre plus lisible l'écriture, nous faisons le choix ici de prendre $i_j = j$, pour tout $0 \leqslant j \leqslant h/r$, c'est ce qui a été fait dans l'algorithme~\ref{algoPremiereAttaqueVaudenay}.
 
-\subsection*{Attaque sachant $\mbf g_{p^r}$}
+\subsection{Attaque sachant $\mbf g_{p^r}$}
 
 Supposons connu l'élément $\mbf g_{p^r}$. Par la proposition~\ref{premierePropVaudenay}, nous pouvons interpoler le polynôme $Q(x)$ en les $\alpha_{\sigma(j)}$, pour $0 \leqslant j \leqslant h/r$ :
 \begin{align*}
@@ -552,7 +556,7 @@ En passant toute les valeurs de $\nu$ en revue, nous pouvons obtenir $\pi(i)$ de
 \end{algorithmic}
 \end{algorithm}
 
-\subsection*{Comment trouver $\mbf g_{p^r}$}
+\subsection{Comment trouver $\mbf g_{p^r}$}
 
 Les équations : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
 $$(\ddagger) \qquad (\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
@@ -586,7 +590,7 @@ Nous pouvons donc écrire un algorithme (\ref{algoTestgpr}) qui vérifie si un c
 \end{algorithmic}
 \end{algorithm}
 
-\subsection*{Utilisation de tous les $c_i$ pour trouver $\mbf g_{p^r}$}
+\subsection{Utilisation de tous les $c_i$ pour trouver $\mbf g_{p^r}$}
 
 En 1991, Hendrik Lenstra \cite{lenstra1991} soupçonnait qu'inclure tous les $c_i$ dans la clé publique était dangereux pour la sécurité du système. Et en effet, Serge Vaudenay a amélioré l'attaque précédente en utilisant la connaissance de tous les $c_i$. 
 
@@ -678,7 +682,7 @@ Cela permet d'écrire l'algorithme~\ref{algogprFromgpri}, recouvrant $\mbf g_{p^
 
 Chaque boucle de la ligne~\ref{algogprFromgpriBoucle} de l'algorithme~\ref{algogprFromgpri} demande en moyenne $\O(pr^2)$ opérations dans $\gf(p)$.
 
-\subsection*{Attaque globale}
+\subsection{Attaque globale}
 
 Pour l'attaque générale, on s'intéresse aux sous-corps de $\gf(p^r)$.
 
@@ -692,7 +696,7 @@ $$C(G) := \sum_{v} \frac{\#L(v) -1}{\ppcm\{\#L(w)-1 \mid v \leftarrow w\}},$$
 où on prend pour convention : $\ppcm(\emptyset) = 1$.
 \end{defi}
 
-Nous pouvons définir un algorithme pour calculer $\mbf g_{p^r}$ avec pour compléxité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf(p^r)$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
+Nous pouvons définir un algorithme pour calculer $\mbf g_{p^r}$ avec pour complexité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf(p^r)$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
 $$\O\left(\min_{\substack{r \text{ divisant } h \\ r^2 \geqslant h}} \; \min_{\substack{G \text{ est un DAG}\\p\text{-factorisant} \\ \text{ de } \gf(p^r)}} \; 
 pr^2C(G)\right).$$
 
@@ -715,7 +719,7 @@ L'algorithme~\ref{algoGeneral} illustre l'attaque complète de Serge Vaudenay.
 \end{algorithmic}
 \end{algorithm}
 
-\subsection*{Conclusion}
+\subsection{Conclusion}
 
 Serge Vaudenay a décrit une attaque du cryptosystème, lorsque $h$ admet un facteur $r$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, ayant pour complexité $\O(h^3p^r/r^2)$.
 
@@ -732,7 +736,7 @@ Dans son article \cite{joux2013} de 2013, Antoine Joux conçoit un algorithme pe
 
 Nous allons donc passer en revu les algorithmes de Hellman-Reyneri et de Coppersmith, ainsi que le crible de corps de fonctions, avant de décortiquer l'article \cite{joux2013} d'Antoine Joux. Mais d’abord, donnons quelques notions liminaires et le squelette de la méthode de calcul d’indice.
 
-\subsection*{Préliminaires}
+\subsection{Préliminaires}
 
 Soient $p$ un nombre premier, $q$ une puissance non-nulle de $p$ et $k$ un entier naturel non-nul. On souhaite dans la suite résoudre le problème du logarithme discret dans $\gf(q^k)$, un corps fini à $q^k$ éléments.
 
@@ -753,7 +757,7 @@ pour certaines valeurs de $n$ et $d$ non détaillées ici.
 Dans un corps fini, le logarithme discret de $h \in \gf(q^k)$ en base $g \in \gf(q^k)$, où $g$ est primitif, est l'entier $a$, déterminé modulo l'ordre de $g$, tel que $h = g^a$. Concrètement, on s'est donné une représentation du corps fini $\gf(q^k)$, à savoir un polynôme irréductible de degré $k$, noté $J_k(X) \in \gf(q)[X]$. Et les éléments de $\gf(q^k)$ sont alors vus comme des polynômes modulo $J_k(X)$ : 
 $$\gf(q^k) \cong \frac{\gf(q)[X]}{(J_k(X))}.$$
 
-\subsubsection*{Description de la méthode du calcul d'indice}
+\subsubsection{Description de la méthode du calcul d'indice}
 La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une \textit{autre représentation du corps $\gf(q^k)$}. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, notons le $I_k(X) \in \gf(q)[X]$. Le changement de représentation se fait de la façon suivante : soit $\alpha$ une racine du polynôme $I_k(X)$ et considérons $J_k(X)$ comme un polynôme à coefficients dans $\gf(q^k) \cong \gf(q)[\alpha]$. Ainsi $J_k(X) \in \gf(q)[\alpha]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\alpha$. Choisissons l'une d'entre elles au hasard et notons la $\beta$. Il est possible d'écrire $\beta = f(\alpha)$, où $f(X) \in \gf(q)[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\beta$, disons $G(\beta)$ et $H(\beta)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\alpha))$ en base $G(f(\alpha))$.
 
 Ensuite, il faut déterminer un ensemble de $\gf(q^k)^\times$, que l'on nomme \textit{base de friabilité}, dont les éléments sont considérés comme petit -- dans un sens restant encore à définir. Souvent, on fixe $d$ un entier assez petit, et les éléments de la base de friabilité sont ceux de la forme $F(\alpha)$ et $F(X)\in\gf(q)[X]$ est un polynôme de degré au plus $d$.
@@ -775,10 +779,10 @@ En résumé, un algorithme implémentant la méthode de calcul d'indice peut se 
 \item la phase de logarithme individuel qui permet de d'obtenir le logarithme de n’importe quel élément du corps.
 \end{enumerate}
 
-\subsubsection*{Heuristique de la méthode du calcul d'indice}
+\subsubsection{Heuristique de la méthode du calcul d'indice}
 Les algorithmes par calcul d'indice reposent sur l'idée de décomposer des éléments comme produits d'éléments considérés comme petits. Les éléments qui peuvent se factoriser de cette manière sont dits friables. Un problème essentiel pour l'analyse de ces algorithmes consiste à estimer la probabilité d'obtenir de tels éléments friables. Dans de nombreux cas, nous procédons heuristiquement en supposant que les éléments créés se comportent comme des éléments aléatoires de même taille. Bien qu'inélégante, car non prouvée, cette heuristique a permis d'obtenir de nombreux progrès algorithmiques.
 
-\subsection*{Algorithme de Hellman-Reyneri en $L_{q^k}(1/2)$}
+\subsection{Algorithme de Hellman-Reyneri en $L_{q^k}(1/2)$}
 
 Choisissons $g$ un générateur du groupe multiplicatif $\gf(q^k)^\times$ et un entier $d$ tel que $1 < d < k$, qui permettra de définir les éléments de la base de friabilité.
 
@@ -809,25 +813,24 @@ $$d = \left\lceil \sqrt{ \frac{k\log_q k}{2} } \right\rceil,$$
 on obtient comme complexité finale :
 $$q^{\sqrt{(2+\o(1))k\log_qk}} = L_{q^k}(1/2,\sqrt 2).$$
 
-\subsection*{Algorithme de Coppersmith en $L_{q^k}(1/3)$}
+\subsection{Algorithme de Coppersmith en $L_{q^k}(1/3)$}
 
 L'algorithme de Don Coppersmith \cite{coppersmith1984} est plus efficace que l'algorithme de Hellman-Reyneri car il prend une représentation de $\gf(q^k)$ qui facilite la création des relations.
 
 Coppersmith propose de choisir un polynôme irréductible $I_k(X)$ de la forme : $$X^k - S(X),$$ où $S(X)$ est un polynôme de degré $d_S$ aussi petit que possible. 
 
-Cependant, Cécile Pierrot \cite{pierrot2016} s'inspire des travaux d'Antoine Joux \cite{joux2013} et suggère de choisir $I_k(X)$ comme facteur irréductible de $X^{q^n}-S(X)$. Développons : soit $n$ l'unique entier tel que $q^{n-1} < k \leqslant q^n$ et choisissons $S(X)$ de petit degré tel que $X^{q^n}-S(X)$ ait un unique facteur irréductible de degré $k$. Nous prenons alors ce facteur pour définir notre corps $\gf(q^k)$.
+Cependant, Cécile Pierrot \cite{pierrot2016} indique divers résultats suggérant de choisir $I_k(X)$ comme facteur irréductible de $X^{q^n}-S(X)$. Détaillons : soit $n$ l'unique entier tel que $q^{n-1} < k \leqslant q^n$ et choisissons $S(X)$ de petit degré tel que $X^{q^n}-S(X)$ ait un unique facteur irréductible de degré $k$. Nous prenons alors ce facteur pour définir notre corps $\gf(q^k)$.
 
 Décomposons $n = n_1 + n_2$ pour des valeurs $n_1$ et $n_2$ que l'on déterminera plus tard. L'idée pour la construction des relations est que pour chaque paire de polynôme $A(X)$ et $B(X)$ de $\gf(q)[X]$, on a l'égalité :
 $$(\dagger) \qquad {\left( A(X) + X^{q^{n_1}}B(X)\right)}^{q^{n_2}} = A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}}) \pmod{I_k(X)},$$
-grâce à la linéarité de l'élévation à la puissance $q$ (c'est l'automorphisme de Frobenius de $\gf(q)$) et à l'égalité $X^{q^n} = S(X) \pmod{I_k(X)}$.
+grâce à la linéarité de l'élévation à la puissance $q$ (c'est l'automorphisme de Frobenius du corps $\gf(q)$) et à l'égalité $X^{q^n} = S(X) \pmod{I_k(X)}$.
 
 Choisissons $g$ un générateur du groupe multiplicatif $\gf(q^k)^\times$ et un entier $d$ tel que $1 < d < k$. Prenons comme base de friabilité :
 $$\mathcal{F} =  \{F(\alpha) : F(X) \in \gf(q)[X] \text{ irréductible unitaire de degré au plus } d \}.$$
 
-L'équation $(\dagger)$ donne une relation multiplicative satisfaisante si les polynômes $A(X) + X^{q^{n_1}}B(X)$ et $A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}})$ sont $d$-friables, ou de manière équivalente, si le produit :
+L'équation $(\dagger)$ donne une relation multiplicative nous contentant si les polynômes $A(X) + X^{q^{n_1}}B(X)$ et $A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}})$ sont $d$-friables, ou de manière équivalente, si le produit :
 $$\left( A(X) + X^{q^{n_1}}B(X)\right)\left( A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}})\right)$$
-est $d$-friable.
-
+est $d$-friable. Une fois de plus, nous supposons l'heuristique classique :
 \begin{heur}\label{heur:polydfriable}
 La probabilité que le produit $$\left( A(X) + X^{q^{n_1}}B(X)\right)\left( A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}})\right)$$ soit $d$-friable est identique à celle d'un polynôme aléatoire de même degré.
 \end{heur}
@@ -841,42 +844,43 @@ alors la complexité est $L_{q^{q^n}}(1/3, (32/9)^{1/3})$, ce qui donne en fonct
 
 Chaque relation multiplicative de la forme $(\dagger)$ donne une équation du type :
 $$q^{n_2} \sum_{F(\alpha) \in \mathcal{F}} e_i \log_g(F(\alpha)) = \sum_{F(\alpha) \in \mathcal{F}} e'_i \log_g(F(\alpha)) \pmod{q^k-1}.$$
-Le système admet plusieurs solutions, et à l'exception du vecteur nul, n'importe laquelle de celles-ci permet de recouvrer les logarithmes de la base de friabilité. En effet, si l'élément $g$ lui-même est dans la base $\mathcal{F}$, il est facile de normaliser le vecteur solution pour avoir les logarithmes en base $g$. En revanche, si $g$ n'appartient à $\mathcal{F}$, nous procédons à une phase de logarithme individuel sur $g$ pour déterminer la valeur de la constante de normalisation.
+Le système admet plusieurs solutions, et, à l'exception du vecteur nul, n'importe laquelle de celles-ci permet de recouvrer les logarithmes de la base de friabilité. En effet, si l'élément $g$ lui-même est dans la base $\mathcal{F}$, il est facile de normaliser le vecteur solution pour avoir les logarithmes en base $g$. En revanche, si $g$ n'appartient à $\mathcal{F}$, nous procédons à une phase de logarithme individuel sur $g$ pour déterminer la valeur de la constante de normalisation.
 
-Par ailleurs, comme indiqué par Cécile Pierrot \cite{pierrot2016}, les gros coefficients $q^{n_2}$ ont un impact sur la performance des multiplications, mais dans de bonnes conditions (comme par exemple être en caractéristique 2) et avec un peu de ruse sur les multiplication matrice-vecteur, le procédé d'algèbre linéaire n'est pas sensiblement ralenti.
+Par ailleurs, comme indiqué par Cécile Pierrot \cite{pierrot2016}, les gros coefficients $q^{n_2}$ ont un impact sur la performance des multiplications, mais dans de bonnes conditions (comme par exemple être en caractéristique 2) et avec un peu de ruse sur les multiplication matrice-vecteur, la phase d'algèbre linéaire n'est pas sensiblement ralenti.
 
-Contrairement à l'algorithme de Hellman-Reyneri, la génération d'une relation faisant intervenir le logarithme d'un élément arbitraire du corps et ceux de la base de friabilité n'est pas aussi facile dans la méthode de Coppersmith. Aussi apparaît une nouvelle notion essentielle : il s'agit de la notion de descente. Ce procédé commence par écrire une relation entre notre élément arbitraire $h := H(\alpha)$ vu comme un polynôme en $\alpha$, l'élément primitif du corps cible $g := G(\alpha)$, et un petit nombre d'autres polynômes auxiliaires de petit degré évalués en $\alpha$. Par itérations successives, il devient alors possible d'exprimer le polynôme initial en produit d'éléments de la base de friabilité $\mathcal{F}$.
+Contrairement à l'algorithme de Hellman-Reyneri, la génération d'une relation faisant intervenir le logarithme d'un élément arbitraire du corps et ceux de la base de friabilité n'est pas aussi facile dans la méthode de Coppersmith. Aussi apparaît une nouvelle notion essentielle : il s'agit de la \textit{notion de descente}. Ce procédé commence par écrire une relation entre notre élément arbitraire $h := H(\alpha)$ vu comme un polynôme en $\alpha$, l'élément primitif du corps cible $g := G(\alpha)$, et un petit nombre d'autres polynômes auxiliaires de petit degré évalués en $\alpha$. Par itérations successives, il devient alors possible d'exprimer le polynôme initial en produit d'éléments de la base de friabilité $\mathcal{F}$.
 
-Par conséquent, le calcul d'un logarithme discret est maintenant représenté par un arbre dont les fils d'un n\oe ud, qui correspond à un polynôme, sont les n\oe uds des polynômes de lus bas degré apparaissant dans la relation associée. Toutes les feuilles de l'arbre doivent être dans $\mathcal{F}$.
+Par conséquent, le calcul d'un logarithme discret est maintenant représenté par un arbre dont les fils d'un n\oe ud, qui correspond à un polynôme, sont les n\oe uds des polynômes de plus bas degré apparaissant dans la relation associée. Toutes les feuilles de l'arbre doivent être dans $\mathcal{F}$.
 
 Pour trouver une relation impliquant un polynôme $H(X)$ (où $H(\alpha) = h$ l'élément cible dans $\gf(q^k)$), qui peut être supposé irréductible sans perte de généralité, nous procédons alors de la façon suivante : \begin{itemize}
 \item Choisir $n_1$ et $n_2$ deux entiers adaptés au degré de $H(X)$, et tel que $n = n_1 + n_2$,
-\item Calculer une base $((A_1(X), B_1(X)), (A_2(X), B_2(X)))$ du réseau formé par l'ensemble des couples de polynômes $(A(X),B(X))$ tel que $H(X)$ divise $A(X) + X^{q^{n_1}}B(X)$.
-\item Pour une paire de polynômes de petit degré $(\lambda_1(X), \lambda_2(X))$, poser $A(X) = \lambda_1(X)A_1(X) + \lambda_2(X)A_2(X)$ et $B(X) = \lambda_1(X)B_1(X) + \lambda_2(X)B_2(X)$ et considérer :
+\item Calculer une base $$((A_1(X), B_1(X)), (A_2(X), B_2(X)))$$ du réseau formé par l'ensemble des couples de polynômes $(A(X),B(X))$ tel que $H(X)$ divise $A(X) + X^{q^{n_1}}B(X)$.
+\item Pour une paire de polynômes de petit degré $(\lambda_1(X), \lambda_2(X))$, poser 
+$$A(X) = \lambda_1(X)A_1(X) + \lambda_2(X)A_2(X) \quad\text{et}\quad B(X) = \lambda_1(X)B_1(X) + \lambda_2(X)B_2(X)$$ et considérer :
 $${\left( A(X) + X^{q^{n_1}}B(X)\right)}^{q^{n_2}} = A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}}) \pmod{I_k(X)}.$$
 Par linéarité, $H(X)$ divise le polynôme $A(X) + X^{q^{n_1}}B(X)$.
 \item Parmi ces relations candidates, contenant toutes $H(X)$, garder seulement celles dont le degré de tous les polynômes irréductibles impliqués est plus petit que $\kappa \deg H(X)$, pour une certaine constante $\kappa$ (un choix classique est $\kappa = 3/4$).
 \end{itemize}
 La descente procède ainsi récursivement jusqu'à atteindre uniquement des éléments de la base de friabilité, à savoir des polynômes de degré inférieur ou égal à $d$.
 
-\subsection*{Crible par corps de fonctions}
+\subsection{Crible par corps de fonctions}
 
 Le crible par corps de fonctions est proposé en 1999 par Leonard Adleman et Ming-Deh Huang \cite{adleman1999}. Sans dénaturer l'idée des auteurs, nous présentons l'algorithme en utilisant des anneaux de polynômes et non des corps de fonctions.
 
 Le point de départ de l'algorithme réside une nouvelle fois dans la manière de définir le corps cible. L'idée consiste à construire l'extension à l'aide de deux relations polynômiales bivariées sur $\gf(q)$ : $$Y = f(X) \quad \text{et}\quad X = (Y).$$
-En assemblant ces deux relations, nous obtenons $X = g(f(X))$ Ainsi, si le polynôme $g(f(X)) - X$ possède un facteur irréductible $I_k(X)$ de degré $k$, nous pouvons représenter $\gf(q^k)$ à l'aide de celui-ci.
+En assemblant ces deux relations, nous obtenons $X = g(f(X))$ Ainsi, si le polynôme $g(f(X)) - X$ possède un facteur irréductible $I_k(X)$ de degré $k$, nous pouvons représenter $\gf(q^k)$ à l'aide de celui-ci. Cela constitue notre heuristique :
 \begin{heur}
-Il existe de tels polynômes $f(X)$ et $g(Y)$ dans $\gf(q)[X, Y]$.
+Il existe deux polynômes $f(X)$ et $g(Y)$ dans $\gf(q)[X, Y]$ tels que le polynôme $g(f(X)) - X$ possède un facteur irréductible $I_k(X)$ de degré $k$.
 \end{heur}
-La représentation étant fixée, nous désignons par $\alpha$ l'une des racines dans $\gf(q^k)$ du polynôme $I_k(X)$ et nous posons $\beta = f(\alpha)$. Par construction nous avons $\alpha = g(\beta)$ dans $\gf(q^k)$. À partit de n'importe quelle paire de polynômes $A(X)$ et $B(X)$ univariés, nous pouvons écrire :
+La représentation étant fixée, nous désignons par $\alpha$ l'une des racines dans $\gf(q^k)$ du polynôme $I_k(X)$ et nous posons $\beta = f(\alpha)$. Par construction nous avons $\alpha = g(\beta)$ dans $\gf(q^k)$. À partir de n'importe quelle paire de polynômes $A(X)$ et $B(X)$ univariés, nous pouvons écrire :
 $$A(\alpha) + f(\alpha)B(\alpha) = A(g(\beta)) + \beta B(g(\beta)).$$
 Nous obtenons ainsi une égalité dans $\gf(q^k)$ entre un polynôme en $\alpha$ et un second en $\beta$. De plus, chacun de ces deux polynômes est de degré relativement petit, si les paramètres sont bien choisis. Par conséquent, si chacun d'entre eux se factorise en produits de polynômes irréductibles de degrés au plus $d$, nous pouvons exploiter cette relation multiplicative. Soulignons que nous avons ici doublé la taille de la base de friabilité, puisqu'elle contient maintenant l'évaluation de chaque polynôme irréductible de petit degré en $\alpha$ et en $\beta$.
 
-Les polynômes $A(x)$ et $B(X)$ sont à choisir de sorte que leur degré soit au plus $d$, tandis le degré de $f(X)$ et $g(Y)$ est choisi de sorte que $$\deg(f(X)) \deg(g(Y)) \approx k \quad\text{et}\quad \frac{\deg(f(X))}{\deg(g(Y))} \approx d.$$
+Les polynômes $A(X)$ et $B(X)$ sont à choisir de sorte que leur degré soit au plus $d$, tandis le degré de $f(X)$ et $g(Y)$ est choisi de sorte que $$\deg(f(X)) \deg(g(Y)) \approx k \quad\text{et}\quad \frac{\deg(f(X))}{\deg(g(Y))} \approx d.$$
 L'optimisation non détaillée ici, donne une complexité asymptotique heuristique de :
 $$L_{q^k}(1/3, (32/9)^{1/3}).$$
 
-\subsection*{Algorithme de Joux en $L_{q^k}(1/4)$}
+\subsection{Algorithme de Joux en $L_{q^k}(1/4)$}
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
