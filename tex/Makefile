@@ -9,16 +9,16 @@ RAPPORT=rapport-stage
 all: clean $(LOGBOOK) $(RAPPORT)
 
 $(LOGBOOK): clean
-	pdflatex $(LOGBOOK).tex > /dev/null
-	bibtex $(LOGBOOK).aux > /dev/null
-	pdflatex $(LOGBOOK).tex > /dev/null
-	pdflatex $(LOGBOOK).tex > /dev/null
+	pdflatex $(LOGBOOK).tex
+	bibtex $(LOGBOOK).aux
+	pdflatex $(LOGBOOK).tex
+	pdflatex $(LOGBOOK).tex
 
 $(RAPPORT): clean
-	pdflatex $(RAPPORT).tex > /dev/null
-	bibtex $(RAPPORT).aux > /dev/null
-	pdflatex $(RAPPORT).tex > /dev/null
-	pdflatex $(RAPPORT).tex > /dev/null
+	pdflatex $(RAPPORT).tex
+	bibtex $(RAPPORT).aux
+	pdflatex $(RAPPORT).tex
+	pdflatex $(RAPPORT).tex
 
 open: $(LOGBOOK) $(RAPPORT)
 	@evince $(LOGBOOK).pdf&

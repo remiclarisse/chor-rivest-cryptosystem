@@ -15,19 +15,19 @@ Generate keys with `CRGenerateKeys`:
 
     sage: %time [PubKey, PrivKey] = CRGenerateKeys (p, h)
 
-Pick a message:
+Pick a message with `generateRandomMessage`:
 
     sage: m = generateRandomMessage (p, h)
 
-Cipher it:
+Cipher it with `CREncrypt`:
 
     sage: e = CREncrypt (m, PubKey)
 
-Now `e` is the ciphertext ! To uncipher it :
+Now `e` is the ciphertext ! To uncipher it with `CRDecrypt`:
 
     sage: CRDecrypt (e, PubKey, PrivKey) == m
 
-Use Vaudenay's attack to make an equivalent key and try to uncipher `e` with it:
+Use Vaudenay's attack, with `VaudenayAttack`, to make an equivalent key and try to uncipher `e` with it:
 
     sage: %time EquivPrivKey = VaudenayAttack (PubKey)
     sage: crackedMessage = CRDecrypt (e, PubKey, EquivPrivKey)
@@ -35,3 +35,10 @@ Use Vaudenay's attack to make an equivalent key and try to uncipher `e` with it:
 ## What can be improved
 Besides everything (python meh!), many computing can be done in parallel, and the computing of
 logarithms have already been parallelized !
+
+---
+### Bibliography
+
+Benny Chor and Ronald L. Rivest, **A Knapsack-Type Public Key Cryptosystem Based on Arithmetic in Finite Fields**, in *IEEE Transactions on Information Theory*, 1988
+
+Serge Vaudenay, **Cryptanalysis of the Chor-Rivest Cryptosystem**, in *Journal of Cryptology*, 2000
