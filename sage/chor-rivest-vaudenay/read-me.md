@@ -1,23 +1,37 @@
 # Chor-Rivest Cryptosystem and Vaudenay's Attack
 
 ## How it works
-Launch `sage` in your favorite shell and attach or load the files `chor-rivest.sage` and `attack-chor-rivest.sage`, like so :
+Launch `sage` in your favorite shell and attach or load the files `chor-rivest.sage` and `attack-chor-rivest.sage`, like so:
 
     sage: load("chor-rivest.sage")
     sage: load("attack-chor-rivest.sage")
-    
- Définir les paramètres du cryptosystème : p un nombre premier et h un entier friable, e.g.
+
+Define parameters for the cryptosystem: p a prime number and h a smooth integer, e.g.
+
     sage: p = 197
     sage: h = 24
-Générer une paire de clé grâce à 'CRGenerateKeys' :
+
+Generate keys with `CRGenerateKeys`:
+
     sage: %time [PubKey, PrivKey] = CRGenerateKeys (p, h)
-Générer le message à chiffer, puis le coder, et le transformer :
+
+Pick a message:
+
     sage: m = generateRandomMessage (p, h)
-Chiffrer le message :
+
+Cipher it:
+
     sage: e = CREncrypt (m, PubKey)
-Maintenant e est le chiffré du message codé ! Pour le déchiffrer :
+
+Now `e` is the ciphertext ! To uncipher it :
+
     sage: CRDecrypt (e, PubKey, PrivKey) == m
-Pour l'attaque de Vaudenay :
+
+Use Vaudenay's attack to make an equivalent key and try to uncipher `e` with it:
+
     sage: %time EquivPrivKey = VaudenayAttack (PubKey)
     sage: crackedMessage = CRDecrypt (e, PubKey, EquivPrivKey)
-Le calcul des logarithmes est (grossièrement) parallelisé ...
+
+## What can be improved
+Besides everything (python meh!), many computing can be done in parallel, and the computing of
+logarithms have already been parallelized !
