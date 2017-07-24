@@ -17,6 +17,7 @@ The file `primes` contains a list of entries for `rho-pollard`. It is formed of
 2. remove the condition testing the gcd: it is useless (see Pollard paper from '78).
 3. improve (?) the search for the right d-th root of unity, or have (?) a smaller d.
 
+---
 ### Bibliography
 
 John Michael Pollard, **Monte Carlo Methods for Index Computation mod p**, in *Mathematics of Computation*, 1978
