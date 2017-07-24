@@ -1,7 +1,7 @@
 # reset()
 # attach("~/chor-rivest-cryptosystem/sage/DLP/hellman-reyneri.sage")
 # q = 2 ** 3
-# k = 7
+# k = 5
 # nb_tests = 10 ** 3
 # F.<a> = FiniteField (q)
 # R.<x> = PolynomialRing (F)
@@ -19,25 +19,29 @@ def hellman_reyneri (g, h) :
     F = R.base_ring()
     q = F.cardinality()
     k = log (K.cardinality(), q)
-    b = min (k,10)
+    b = min (k, 10)
+    card = q ** k - 1
     # changement de représentation
-    print "Changement de représentation"
-    Ik = find_good_irreducible_poly_S (q, k, b, F, R)
-    newK = R.quotient_ring(Ik, 'v')
-    M = make_change_basis_matrix (q, k, F, R, K.gen(), Ik) # matrice de v à u (exprime v dans la base 1, u, u^2, ..., u^{k-1})
-    M = M.inverse()
-    G = newK(list(M * vector(list(g))))
-    H = [ newK(list(M * vector(list(elem)))) for elem in h ]
+    ## print "Changement de représentation"
+    ## Ik = find_good_irreducible_poly_S (q, k, b, F, R)
+    ## newK = R.quotient_ring(Ik, 'v')
+    ## M = make_change_basis_matrix (q, k, F, R, K.gen(), Ik) # matrice de v à u (exprime v dans la base 1, u, u^2, ..., u^{k-1})
+    ## M = M.inverse()
+    M = Matrix.identity(k)
+    G = K(list(M * vector(list(g))))
+    H = [ K(list(M * vector(list(elem)))) for elem in h ]
     # collecte de relations
     print "Collecte de relations"
     d = int(ceil (sqrt (0.5 * k * log (k, q))))
-    rs, rel_liste = make_pool_relations (G, d, q ** (d + 1), q ** k - 1)
-    basis, logs_basis = make_smoothness_basis (rel_liste, rs, q ** k - 1)
+    rs, rel_liste = make_pool_relations (G, d, q ** (d + 1), card)
+    basis, logs_basis = make_smoothness_basis (rel_liste, rs, card)
     # descente individuelle
     print "Descente individuelle"
-    logs = [ mod(descent_log (elem_h, G, basis, logs_basis, q ** k - 1), q ** k - 1) for elem_h in H ]
+    logs = descent_log ([ (elem_h, G, basis, logs_basis, card) for elem_h in H ])
+    logs = [ mod(l, card) for l in logs ]
     return logs
 
+@parallel
 def descent_log (elem_target, gen, basis, logs_basis, card) :
     P = elem_target.lift()
     r = 0
