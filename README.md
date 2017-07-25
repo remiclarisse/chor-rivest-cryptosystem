@@ -16,6 +16,6 @@ If everything went smoothly (maybe the `.tex` file can give you a hard time), mo
 
 The pdf file `rapport-stage.pdf` is a french manuscript of what I have done during this intership.
 
-The folders have self-explanatory names and all contain a markdown `README.md`, so help yourself ;)
+The folders have self-explanatory name and each contains a markdown `README.md` file, so help yourself ;)
 
 > Thank you for checking out. Rémi (:
