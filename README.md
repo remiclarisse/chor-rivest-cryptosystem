@@ -2,7 +2,7 @@
 
 This work is/was done at the INRIA Saclay-Île de France by Rémi Clarisse (me writting) during an intership and supervised by Daniel Augot and Luca De Feo.
 
-## The Discreet Logarithm Problem
+## The Discrete Logarithm Problem
 
 Because Chor-Rivest cryptosystem uses discreet logarithms in finite fields, we have encountered severeal algorithms solving the discreet logarithm problem.
 

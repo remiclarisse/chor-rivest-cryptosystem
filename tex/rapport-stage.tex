@@ -732,7 +732,7 @@ Les préconisations pour réparer le cryptosystème de Chor-Rivest sont : \begin
 
 \section{Le calcul de logarithmes discrets selon Antoine Joux}\label{sec:DLPJoux} 
 
-Dans son article \cite{joux2013} de 2013, Antoine Joux conçoit un algorithme permettant un calcul rapide de logarithme discret dans un corps fini de petite caractéristique. À l'aide de la thèse \cite{pierrot2016} de Cécile Pierrot, soutenue en 2016, nous faisons un historique des différents algorithmes dont s'est inspiré Antoine Joux, et cela nous aidera aussi à comprendre ce qu'est la \textit{méthode de calcul d'indice}.
+Dans son article \cite{joux2013} de 2013, Antoine Joux conçoit un algorithme permettant un calcul rapide de logarithme discret dans un corps fini de petite caractéristique. À l'aide de la thèse \cite{pierrot2016} de Cécile Pierrot, soutenue en 2016, nous faisons un historique des différents algorithmes dont s'est inspiré Antoine Joux, et nous donnons un algorithme aidant à comprendre ce qu'est la \textit{méthode de calcul d'indice}.
 
 Nous allons donc passer en revu les algorithmes de Hellman-Reyneri et de Coppersmith, ainsi que le crible de corps de fonctions, avant de décortiquer l'article \cite{joux2013} d'Antoine Joux. Mais d’abord, donnons quelques notions liminaires et le squelette de la méthode de calcul d’indice.
 
@@ -744,7 +744,7 @@ On adopte la notation suivante pour donner la \textit{complexité d'un algorithm
 $$L_{q^k}(\alpha, c) := \exp\left({(c+\o(1))(\log Q)^\alpha(\log\log Q)^{1 - \alpha}}\right),$$
 où $0 \leqslant \alpha\leqslant 1$ et $c > 0$. Lorsque $\alpha = 0$, l'algorithme est dit \textit{polynomial}, si $0 < \alpha < 1$ alors l'algorithme est dit \textit{sous-exponentiel}, et enfin quand $\alpha = 1$, l'algorithme est dit \textit{exponentiel}. Notons aussi que la constante $c$ est souvent omise, la notation devenant simplement $L_{q^k}(\alpha)$. 
 
-La notion de \textit{petite, moyenne et grande caractéristique} est défini grâce à la notation précédente. À savoir, on commence par écrire $p = L_{p^n}(\ell,c)$ avec $0\leqslant\ell\leqslant 1$ et $c$ une constante proche de $1$. Si $\ell < 1/3$, on parle de petite caractéristique, si $1/3 < \ell < 2/3$, de moyenne caractéristique, et de grande si $\ell > 2/3$.
+La notion de \textit{petite, moyenne et grande caractéristique} est défini grâce à la notation précédente. À savoir, on commence par écrire $p = L_{p^n}(\ell,c)$ avec $0\leqslant\ell\leqslant 1$ et $c$ une constante proche de $1$. Si $\ell < 1/3$, on parle de petite caractéristique, si $1/3 < \ell < 2/3$, de moyenne caractéristique, et de grande caractéristique si $\ell > 2/3$.
 
 \begin{defi}
 Un polynôme $P(X) \in \gf(q)[X]$ est dit \textit{$d$-friable} s'il se factorise en produit de polynômes de $\gf(q)[X]$ de degré au plus $d$.
@@ -760,7 +760,7 @@ $$\gf(q^k) \cong \frac{\gf(q)[X]}{(J_k(X))}.$$
 \subsubsection{Description de la méthode du calcul d'indice}
 La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une \textit{autre représentation du corps $\gf(q^k)$}. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, notons le $I_k(X) \in \gf(q)[X]$. Le changement de représentation se fait de la façon suivante : soit $\alpha$ une racine du polynôme $I_k(X)$ et considérons $J_k(X)$ comme un polynôme à coefficients dans $\gf(q^k) \cong \gf(q)[\alpha]$. Ainsi $J_k(X) \in \gf(q)[\alpha]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\alpha$. Choisissons l'une d'entre elles au hasard et notons la $\beta$. Il est possible d'écrire $\beta = f(\alpha)$, où $f(X) \in \gf(q)[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\beta$, disons $G(\beta)$ et $H(\beta)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\alpha))$ en base $G(f(\alpha))$.
 
-Ensuite, il faut déterminer un ensemble de $\gf(q^k)^\times$, que l'on nomme \textit{base de friabilité}, dont les éléments sont considérés comme petit -- dans un sens restant encore à définir. Souvent, on fixe $d$ un entier assez petit, et les éléments de la base de friabilité sont ceux de la forme $F(\alpha)$ et $F(X)\in\gf(q)[X]$ est un polynôme de degré au plus $d$.
+Ensuite, il faut déterminer un ensemble de $\gf(q^k)^\times$, que l'on nomme \textit{base de friabilité}, dont les éléments sont considérés comme petit -- dans un sens restant encore à définir. Souvent, on fixe $d$ un entier assez petit, et les éléments de la base de friabilité sont ceux de la forme $F(\alpha)$, où $F(X)\in\gf(q)[X]$ est un polynôme de degré au plus $d$.
 
 Vient après la \textit{phase de collecte de relations} ou \textit{phase de crible}, à savoir, si la base de friabilité utilisée est $\{g_i : i \in I\}$, nous nous intéressons à des relations de la forme :
 $$\prod_{i\in I} {g_i}^{u_i} = \prod_{i\in I} {g_i}^{v_i},$$
@@ -819,7 +819,7 @@ L'algorithme de Don Coppersmith \cite{coppersmith1984} est plus efficace que l'a
 
 Coppersmith propose de choisir un polynôme irréductible $I_k(X)$ de la forme : $$X^k - S(X),$$ où $S(X)$ est un polynôme de degré $d_S$ aussi petit que possible. 
 
-Cependant, Cécile Pierrot \cite{pierrot2016} indique divers résultats suggérant de choisir $I_k(X)$ comme facteur irréductible de $X^{q^n}-S(X)$. Détaillons : soit $n$ l'unique entier tel que $q^{n-1} < k \leqslant q^n$ et choisissons $S(X)$ de petit degré tel que $X^{q^n}-S(X)$ ait un unique facteur irréductible de degré $k$. Nous prenons alors ce facteur pour définir notre corps $\gf(q^k)$.
+Cependant, Cécile Pierrot \cite{pierrot2016} indique divers résultats \cite{joux2006, joux2013} suggérant de choisir $I_k(X)$ comme facteur irréductible de $X^{q^n}-S(X)$. Détaillons : soit $n$ l'unique entier tel que $q^{n-1} < k \leqslant q^n$ et choisissons $S(X)$ de petit degré tel que $X^{q^n}-S(X)$ ait un unique facteur irréductible de degré $k$. Nous prenons alors ce facteur pour définir notre corps $\gf(q^k)$.
 
 Décomposons $n = n_1 + n_2$ pour des valeurs $n_1$ et $n_2$ que l'on déterminera plus tard. L'idée pour la construction des relations est que pour chaque paire de polynôme $A(X)$ et $B(X)$ de $\gf(q)[X]$, on a l'égalité :
 $$(\dagger) \qquad {\left( A(X) + X^{q^{n_1}}B(X)\right)}^{q^{n_2}} = A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}}) \pmod{I_k(X)},$$
@@ -865,7 +865,7 @@ La descente procède ainsi récursivement jusqu'à atteindre uniquement des él�
 
 \subsection{Crible par corps de fonctions}
 
-Le crible par corps de fonctions est proposé en 1999 par Leonard Adleman et Ming-Deh Huang \cite{adleman1999}. Sans dénaturer l'idée des auteurs, nous présentons l'algorithme en utilisant des anneaux de polynômes et non des corps de fonctions.
+Le crible par corps de fonctions est proposé en 1999 par Leonard Adleman et Ming-Deh Huang \cite{adleman1999}. Sans dénaturer l'idée des auteurs, nous présentons l'algorithme en utilisant des anneaux de polynômes et non des corps de fonctions, comme dans \cite{joux2013, joux2006, pierrot2016}.
 
 Le point de départ de l'algorithme réside une nouvelle fois dans la manière de définir le corps cible. L'idée consiste à construire l'extension à l'aide de deux relations polynômiales bivariées sur $\gf(q)$ : $$Y = f(X) \quad \text{et}\quad X = (Y).$$
 En assemblant ces deux relations, nous obtenons $X = g(f(X))$ Ainsi, si le polynôme $g(f(X)) - X$ possède un facteur irréductible $I_k(X)$ de degré $k$, nous pouvons représenter $\gf(q^k)$ à l'aide de celui-ci. Cela constitue notre heuristique :

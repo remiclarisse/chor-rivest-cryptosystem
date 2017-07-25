@@ -1,6 +1,7 @@
 # Chor-Rivest Cryptosystem and Vaudenay's Attack
 
 ## How it works
+
 Launch `sage` in your favorite shell and attach or load the files `chor-rivest.sage` and `attack-chor-rivest.sage`, like so:
 
     sage: load("chor-rivest.sage")
@@ -27,7 +28,10 @@ Now `e` is the ciphertext ! To uncipher it with `CRDecrypt`:
 
     sage: CRDecrypt (e, PubKey, PrivKey) == m
 
-Use Vaudenay's attack, with `VaudenayAttack`, to make an equivalent key and try to uncipher `e` with it:
+
+### Attack
+
+Use Vaudenay's attack, with `VaudenayAttack`, to make an equivalent key then try to uncipher `e` with it:
 
     sage: %time EquivPrivKey = VaudenayAttack (PubKey)
     sage: crackedMessage = CRDecrypt (e, PubKey, EquivPrivKey)

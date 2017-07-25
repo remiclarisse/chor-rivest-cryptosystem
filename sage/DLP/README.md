@@ -1,10 +1,12 @@
 # Some Algorithms to Solve DLP
 
-## Pohlig-Hellman
+Because Chor-Rivest cryptosystem uses discrete logarithms in finite fields, we have encountered several algorithms solving the discrete logarithm problem (a.k.a. DLP).
 
-The file `pohlig-hellman.sage` contains an implementation of *Pohlig-Hellman Algorithm* : Given a field Z/pZ and **knowing the factorisation of p-1** (strong assumption), solve the DLP for each maximal sub-r-group of (Z/pZ)\*, where r is a divisor of p-1, and reconstruct the original logarithm.
+## Pohlig-Hellman's Algorithm
 
-Here, it uses an exhaustive seach in the cyclic sub-r-groups.
+The file `pohlig-hellman.sage` contains an implementation of *Pohlig-Hellman's Algorithm* : Given a field Z/pZ and **knowing the factorisation of p-1** (strong assumption), solve the DLP for each maximal sub-r-group of (Z/pZ)\*, where r is a divisor of p-1, and reconstruct the original logarithm.
+
+Here, the implementation uses an exhaustive seach in the cyclic sub-r-groups (which can be improved with baby-step giant-step algorithm).
 
 ### Example
 
@@ -17,11 +19,11 @@ In `sage`, after attaching or loading the file `pohlig-hellman.sage`, try :
     sage: log (h,g) # is equal to 2074276358
     sage: %time pohlig_hellman (g, h, Fa) # must equal the value above
 
-## Hellman-Reyneri
+## Hellman-Reyneri's Algorithm
 
-The file `hellman-reyneri.sage` contains an implementation of *Hellman-Reyneri Algorithm* : Given a finite field GF(q^k), a generator `g` and a list of elements `h`, solve the DLP for each element in `h`.
+The file `hellman-reyneri.sage` contains an implementation of *Hellman-Reyneri's Algorithm* : Given a finite field GF(q^k), a generator `g` and a list of elements `h`, solve the DLP for each element in `h`.
 
-In `sage`, the construction of the finite field GF(q^k) is tricky because `GF(q^k)` is viewed as GF(p)[X]/(P) where P is an irreducible polynomial of degree n (if q = p^m then n = m*k). I believe that this construction makes the computation remarquably slow, but it works.
+In `sage`, the construction of the finite field GF(q^k) is tricky because `GF(q^k)` is viewed as GF(p)[X]/(P) where P is an irreducible polynomial of degree n (if q = p^m then n = m*k). I believe that this construction makes the computations remarquably slow, but it works.
 
 ### Example
 
@@ -42,7 +44,13 @@ In `sage`, after attaching or loading the file `hellman-reyneri.sage`, try :
 
 ### Remark
 
-After the sieving phase, the system might not have a solution, depending on how many relevant equations where collected ! That is something to improve !!
+After the sieving phase, the system might not have a solution, depending on how many relevant equations where collected ! That is something to improve !! Besides, the change of representation is surely too greedy and not be to demand an irreducible polynomial of the form X^k - S(X) (see Coppersmith's Algorithm).
+
+## Joux's Algorithm
+
+> Have a look at *Coppersmith's Algorithm* and the *Function Field Sieve* (FFS)
+
+ ***In the near future***
 
 ---
 ## Bibliography
@@ -50,3 +58,11 @@ After the sieving phase, the system might not have a solution, depending on how 
 Stephen C. Pohlig and Martin E. Hellman, **An Improved Algorithm for Computing Logarithms over GF(p) and Its Cryptographic Signifiance**, in *IEEE Transactions on Information Theory*, 1978
 
 Martin E. Hellman and Justin M. Reyneri, **Fast Computation of Discrete Logarithms in GF(q)**, in *Advances in Cryptology: Proceedings of CRYPTO '82*, 1982
+
+Don Coppersmith, **Fast Evaluation of Logarithms in Fields of Characteristic Two**, in *IEEE transactions on information theory*, 1984
+
+Leonard M. Adleman and Ming-Deh A. Huang, **Function Field Sieve Method for Discrete Logarithms over Finite Fields**, in *Information and Computation*, 1999
+
+Antoine Joux and Reynald Lercier, **The Function Field Sieve in the Medium Prime Case**, in *Advances in Cryptology: EUROCRYPT 2006*, 2006
+
+Antoine Joux, **A new index calculus algorithm with complexity L(1/4+o(1)) in small characteristic**, 2013
