@@ -48,9 +48,9 @@ After the sieving phase, the system might not have a solution, depending on how 
 
 ## Joux's Algorithm
 
-> Have a look at *Coppersmith's Algorithm* and the *Function Field Sieve* (FFS)
+> Have a look at *Coppersmith's Algorithm* and the *Function Field Sieve* (FFS).
 
- ***In the near future***
+>> Will come in the near future.
 
 ---
 ## Bibliography
