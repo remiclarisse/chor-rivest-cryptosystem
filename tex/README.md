@@ -2,6 +2,6 @@
 
 Here there is the raw material to make the `rapport-stage.pdf`.
 
-`rough-book.pdf` is a logbook of what I have learned along my way here. It can be thought of as a *clean* rough book (hence the name!).
+`brouillon.pdf` is a logbook of what I have learned along my way here. It can be thought of as a *clean* rough book (hence the name!).
 
 > Everything is in french.

@@ -1,5 +1,5 @@
 # Variables
-LOGBOOK=rough-book
+LOGBOOK=brouillon
 RAPPORT=rapport-stage
 
 # Special rules and targets
