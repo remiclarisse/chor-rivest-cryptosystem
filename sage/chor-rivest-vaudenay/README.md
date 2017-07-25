@@ -1,11 +1,11 @@
 # Chor-Rivest Cryptosystem and Vaudenay's Attack
 
-## How it works
+## How does it work?
 
-Launch `sage` in your favorite shell and attach or load the files `chor-rivest.sage` and `attack-chor-rivest.sage`, like so:
+Launch `sage` in your favorite shell and attach or load the files `chor-rivest-prime-number.sage` and `vaudenay-attack.sage`, like so:
 
-    sage: load("chor-rivest.sage")
-    sage: load("attack-chor-rivest.sage")
+    sage: load("chor-rivest-prime-number.sage")
+    sage: load("vaudenay-attack.sage")
 
 Define parameters for the cryptosystem: `p` a prime number and `h` a smooth integer, e.g.
 
@@ -29,7 +29,7 @@ Now `e` is the ciphertext ! To uncipher it with `CRDecrypt`:
     sage: CRDecrypt (e, PubKey, PrivKey) == m
 
 
-### Attack
+### Vaudenay's attack
 
 Use Vaudenay's attack, with `VaudenayAttack`, to make an equivalent key then try to uncipher `e` with it:
 

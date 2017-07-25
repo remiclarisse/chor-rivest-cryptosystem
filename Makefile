@@ -3,6 +3,8 @@ EXE=rho-pollard
 FILE=rapport-stage
 DLP=computing-dlp
 IMPLEMCHORRIVEST=implementation-chor-rivest
+VAUDENAY=with-attack-vaudenay
+JOUX=with-joux-algorithm
 
 # Special rules and targets
 .PHONY: all clean help info open
@@ -13,10 +15,10 @@ all: clean
 	@cd tex && $(MAKE) $(FILE)
 	@cp -f tex/$(FILE).pdf ./$(FILE)/
 	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)
-	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/vaudenay
-	@cp -f sage/chor-rivest-vaudenay/* ./$(FILE)/$(IMPLEMCHORRIVEST)/vaudenay
-	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/joux
-	@cp -f sage/chor-rivest-joux/* ./$(FILE)/$(IMPLEMCHORRIVEST)/joux
+	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/$(VAUDENAY)
+	@cp -f sage/chor-rivest-vaudenay/* ./$(FILE)/$(IMPLEMCHORRIVEST)/$(VAUDENAY)
+	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/$(JOUX)
+	@cp -f sage/chor-rivest-joux/* ./$(FILE)/$(IMPLEMCHORRIVEST)/$(JOUX)
 	@mkdir $(FILE)/$(DLP)
 	@cp -f sage/DLP/hellman-reyneri.sage ./$(FILE)/$(DLP)/
 	@cp -f sage/DLP/pohlig-hellman.sage ./$(FILE)/$(DLP)/

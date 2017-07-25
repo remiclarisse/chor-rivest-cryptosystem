@@ -1,10 +1,10 @@
-# Chor-Rivest Cryptosystem with Joux Enhancement
+# Chor-Rivest Cryptosystem with Joux's Solving DLP Algorithm
 
-## How it works
+## How does it work?
 
-Launch `sage` in your favorite shell and attach or load the file `chor-rivest.sage`, like so:
+Launch `sage` in your favorite shell and attach or load the file `chor-rivest-prime-power.sage`, like so:
 
-    sage: load("chor-rivest.sage")
+    sage: load("chor-rivest-prime-power.sage")
 
 Define parameters for the cryptosystem: `q` a prime-power of 2 (3 may also work) and `k` a prime number, e.g.
 
