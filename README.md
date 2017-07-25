@@ -1,6 +1,6 @@
 # A study of the Chor-Rivest Cryptosystem
 
-This work is/was done at the INRIA Saclay-Île de France by Rémi Clarisse (me writting) during an intership and supervised by Daniel Augot and Luca De Feo.
+This work is/was done at the INRIA Saclay-Île de France by Rémi Clarisse (me writting) during an intership and supervised by [Daniel Augot](http://pages.saclay.inria.fr/daniel.augot/index-eng.html) and [Luca De Feo](http://defeo.lu/).
 
 ## sage & pdflatex
 

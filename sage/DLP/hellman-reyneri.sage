@@ -22,14 +22,10 @@ def hellman_reyneri (g, h) :
     basis, logs_basis = make_smoothness_basis (rel_liste, rs, card)
     # descente individuelle
     print "Descente individuelle"
-    logs = list(descent_log ([ (i, H[i], G, basis, logs_basis, card) for i in range (len (H)) ]))
-    logs = [ logs[i][1] for i in range (len (H)) ]
-    logs.sort()
-    logs = [ mod(logs[i][1], card) for i in range (len (H)) ]
+    logs = [ mod (descent_log (elem_h, G, basis, logs_basis, card), card) for elem_h in H ]
     return logs
 
-@parallel
-def descent_log (i, elem_target, gen, basis, logs_basis, card) :
+def descent_log (elem_target, gen, basis, logs_basis, card) :
     P = elem_target.lift()
     r = 0
     while not is_in_basis (P, basis) :
@@ -40,7 +36,7 @@ def descent_log (i, elem_target, gen, basis, logs_basis, card) :
         lo += logs_basis[basis.index(P.lc())]
     for poly, mult in list(P.factor()) :
         lo += mult * logs_basis[basis.index(poly)]
-    return i, lo - r
+    return lo - r
 
 def is_in_basis (x, basis) :
     for poly, mult in list(x.factor()) :
