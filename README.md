@@ -2,6 +2,16 @@
 
 This work is/was done at the INRIA Saclay-Île de France by Rémi Clarisse (me writting) during an intership and supervised by Daniel Augot and Luca De Feo.
 
+## sage & pdflatex
+
+Here is the `sage` version used:
+
+    SageMath version 7.5.1, Release Date: 2017-01-15
+
+and the `pdflatex` version used:
+
+    This is pdfTeX, Version 3.14159265-2.6-1.40.16
+
 ## How does it work ?
 
 First clone the git via :

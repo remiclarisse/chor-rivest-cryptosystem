@@ -41,7 +41,7 @@ clean:
 	@cd c && $(MAKE) clean
 	@cd tex && $(MAKE) clean
 	@echo "./ : Cleaning..."
-	@rm -f *~ $(EXE) $(FILE).pdf
+	@rm -f *~ $(EXE) *.pdf *.log
 	@rm -rf ./$(FILE)
 
 open: pdf
