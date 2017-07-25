@@ -364,7 +364,7 @@ Soient $i$ et $j$ deux entiers distincts et $\sigma$ une permutation d'une clé 
 Posons :
 $$\quad u = \frac{\alpha_i - \alpha_j}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf{p}^\times \quad \text{ et } \quad v =  \frac{\alpha_j\alpha_{\sigma(0)} - \alpha_i\alpha_{\sigma(1)}}{\alpha_{\sigma(0)}- \alpha_{\sigma(1)}} \in \gf{p}.$$
 Il faut alors définir la permutation $\pi$ par
-$$\forall i : 0\leqslant i \leqslant p-1, \qquad \alpha_{\pi(i)} = u\alpha_{\sigma(i)} + v.$$
+$$\alpha_{\pi(i)} = u\alpha_{\sigma(i)} + v,\qquad \forall i : 0\leqslant i \leqslant p-1.$$
 \end{proof}
 
 \paragraph*{Notation :} Le discours qui suit porte sur la recherche de clés privées équivalentes. Souvent, elles sont exprimées en fonction de la clé privée possédée par le destinataire légitime. On note en lettre grasse la clé privée d'origine $(\mbf{g}, \mbf{t}, \sigma, \mbf{d})$ et en police ordinaire une clé privée équivalente $(g, t, \pi, d)$ -- la permutation d'une clé équivalente est notée $\pi$.
@@ -404,16 +404,19 @@ car $\mbf t^{p^{r(h/r)}} = \mbf t^{p^h} = \mbf t = \mbf t^{p^0}$. Cela montre au
 Cela achève la démonstration de la proposition.
 \end{proof}
 
-Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(\mbf g_{p^r}, Q)$, et $\mbf g_{p^r}$ est donc essentiellement unique. Soulignons la particularité de ce polynôme $Q$, il est à coefficients dans $\gf{p^r}$, il est de degré $h/r$ et nous connaissons ses images sur tout $\gf{p}$ : il peut donc être interpolé sur un petit sous-ensemble de $\gf{p}$.
+Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions $(\mbf g_{p^r}, Q(X))$, et $\mbf g_{p^r}$ est donc essentiellement unique. Soulignons la particularité de ce polynôme $Q(X)$, il est à coefficients dans $\gf{p^r}$, il est de degré $h/r$ et nous connaissons ses images sur tout $\gf{p}$ : il peut donc être interpolé sur un petit sous-ensemble de $\gf{p}$.
 
 \paragraph*{Notation :} Pour $r$ divisant $h$ et $\omega$ élément de $\gf{p^h}$, notons $$\omega_{p^r} := \omega^{(p^h-1)/(p^r-1)} = \omega^{1+p^r+p^{2r}+p^{3r}+\cdots+p^{h-r}},$$
 la norme de $\omega$ considéré dans l'extension de corps $\extension{\gf{p^h}}{\gf{p^r}}$.
 
 \subsection{Attaque sachant $\mbf g_{p^r}$ et $\sigma$}
 
-Supposons connus la norme $\mbf g_{p^r}$ et la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(x)$ de la proposition~\ref{prop:vaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (\mbf g_{p^r})^{c_i})}$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-\mbf t$.  Par équivalence de clés privées, nous pouvons sélectionner n'importe quelle racine de $Q(x)$. Cet algorithme est l'objet de la figure Algorithme~\ref{algo:premiereAttaqueVaudenay}.
+Supposons connus la norme $\mbf g_{p^r}$ et la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(X)$ de la proposition~\ref{prop:vaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (\mbf g_{p^r})^{c_i})}$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-\mbf t$.  Par équivalence de clés privées, nous pouvons sélectionner n'importe quelle racine de $Q(X)$. Cet algorithme est l'objet de la figure Algorithme~\ref{algo:premiereAttaqueVaudenay}.
 
 Nous résolvons l'attaque en calculant $g$ et $d$ -- d'une clé équivalente donc -- grâce à l'attaque de Oded Goldreich exposée dans \cite[VII.A.3]{chorRivest1988}, une version simplifiée sera utilisée plus loin, c'est pour cela qu'elle est volontairement omise ici.
+
+\paragraph*{Notation :} Pour $j$ tel que $0\leqslant j \leqslant h/r$, on note $\mathcal L_j(X)$ l'interpolateur de Lagrange :
+$$\mathcal L_j(X) := \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{X-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}.$$
 
 \begin{algorithm}[h]
 \caption{Algorithme implémentant l'attaque sachant $\mbf g_{p^r}$ et $\sigma$}
@@ -421,41 +424,30 @@ Nous résolvons l'attaque en calculant $g$ et $d$ -- d'une clé équivalente don
 \begin{algorithmic}[1]
 \REQUIRE $\gf{p^h}$, $(c_0,\dots, c_{p-1})$, $\sigma$, $r$ divisant $h$ et $\mbf g_{p^r}$
 \ENSURE $\mbf t, \mbf t^{p^r}, \mbf t^{p^{2r}}, \dots, \mbf t^{p^{h - r}}$
-\STATE{$Q(x) \in \gf{p^r}[X]$ :  initialisé $Q(x) \gets 0$}
-\FOR{$i$ allant de $0$ à $h/r$}
-	\STATE{calculer le polynôme interpolateur de Lagrange : $$L(x) \gets \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq i}}\frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}$$}
-	\STATE{$Q(x) \gets Q(x) + (\mbf g_{p^r})^{c_i} L(x)$}
+\STATE{$Q(X) \in \gf{p^r}[X]$ : initialiser à $Q(X) \gets 0$}
+\FOR{$j$ allant de $0$ à $h/r$}
+	\STATE{$Q(X) \gets Q(X) + (\mbf g_{p^r})^{c_j} \mathcal L_j(x)$}
 \ENDFOR
-\RETURN{$[-y \in \gf{p^h}$ pour $y$ racine du polynôme $Q(x) ]$}
+\RETURN{$[-y \in \gf{p^h}$ pour $y$ racine du polynôme $Q(X) ]$}
 \end{algorithmic}
 \end{algorithm}
 
 \subsection{Simplification : choix des points d'interpolation}
 
-Dans son papier, Serge Vaudenay interpole le polynôme $Q(x)$ de la proposition~\ref{prop:vaudenay} sur un ensemble quelconque de $h/r+1$ éléments de $\gf{p}$. À savoir, il choisit des indices $i_0, i_1, \dots, i_{h/r}$ pris entre $0$ et $p-1$, deux à deux distincts ; et interpole le polynôme en les éléments $\alpha_{i_j}$ pour $j$ tel que $0 \leqslant j \leqslant h/r$.
+Dans son papier, Serge Vaudenay interpole le polynôme $Q(X)$ de la proposition~\ref{prop:vaudenay} sur un ensemble quelconque de $h/r+1$ éléments de $\gf{p}$. À savoir, il choisit des indices $i_0, i_1, \dots, i_{h/r}$ pris entre $0$ et $p-1$, deux à deux distincts ; et interpole le polynôme en les éléments $\alpha_{i_j}$ pour $j$ tel que $0 \leqslant j \leqslant h/r$.
 
 Pour simplifier le propos, et surtout pour rendre plus lisible l'écriture, nous faisons le choix ici de prendre $i_j = j$, pour tout $0 \leqslant j \leqslant h/r$, c'est ce qui a été fait dans l'algorithme~\ref{algo:premiereAttaqueVaudenay}.
 
-\subsection{Attaque sachant $\mbf g_{p^r}$}
+\subsection{Attaque directe sachant $\mbf g_{p^r}$}
 
-Supposons connu l'élément $\mbf g_{p^r}$. Par la proposition~\ref{prop:vaudenay}, nous pouvons interpoler le polynôme $Q(x)$ en les $\alpha_{\sigma(j)}$, pour $0 \leqslant j \leqslant h/r$ :
-\begin{align*}
-Q(x) &= \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(j)}\right) \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}, \\
-&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}, \\
-\end{align*}
-ce qui mène aux égalités : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
-$$(\dagger) \qquad (\mbf g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}.$$
+Supposons connu l'élément $\mbf g_{p^r}$. Par la proposition~\ref{prop:vaudenay}, nous pouvons interpoler le polynôme $Q(X)$ en les $\alpha_{\sigma(j)}$, pour $0 \leqslant j \leqslant h/r$ :
+$$ Q(X) = \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(j)}\right) \mathcal L_j(X) = \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \mathcal L_j(X),$$
+ce qui mène aux égalités :
+\begin{equation}\label{eqn:interpolation}
+(\mbf g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \mathcal L(\alpha_{\sigma(i)}),\qquad \forall i : 0\leqslant i \leqslant p-1.
+\end{equation}
 
-En fait, nous pouvons même écrire : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
-$$(\ddagger) \qquad (\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}.$$
-En effet, soit $i$ tel que $0 \leqslant i \leqslant {h/r}$ :
-$$(\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
-car, pour $i$ tel que $0 \leqslant i \leqslant {h/r}$ : $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}\right) = 1.$$
-Ainsi, nous avons l'égalité de polynôme :
-$$Q(x) - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
-car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque les polynômes sont évalués en les $\alpha_{\sigma(i)}$, pour $0\leqslant i \leqslant p-1$.
-
-Par équivalence entre clés privées, nous pouvons choisir arbitrairement les images $\pi(0)$ et $\pi(1)$, où $\pi$ est la permutation d'une clé équivalente à celle contenant $\sigma$. L'algorithme naïf \ref{algo:naifgpr} pour trouver la permutation $\pi$ est de chercher exhaustivement les valeurs $\pi(j)$ pour $2\leqslant j \leqslant h/r$, jusqu'à ce que $(\dagger)$ donne une permutation consistante.
+Par équivalence entre clés privées, nous pouvons choisir arbitrairement les images $\pi(0)$ et $\pi(1)$, où $\pi$ est la permutation d'une clé équivalente à celle contenant $\sigma$. L'algorithme naïf \ref{algo:naifgpr} trouve la permutation $\pi$ en cherchant exhaustivement les valeurs $\pi(j)$ pour $2\leqslant j \leqslant h/r$, jusqu'à ce que l'équation~(\ref{eqn:interpolation}) donne une permutation consistante.
 
 \begin{algorithm}[h]
 \caption{Algorithme pour trouver $\pi$ sachant $\mbf g_{p^r}$}
@@ -467,7 +459,7 @@ Par équivalence entre clés privées, nous pouvons choisir arbitrairement les i
 \FORALL{$\pi(2), \pi(3), \dots, \pi({h/r})$ distincts deux à deux} \label{boucle:algoNaifgprBoucle}
 	\STATE{$S \gets \left\{\pi(2), \pi(3), \dots, \pi({h/r})\right\}$}
 	\FORALL{$\ell \not\in S$} \label{boucle:algoNaifgprBoucle2}
-		\STATE{calculer le membre de droite de $(\dagger)$ avec $\alpha_\ell$ au lieu de $\alpha_{\pi(i)}$ : $$\mathbf{res} \gets \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}}\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_\ell-\alpha_{\pi(k)}}{\alpha_{\pi(j)}-\alpha_{\pi(k)}} $$}
+		\STATE{calculer le membre de droite $\mathbf{res}$ de l'équation~(\ref{eqn:interpolation}) avec $\alpha_\ell$ au lieu de $\alpha_{\pi(i)}$}
 		\IF{il existe $i$ tel que $\mathbf{res} = (\mbf g_{p^r})^{c_i}$ et $\pi(i)$ n'est pas définie}
 			\STATE{$\pi(i) \gets \ell$}
 			\STATE{$S \gets S \cup \{\pi(i)\}$}
@@ -480,23 +472,21 @@ Par équivalence entre clés privées, nous pouvons choisir arbitrairement les i
 \end{algorithmic}
 \end{algorithm}
 
-La complexité de cet algorithme est grossièrement $\O(rp^{h/r})$ opérations dans $\gf{p}$ : la boucle à la ligne~\ref{boucle:algoNaifgprBoucle2} fait en moyenne $\O(pr/h)$ itérations, chacune avec une complexité $\O(h)$, et il nous avons besoin de $\O(p^{h/r}-1)$ itérations de cette boucle.
+La complexité de cet algorithme est grossièrement $\O(rp^{h/r})$ opérations dans $\gf{p}$ : la boucle à la ligne~\ref{boucle:algoNaifgprBoucle2} fait en moyenne $\O(pr/h)$ itérations, chacune avec une complexité $\O(h)$, et nous avons besoin de $\O(p^{h/r}-1)$ itérations de cette boucle.
 
-Par la proposition~\ref{prop:permutation}, la permutation $\pi$ donnée par l'algorithme~\ref{algo:naifgpr} est telle qu'il existe $u \in \gf{p}^\times$ et $v \in \gf{p}$ vérifiant, pour tout $0 \leqslant i \leqslant p-1$ :
-$$\alpha_{\pi(i)} = u \alpha_{\sigma(i)} + v.$$
-
-En exprimant le polynôme $Q(x)$ faisant intervenir la permutation $\pi$ par rapport au polynôme $Q(x)$ faisant intervenir la permutation $\sigma$, nous obtenons :
+Maintenant que nous avons obtenu la permutation $\pi$, nous souhaitons résoudre l'attaque. C'est ici qu'intervient l'attaque de Goldreich simplifiée susmentionnée. Pour comprendre son fonctionnement, il faut d'abord exprimer $t$, de la clé privée équivalente que nous sommes en train de fabriquer, en fonction de $\mbf t$. Par la proposition~\ref{prop:permutation}, la permutation $\pi$ donnée par l'algorithme~\ref{algo:naifgpr} est telle qu'il existe $u \in \gf{p}^\times$ et $v \in \gf{p}$ vérifiant :
+$$\alpha_{\pi(i)} = u \alpha_{\sigma(i)} + v, \qquad \forall i : 0 \leqslant i \leqslant p-1.$$
+En exprimant le polynôme $Q(X)$ faisant intervenir la permutation $\pi$, noté $Q_\pi(X)$, par rapport au polynôme $Q(X)$ faisant intervenir la permutation $\sigma$, noté $Q_\sigma(X)$, nous obtenons :
 \begin{align*}
-Q_\pi(x) &= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-\alpha_{\pi(k)}}{\alpha_{\pi(j)}-\alpha_{\pi(k)}}, \\
-&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{x-u\alpha_{\sigma(k)} - v}{u\alpha_{\sigma(j)}-u\alpha_{\sigma(k)}}, \\
-&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{u^{-1}x - u^{-1}v-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}, \\
-&= Q_\sigma(u^{-1}(x -v)). \\
+Q_\pi(X) &= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{X-\alpha_{\pi(k)}}{\alpha_{\pi(j)}-\alpha_{\pi(k)}}, \\
+&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{X-u\alpha_{\sigma(k)} - v}{u\alpha_{\sigma(j)}-u\alpha_{\sigma(k)}}, \\
+&= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{u^{-1}X - u^{-1}v-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}, \\
+&= Q_\sigma(u^{-1}(X -v)). \\
 \end{align*}
-Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(x)$, alors $-u^{-1}(\omega +v)$ est racine du polynôme $Q_\sigma(x)$, donc si on fait tourner l'algorithme~\ref{prop:vaudenay} avec la permutation $\pi$, les valeurs renvoyées sont :
+Ainsi, si $-\omega$ est racine du polynôme $Q_\pi(X)$, alors $-u^{-1}(\omega +v)$ est racine du polynôme $Q_\sigma(X)$, donc si on fait tourner l'algorithme~\ref{algo:premiereAttaqueVaudenay} avec la permutation $\pi$, les valeurs renvoyées sont :
 $$u \mbf t -v,\quad u \mbf t^{p^r} -v,\quad u \mbf t^{p^{2r}} -v,\quad \dots,\quad u \mbf t^{p^{h - r}} -v.$$
-Il existe alors un façon plus simple de déterminer $g$, que d'utiliser l'attaque de Goldreich.
 
-En effet : choisissons un générateur arbitraire $\gamma$ de $\gf{p^h}^\times$, et pour un $j$ tel que $0 \leqslant j < h/r$, à savoir on choisit n'importe quel élément retourné par l'algorithme~\ref{prop:vaudenay}, calculons $$b_i := \log_{\gamma}\left(u \mbf t^{p^{jr}} -v+\alpha_{\pi(i)}\right)$$
+Ensuite, choisissons un générateur arbitraire $\gamma$ de $\gf{p^h}^\times$, et un $j$ tel que $0 \leqslant j < h/r$, à savoir on choisit n'importe quel élément retourné par l'algorithme~\ref{algo:premiereAttaqueVaudenay}. Posons $$b_i := \log_{\gamma}\left(u \mbf t^{p^{jr}} -v+\alpha_{\pi(i)}\right).$$
 Notons $L := \log_{\gamma}(\mbf g^{p^{jr}})$, de sorte que $\mbf g^{p^{jr}}=\gamma^L$. Alors pour tout $0 \leqslant i \leqslant p-1$ :
 \begin{align*}
 b_i - b_0 &= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} -v + \alpha_{\pi(i)}}{u \mbf t^{p^{jr}} -v + \alpha_{\pi(0)}}\right), \\
@@ -505,6 +495,10 @@ b_i - b_0 &= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} -v + \alpha_{\pi(i)}}{u 
 &= L\log_{\mbf g^{p^{jr}}}\left(\frac{\mbf t^{p^{jr}} + \alpha_{\sigma(i)}}{\mbf t^{p^{jr}} + \alpha_{\sigma(0)}}\right),\\
 &= L(c_i - c_0). \\
 \end{align*}
+En conséquence, s'il existe un $i$ tel que $(c_i - c_0)$ est inversible modulo $p^h - 1$, nous retrouvons : 
+$$L = (b_i - b_0)(c_i - c_0)^{-1} \pmod{p^h-1},$$
+ce que permet de déterminer $g$ et $d$.
+L'attaque de Goldreich simplifiée est dépeinte par l'algorithme~\ref{algo:attaqueGoldreichsimplifiee}.
 
 \begin{algorithm}[h]
 \caption{Attaque de Goldreich simplifiée}
@@ -531,7 +525,18 @@ b_i - b_0 &= \log_{\gamma}\left(\frac{u \mbf t^{p^{jr}} -v + \alpha_{\pi(i)}}{u 
 \end{algorithmic}
 \end{algorithm}
 
-Bien sûr, si en entrée de l'algorithme~\ref{algo:attaqueGoldreichsimplifiee}, le $t$ donné est $u \mbf t^{p^{jr}} -v$, il retourne le conjugué $\mbf g^{p^{jr}}$ de $\mbf g$ et l'entier $\mbf d - \log_{\mbf g^{p^{jr}}}(u)$.
+Si en entrée de l'algorithme~\ref{algo:attaqueGoldreichsimplifiee}, le $t$ donné est $u \mbf t^{p^{jr}} -v$, la clé équivalente construite est : $$(\mbf g^{p^{jr}}, u \mbf t^{p^{jr}} -v, \pi, \mbf d - \log_{\mbf g^{p^{jr}}}(u)).$$
+
+\subsection{Attaque améliorée sachant $\mbf g_{p^r}$}
+
+En fait, nous pouvons même écrire : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
+$$(\ddagger) \qquad (\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)L(\alpha_{\sigma(i)}).$$
+En effet, soit $i$ tel que $0 \leqslant i \leqslant {h/r}$ :
+$$(\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
+car, pour $i$ tel que $0 \leqslant i \leqslant {h/r}$ : $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}\right) = 1.$$
+Ainsi, nous avons l'égalité de polynôme :
+$$Q(x) - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
+car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque les polynômes sont évalués en les $\alpha_{\sigma(i)}$, pour $0\leqslant i \leqslant p-1$.
 
 Quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\pi$. En fait, si $r \geqslant h/r + 1$, alors la famille $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$ est affinement indépendante. Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf{p}$ de l'écriture de $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(\mbf g_{p^r})^{c_{1}} - (\mbf g_{p^r})^{c_{0}},\quad \dots,\quad (\mbf g_{p^r})^{c_{{h/r}}} - (\mbf g_{p^r})^{c_{0}}.$$
 
