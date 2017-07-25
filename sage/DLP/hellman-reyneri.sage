@@ -1,18 +1,3 @@
-# reset()
-# attach("~/chor-rivest-cryptosystem/sage/DLP/hellman-reyneri.sage")
-# q = 2 ** 3
-# k = 5
-# nb_tests = 10 ** 3
-# F.<a> = FiniteField (q)
-# R.<x> = PolynomialRing (F)
-# mu = R.irreducible_element (k)
-# K.<u> = R.quotient_ring (mu)
-# g = pick_primitive_element (K)
-# lo = [ randint (1, q ** k - 1) for i in range (nb_tests) ]
-# h = [ g ** i for i in lo ]
-# %time logs_hr = hellman_reyneri (g, h)
-# print "Did it work? " + str(lo == logs_hr)
-
 def hellman_reyneri (g, h) :
     K = g.parent()
     R = K.base()
@@ -22,14 +7,14 @@ def hellman_reyneri (g, h) :
     b = min (k, 10)
     card = q ** k - 1
     # changement de représentation
-    ## print "Changement de représentation"
-    ## Ik = find_good_irreducible_poly_S (q, k, b, F, R)
-    ## newK = R.quotient_ring(Ik, 'v')
-    ## M = make_change_basis_matrix (q, k, F, R, K.gen(), Ik) # matrice de v à u (exprime v dans la base 1, u, u^2, ..., u^{k-1})
-    ## M = M.inverse()
+    print "Changement de représentation"
+    Ik = find_good_irreducible_poly_S (q, k, b, F, R)
+    newK = R.quotient_ring(Ik, 'v')
+    M = make_change_basis_matrix (q, k, F, R, K.gen(), Ik) # matrice de v à u (exprime v dans la base 1, u, u^2, ..., u^{k-1})
+    M = M.inverse()
     M = Matrix.identity(k)
-    G = K(list(M * vector(list(g))))
-    H = [ K(list(M * vector(list(elem)))) for elem in h ]
+    G = newK(list(M * vector(list(g))))
+    H = [ newK(list(M * vector(list(elem)))) for elem in h ]
     # collecte de relations
     print "Collecte de relations"
     d = int(ceil (sqrt (0.5 * k * log (k, q))))
@@ -37,12 +22,14 @@ def hellman_reyneri (g, h) :
     basis, logs_basis = make_smoothness_basis (rel_liste, rs, card)
     # descente individuelle
     print "Descente individuelle"
-    logs = descent_log ([ (elem_h, G, basis, logs_basis, card) for elem_h in H ])
-    logs = [ mod(l, card) for l in logs ]
+    logs = list(descent_log ([ (i, H[i], G, basis, logs_basis, card) for i in range (len (H)) ]))
+    logs = [ logs[i][1] for i in range (len (H)) ]
+    logs.sort()
+    logs = [ mod(logs[i][1], card) for i in range (len (H)) ]
     return logs
 
 @parallel
-def descent_log (elem_target, gen, basis, logs_basis, card) :
+def descent_log (i, elem_target, gen, basis, logs_basis, card) :
     P = elem_target.lift()
     r = 0
     while not is_in_basis (P, basis) :
@@ -53,7 +40,7 @@ def descent_log (elem_target, gen, basis, logs_basis, card) :
         lo += logs_basis[basis.index(P.lc())]
     for poly, mult in list(P.factor()) :
         lo += mult * logs_basis[basis.index(poly)]
-    return lo - r
+    return i, lo - r
 
 def is_in_basis (x, basis) :
     for poly, mult in list(x.factor()) :

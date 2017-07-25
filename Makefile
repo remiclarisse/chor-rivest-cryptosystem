@@ -19,6 +19,7 @@ all: clean
 	@cp -f sage/chor-rivest-joux/* ./$(FILE)/$(IMPLEMCHORRIVEST)/joux
 	@mkdir $(FILE)/$(DLP)
 	@cp -f sage/DLP/hellman-reyneri.sage ./$(FILE)/$(DLP)/
+	@cp -f sage/DLP/pohlig-hellman.sage ./$(FILE)/$(DLP)/
 	@cp -f sage/DLP/README.md ./$(FILE)/$(DLP)/
 	@cd c && $(MAKE) nodebug
 	@mkdir $(FILE)/$(EXE)

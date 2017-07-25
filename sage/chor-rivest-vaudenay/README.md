@@ -32,12 +32,8 @@ Use Vaudenay's attack, with `VaudenayAttack`, to make an equivalent key and try 
     sage: %time EquivPrivKey = VaudenayAttack (PubKey)
     sage: crackedMessage = CRDecrypt (e, PubKey, EquivPrivKey)
 
-## What can be improved
-Besides everything (python meh!), many computing can be done in parallel, and the computing of
-logarithms have already been parallelized !
-
 ---
-### Bibliography
+## Bibliography
 
 Benny Chor and Ronald L. Rivest, **A Knapsack-Type Public Key Cryptosystem Based on Arithmetic in Finite Fields**, in *IEEE Transactions on Information Theory*, 1988
 
