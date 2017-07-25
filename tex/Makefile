@@ -1,5 +1,5 @@
 # Variables
-LOGBOOK=chor-rivest
+LOGBOOK=rough-draft
 RAPPORT=rapport-stage
 
 # Special rules and targets
