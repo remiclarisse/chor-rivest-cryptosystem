@@ -26,8 +26,7 @@ open: $(LOGBOOK) $(RAPPORT)
 
 clean:
 	@echo "./tex/ : Cleaning..."
-	@rm -f *~ $(LOGBOOK).aux $(LOGBOOK).bbl $(LOGBOOK).blg $(LOGBOOK).toc *.log *.gz $(LOGBOOK).out
-	@rm -f *~ $(RAPPORT).aux $(RAPPORT).bbl $(RAPPORT).blg $(RAPPORT).toc *.log *.gz $(RAPPORT).out
+	@rm -f *~ *.aux *.bbl *.blg *.toc *.log *.gz *.out *.pdf
 
 help:
 	@echo "all:\tRun the whole build to make the PDF files."
