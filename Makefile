@@ -3,7 +3,7 @@ EXE=rho-pollard
 FILE=rapport-stage
 DLP=computing-dlp
 IMPLEMCHORRIVEST=implementation-chor-rivest
-VAUDENAY=with-attack-vaudenay
+VAUDENAY=with-vaudenay-attack
 JOUX=with-joux-algorithm
 
 # Special rules and targets
