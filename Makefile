@@ -12,7 +12,7 @@ JOUX=with-joux-algorithm
 # Rules and tagets
 all: clean
 	@mkdir $(FILE)
-	@cd tex && $(MAKE) $(FILE)
+	@cd tex && $(MAKE)
 	@cp -f tex/$(FILE).pdf ./$(FILE)/
 	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)
 	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/$(VAUDENAY)

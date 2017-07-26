@@ -410,7 +410,7 @@ Comme $h/r$ est assez petit, il est peu probable qu'il existe d'autres solutions
 \paragraph*{Notation :} Pour $r$ divisant $h$ et $\omega$ élément de $\gf{p^h}$, notons $$\omega_{p^r} := \omega^{(p^h-1)/(p^r-1)} = \omega^{1+p^r+p^{2r}+p^{3r}+\cdots+p^{h-r}},$$
 la norme de $\omega$ considéré dans l'extension de corps $\extension{\gf{p^h}}{\gf{p^r}}$.
 
-\subsection{Attaque sachant $\mbf g_{p^r}$ et $\sigma$}
+\subsection{Comment trouver $t$ sachant $\mbf g_{p^r}$ et $\sigma$}
 
 Supposons connus la norme $\mbf g_{p^r}$ et la permutation $\sigma$. Nous pouvons alors interpoler le polynôme $Q(X)$ de la proposition~\ref{prop:vaudenay}, avec $h/r +1$ pairs ${(\alpha_{\sigma(i)}, (\mbf g_{p^r})^{c_i})}$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $-\mbf t$.  Par équivalence de clés privées, nous pouvons sélectionner n'importe quelle racine de $Q(X)$. Cet algorithme est l'objet de la figure Algorithme~\ref{algo:premiereAttaqueVaudenay}.
 
@@ -439,13 +439,13 @@ Dans son papier, Serge Vaudenay interpole le polynôme $Q(X)$ de la proposition~
 
 Pour simplifier le propos, et surtout pour rendre plus lisible l'écriture, nous faisons le choix ici de prendre $i_j = j$, pour tout $0 \leqslant j \leqslant h/r$, c'est ce qui a été fait dans l'algorithme~\ref{algo:premiereAttaqueVaudenay}.
 
-\subsection{Attaque directe sachant $\mbf g_{p^r}$}
+\subsection{Comment trouver $\pi$ sachant $\mbf g_{p^r}$, approche directe}
 
 Supposons connu l'élément $\mbf g_{p^r}$. Par la proposition~\ref{prop:vaudenay}, nous pouvons interpoler le polynôme $Q(X)$ en les $\alpha_{\sigma(j)}$, pour $0 \leqslant j \leqslant h/r$ :
 $$ Q(X) = \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(j)}\right) \mathcal L_j(X) = \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \mathcal L_j(X),$$
-ce qui mène aux égalités :
+ce qui donne pour tout $i$ tel que $0\leqslant i \leqslant p-1$ :
 \begin{equation}\label{eqn:interpolation}
-(\mbf g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \mathcal L(\alpha_{\sigma(i)}),\qquad \forall i : 0\leqslant i \leqslant p-1.
+(\mbf g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \mathcal L_j(\alpha_{\sigma(i)}).
 \end{equation}
 
 Par équivalence entre clés privées, nous pouvons choisir arbitrairement les images $\pi(0)$ et $\pi(1)$, où $\pi$ est la permutation d'une clé équivalente à celle contenant $\sigma$. L'algorithme naïf \ref{algo:naifgpr} trouve la permutation $\pi$ en cherchant exhaustivement les valeurs $\pi(j)$ pour $2\leqslant j \leqslant h/r$, jusqu'à ce que l'équation~(\ref{eqn:interpolation}) donne une permutation consistante.
@@ -473,7 +473,7 @@ Par équivalence entre clés privées, nous pouvons choisir arbitrairement les i
 \end{algorithmic}
 \end{algorithm}
 
-La complexité de cet algorithme est grossièrement $\O(rp^{h/r})$ opérations dans $\gf{p}$ : la boucle à la ligne~\ref{boucle:algoNaifgprBoucle2} fait en moyenne $\O(pr/h)$ itérations, chacune avec une complexité $\O(h)$, et nous avons besoin de $\O(p^{h/r}-1)$ itérations de cette boucle.
+La complexité de cet algorithme~\ref{algo:naifgpr} est grossièrement $\O(rp^{h/r})$ opérations dans $\gf{p}$ : la boucle à la ligne~\ref{boucle:algoNaifgprBoucle2} fait en moyenne $\O(pr/h)$ itérations, chacune avec une complexité $\O(h)$, et nous avons besoin de $\O(p^{h/r}-1)$ itérations de cette boucle.
 
 Maintenant que nous avons obtenu la permutation $\pi$, nous souhaitons résoudre l'attaque. C'est ici qu'intervient l'attaque de Goldreich simplifiée susmentionnée. Pour comprendre son fonctionnement, il faut d'abord exprimer $t$, de la clé privée équivalente que nous sommes en train de fabriquer, en fonction de $\mbf t$. Par la proposition~\ref{prop:permutation}, la permutation $\pi$ donnée par l'algorithme~\ref{algo:naifgpr} est telle qu'il existe $u \in \gf{p}^\times$ et $v \in \gf{p}$ vérifiant :
 $$\alpha_{\pi(i)} = u \alpha_{\sigma(i)} + v, \qquad \forall i : 0 \leqslant i \leqslant p-1.$$
@@ -528,20 +528,30 @@ L'attaque de Goldreich simplifiée est dépeinte par l'algorithme~\ref{algo:atta
 
 Si en entrée de l'algorithme~\ref{algo:attaqueGoldreichsimplifiee}, le $t$ donné est $u \mbf t^{p^{jr}} -v$, la clé équivalente construite est : $$(\mbf g^{p^{jr}}, u \mbf t^{p^{jr}} -v, \pi, \mbf d - \log_{\mbf g^{p^{jr}}}(u)).$$
 
-\subsection{Attaque améliorée sachant $\mbf g_{p^r}$}
+\subsection{Comment trouver $\pi$ sachant $\mbf g_{p^r}$, approche maligne}
 
-En fait, nous pouvons même écrire : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
-$$(\ddagger) \qquad (\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)L(\alpha_{\sigma(i)}).$$
-En effet, soit $i$ tel que $0 \leqslant i \leqslant {h/r}$ :
-$$(\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
-car, pour $i$ tel que $0 \leqslant i \leqslant {h/r}$ : $$\sum_{j=0}^{h/r} \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}\right) = 1.$$
+Quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\pi$. En effet, si $r \geqslant h/r$, alors la famille $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$ est libre. 
+Cela signifie que les coefficients dans l'équation (\ref{eqn:interpolation}) sont les seuls coefficients dans $\gf{p}$ de l'écriture du vecteur $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(\mbf g_{p^r})^{c_{1}} - (\mbf g_{p^r})^{c_{0}},\quad \dots,\quad (\mbf g_{p^r})^{c_{{h/r}}} - (\mbf g_{p^r})^{c_{0}}.$$
+Cela est résumé dans la proposition suivante :
+
+\begin{prop}Pour tout $i$ tel que $0\leqslant i \leqslant p-1$ :
+\begin{equation}\label{eqn:combLineaire}
+(\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\mathcal L_j(\alpha_{\sigma(i)}).
+\end{equation}
+\end{prop}
+
+\begin{proof}
+Soit $i$ tel que $0 \leqslant i \leqslant {h/r}$ :
+$$(\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\mathcal L_j(\alpha_{\sigma(i)}).$$
 Ainsi, nous avons l'égalité de polynôme :
-$$Q(x) - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{x-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
-car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque les polynômes sont évalués en les $\alpha_{\sigma(i)}$, pour $0\leqslant i \leqslant p-1$.
+$$Q(X) - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\mathcal L_j(X),$$
+car les deux polynômes sont de degré $h/r$ et sont égaux sur un ensemble de $h/r + 1$ éléments : d'où l'égalité lorsque les polynômes sont évalués en les $\alpha_{\sigma(i)}$, pour $0\leqslant i \leqslant p-1$.\end{proof}
 
-Quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\pi$. En fait, si $r \geqslant h/r + 1$, alors la famille $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{0\leqslant j \leqslant h/r}$ est affinement indépendante. Cela signifie que les coefficients dans $(\dagger)$ sont les seuls coefficients dans $\gf{p}$ de l'écriture de $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(\mbf g_{p^r})^{c_{1}} - (\mbf g_{p^r})^{c_{0}},\quad \dots,\quad (\mbf g_{p^r})^{c_{{h/r}}} - (\mbf g_{p^r})^{c_{0}}.$$
+\begin{rema}
+L'équation~\ref{eqn:combLineaire} est vraie quel que soit $r$.
+\end{rema}
 
-Notons $a_j^i$ le coefficient de $(\mbf g_{p^r})^{c_{{j}}} - (\mbf g_{p^r})^{c_{0}}$ pour $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, où $i , j\geqslant 1$. Alors, par $(\ddagger)$, nous avons, si $a_1^i \neq 0$ :
+Notons $a_j^i$ le coefficient de $(\mbf g_{p^r})^{c_{{j}}} - (\mbf g_{p^r})^{c_{0}}$ pour $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$, où $i , j\geqslant 1$. Alors, par l'équation (\ref{eqn:combLineaire}), nous avons, si $a_1^i \neq 0$ :
 \begin{align*}
 \frac{a_2^i}{a_1^i} &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(2)}-\alpha_{\sigma(k)}} \right)\left(\prod_{\substack{0\leqslant k'\leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma({k'})}}{\alpha_{\sigma(1)}-\alpha_{\sigma({k'})}} \right)^{-1}, \\
 &= \left(\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq 2}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(2)}-\alpha_{\sigma(k)}} \right)\left(\prod_{\substack{0\leqslant k' \leqslant h/r \\ k' \neq 1}} \frac{\alpha_{\sigma(1)}-\alpha_{\sigma({k'})}}{\alpha_{\sigma(i)}-\alpha_{\sigma({k'})}} \right), \\
@@ -549,10 +559,12 @@ Notons $a_j^i$ le coefficient de $(\mbf g_{p^r})^{c_{{j}}} - (\mbf g_{p^r})^{c_{
 &= \left(\prod_{\substack{0\leqslant k, k'\leqslant h/r \\ k \neq 2, k' \neq 1}} \frac{\alpha_{\sigma(1)}-\alpha_{\sigma({k'})}}{\alpha_{\sigma(2)}-\alpha_{\sigma(k)}} \right) \left(\frac{\alpha_{\sigma(i)}-\alpha_{\sigma(1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(2)}} \right). \\
 \end{align*}
 
-Ainsi, il existe $\nu$ dans $\gf{p}$, indépendant de $i$, tel que
-$$(\star) \qquad\frac{a_2^i}{a_1^i} = \nu \frac{\alpha_{\pi(i)}-\alpha_{\pi(1)}}{\alpha_{\pi(i)}-\alpha_{\pi(2)}}\quad\Leftrightarrow\quad
-\alpha_{\pi(i)} = \frac{a_2^i\alpha_{\pi(2)}-\nu a_1^i\alpha_{\pi(1)}}{a_2^i-\nu a_1^i}.$$
-En passant toute les valeurs de $\nu$ en revue, nous pouvons obtenir $\pi(i)$ de l'équation $(\star)$. Cependant, cela ne permet pas de déterminer $\pi(0)$ et $\pi(j)$ pour $3 \leqslant j \leqslant h/r$. Il reste alors à les chercher de manière exhaustive. Cette remarque donne naissance à l'algorithme~\ref{algo:gpr}.
+Ainsi, il existe $\nu$ dans $\gf{p}$, indépendant de $i$, tel que :
+\begin{equation}\label{eqn:coeff}
+\frac{a_2^i}{a_1^i} = \nu \frac{\alpha_{\pi(i)}-\alpha_{\pi(1)}}{\alpha_{\pi(i)}-\alpha_{\pi(2)}}\quad\Leftrightarrow\quad
+\alpha_{\pi(i)} = \frac{a_2^i\alpha_{\pi(2)}-\nu a_1^i\alpha_{\pi(1)}}{a_2^i-\nu a_1^i}.
+\end{equation}
+En passant toutes les valeurs de $\nu$ en revue, nous pouvons obtenir $\pi(i)$ de l'équation (\ref{eqn:coeff}). Cependant, cela ne permet pas de déterminer $\pi(0)$ et $\pi(j)$ pour $3 \leqslant j \leqslant h/r$. Il reste alors à les chercher de manière exhaustive. Cette remarque donne naissance à l'algorithme~\ref{algo:gpr}.
 
 \begin{algorithm}[h]
 \caption{Algorithme pour trouver $\pi$ sachant $\mbf g_{p^r}$ lorsque $r\geqslant \sqrt h$}
@@ -566,10 +578,10 @@ En passant toute les valeurs de $\nu$ en revue, nous pouvons obtenir $\pi(i)$ de
 	\FOR{$i$ tel que $0\leqslant i\leqslant p-1$ et $i \neq 0, 1, \dots, h/r$}
 		\STATE{écrire $(\mbf g_{p^r})^{c_{i}} - (\mbf g_{p^r})^{c_{0}}$ dans la ``base'' $\left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$}
 		\STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
-		\STATE{trouver la valeur de $\pi(i)$ grâce à $(\star)$}
+		\STATE{trouver la valeur de $\pi(i)$ grâce à l'équation (\ref{eqn:coeff})}
 	\ENDFOR
 	\STATE{essayer de compléter $\pi$ en cherchant exhaustivement $\pi(0)$ et $\pi(j)$ pour $3 \leqslant j \leqslant h/r$}
-	\IF{$\pi$ vérifie les relations $(\dagger)$}
+	\IF{$\pi$ vérifie les équations (\ref{eqn:interpolation})}
 		\RETURN{$\pi$}
 	\ENDIF
 \ENDFOR
@@ -579,16 +591,14 @@ En passant toute les valeurs de $\nu$ en revue, nous pouvons obtenir $\pi(i)$ de
 \subsection{Comment trouver $\mbf g_{p^r}$}
 
 Les équations : quel que soit $i$ tel que $0\leqslant i \leqslant p-1$,
-$$(\ddagger) \qquad (\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right)\prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}} \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}},$$
-signifient que tous les $(\mbf g_{p^r})^{c_i}$ sont en fait dans un même sous-espace affine de dimension $h/r$ du $\gf{p}$-espace vectoriel $\gf{p^r}$.
-
-Donc si on suppose que $h/r + 1 \leqslant r$, à savoir $r \geqslant \sqrt{h + 1/4} + 1/2$, on peut donner un test facile pour $\mbf g_{p^r}$.
+$$(\mbf g_{p^r})^{c_i} - (\mbf g_{p^r})^{c_{0}} = \sum_{j=1}^{h/r} \left((\mbf g_{p^r})^{c_{j}} - (\mbf g_{p^r})^{c_{0}} \right) \mathcal L_j(\alpha_{\sigma(i)}),$$
+signifient que tous les $(\mbf g_{p^r})^{c_i}$ sont en fait dans un même sous-espace affine de dimension $h/r$ du $\gf{p}$-espace vectoriel $\gf{p^r}$. Donc si on suppose que $h/r + 1 \leqslant r$, à savoir $r \geqslant \sqrt{h + 1/4} + 1/2$, on peut donner un test facile pour $\mbf g_{p^r}$ :
 
 \begin{prop}
 S'il existe un facteur $r$ de $h$ de sorte que $r \geqslant \sqrt{h + 1/4} + 1/2$, alors tous les $\mbf g_{p^r}^{c_i}$ sont sur le même sous-espace affine de dimension $h/r$ de $\gf{p^r}$ lorsque celui-ci est considéré comme un espace affine de dimension $r$ sur $\gf{p}$.
 \end{prop}
 
-L'existence d'un tel $r$ peut être considérée comme un mauvais prérequis, cependant vu que les paramètres du cryptosystème de Chor-Rivest doivent être choisis de sorte que le problème du logarithme discret soit facile à résoudre, nous savons déjà que $h$ à plusieurs facteurs, et il est donc fort probable que cette hypothèse sur $r$ soit satisfaite. En fait, les $h$ sans de tels facteurs sont les nombres premiers et les carrés de nombres premiers. Le vrai problème est que $r$ ne doit pas être trop grand, sinon la recherche devient fastidieuse.
+L'existence d'un tel $r$ peut être considérée comme un mauvais prérequis, cependant vu que les paramètres du cryptosystème de Chor-Rivest ont été choisis de sorte que le problème du logarithme discret soit facile à résoudre, nous savons déjà que $h$ à plusieurs facteurs, et il est donc fort probable que cette hypothèse sur $r$ soit satisfaite. En fait, les $h$ sans de tels facteurs sont les nombres premiers et les carrés de nombres premiers. Le vrai problème est que $r$ ne doit pas être trop grand, sinon la recherche d'un $\mbf g_{p^r}$  devient fastidieuse.
 
 Nous pouvons donc écrire l'algorithme \ref{algo:testgpr} qui vérifie si un candidat pour $\mbf g_{p^r}$ est bon : l'algorithme vérifie simplement si les $(\mbf g_{p^r})^{c_i}$ sont affinement liés. Cet algorithme a pour complexité moyenne $\O(h^3/r)$ opérations dans $\gf{p}$. Comme il y a $\phi(p^r-1)/r$ candidats, nous pouvons chercher exhaustivement un $\mbf g_{p^r}$ avec une complexité de $\O(h^3p^r/r^2)$.
 
@@ -599,9 +609,8 @@ Nous pouvons donc écrire l'algorithme \ref{algo:testgpr} qui vérifie si un can
 \REQUIRE $\gf{p^h}$, $(c_0,\dots, c_{p-1})$ et $r$ divisant $h$ tel que $r\geqslant \sqrt{h + 1/4} + 1/2$
 \ENSURE un élément $\mbf g_{p^r}$
 \FORALL{$\zeta \in \gf{p^h}$ générateur de $\gf{p^r}^\times$} \label{boucle:algoTestgpr}
-	\STATE{calculer l'équation du sous-espace affine $V$ engendré par $(\zeta^{c_{0}}, \dots, \zeta^{c_{{h/r}}})$}
-	\FORALL{$i$ différent de $0, 1, \dots, {h/r}$ }
-		\IF{$\zeta^{c_{i}}$ ne satisfait pas à l'équation du sous-espace affine $V$}
+	\FORALL{$i$ allant de $h/r + 1$ à $p-1$}
+		\IF{$\zeta^{c_{i}}$ n'appartient pas au sous-espace affine engendré par $(\zeta^{c_{0}}, \dots, \zeta^{c_{{h/r}}})$}
 			\STATE{continuer la boucle ligne~\ref{boucle:algoTestgpr}}
 		\ENDIF
 	\ENDFOR
@@ -610,16 +619,15 @@ Nous pouvons donc écrire l'algorithme \ref{algo:testgpr} qui vérifie si un can
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Utilisation de tous les $c_i$ pour trouver $\mbf g_{p^r}$}
+\subsection{Comment trouver $\mbf g_{p^r}$ en s'aidant des $c_i$}
 
 En 1991, Hendrik Lenstra \cite{lenstra1991} soupçonnait qu'inclure tous les $c_i$ dans la clé publique était dangereux pour la sécurité du système. Et en effet, Serge Vaudenay a amélioré l'attaque précédente en utilisant la connaissance de tous les $c_i$.
 
 Avant de voir comment il a procédé, voici un fait dont nous allons nous servir :
 
 \begin{prop}\label{prop:faitCool}
-Soit $Q(x)$ un polynôme de $\gf{p^r}[X]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Alors : $$\sum_{a \in \gf{p}} Q(a)^e = 0.$$
+Soit $Q(X)$ un polynôme de $\gf{p^r}[X]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Alors : $$\sum_{a \in \gf{p}} Q(a)^e = 0.$$
 \end{prop}
-
 Le lemme qui suit permet de démontrer cette proposition.
 
 \begin{lemm}
@@ -628,48 +636,34 @@ $$\sum_{a\in\gf{p}} a^k = 0.$$
 Ainsi, si $P(X) \in \gf{p^r}[X]$ est de degré inférieur à $p-1$, alors : $$\sum_{a\in\gf{p}} P(a) = 0.$$
 \end{lemm}
 
-\begin{proof}[Démonstration du lemme]
-Tout d'abord remarquons que $0 \in \gf{p}$ ne contribue pas à la somme, et ensuite, notons $g$ un élément primitif du corps $\gf{p}$. Alors, pour $1 \leqslant k < p-1$ :
-$$\sum_{a\in\gf{p}} a^k = \sum_{a\in\gf{p}^\times} a^k = \sum_{j=0}^{p-2} g^{jk} = \frac{g^{k(p-1)} - 1}{g^{k} - 1} = \frac{1^{k} - 1}{g^{k} - 1} = 0.$$
-Soit $P(X) \in \gf{p^r}[X]$ de degré inférieur à $p-1$ :
-$$P(X) = b_{p-2}x^{p-2} + \cdots + b_1x + b_0, \qquad \text{où }b_i \in \gf{p^r} \text{ pour } 0 \leqslant i \leqslant p-1.$$
-Ainsi, on obtient bien :
-\begin{align*}
-\sum_{a\in\gf{p}} P(a) &= \sum_{a\in\gf{p}} \left({b_{p-2}a^{p-2} + \cdots + b_1a + b_0}\right), \\
-&= \sum_{k=1}^{p-2} \left({ b_k\sum_{a\in\gf{p}} a^k}\right) + pb_0, \\
-&= 0.
-\end{align*}
-\end{proof}
-
 \begin{proof}[Démonstration de la proposition]
-Comme $Q(x) \in \gf{p^r}[X]$ est de degré $d$ et que $e$ est tel que $1\leqslant e < (p-1)/d$, le polynôme $Q(x)^e$ est de degré inférieur à $p-1$. Le lemme précédent conclut :
+Comme $Q(X) \in \gf{p^r}[X]$ est de degré $d$ et que $e$ est tel que $1\leqslant e < (p-1)/d$, le polynôme $Q(X)^e$ est de degré inférieur à $p-1$. Le lemme précédent conclut :
 $$\sum_{a\in\gf{p}} Q(a)^e = 0.$$
 \end{proof}
 
 Cela nous donne un critère particulièrement intéressant pour $\mbf g_{p^r}$ :
-
 \begin{prop}
 Pour tout $1 \leqslant e < (p-1)r/h$ :
 $$\sum_{i=0}^{p-1} (\mbf g_{p^r})^{ec_i} = 0.$$
 \end{prop}
-
 \begin{proof}
-Considérons le polynôme $Q(x)\in\gf{p^r}[X]$ de la proposition~\ref{prop:vaudenay} : le polynôme $Q(x)$ est de degré $h/r$, à coefficients dans $\gf{p^r}$ et tel que, pour tout $0 \leqslant i \leqslant p-1$ :
+Considérons le polynôme $Q(X)\in\gf{p^r}[X]$ de la proposition~\ref{prop:vaudenay} : le polynôme $Q(X)$ est de degré $h/r$, à coefficients dans $\gf{p^r}$ et tel que, pour tout $0 \leqslant i \leqslant p-1$ :
 $$Q\left(\alpha_{\sigma(i)}\right) = (\mbf g_{p^r})^{c_i}.$$
 Ainsi par la proposition~\ref{prop:faitCool}, pour tout $1 \leqslant e < (p-1)r/h$ :
 $$\sum_{a\in\gf{p}} Q(a)^e = \sum_{i=0}^{p-1} Q\left(\alpha_{\sigma(i)}\right)^e = 0,$$
 d'où l'égalité souhaitée :
 $$\sum_{i=0}^{p-1} (\mbf g_{p^r})^{ec_i} = 0.$$
 \end{proof}
-
-Cela donne une façon plus simple de sélectionner tous les candidats pour $\mbf g_{p^r}$ -- par rapport à la recherche exhaustive. Son principal avantage est qu'elle fonctionne dans n'importe quel sous-corps. Par exemple, on peut considérer $r=1$ et trouver les seuls $\mbf g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$ :
+\noindent Cela donne une façon plus simple, par rapport à la recherche exhaustive, de sélectionner tous les candidats pour $\mbf g_{p^r}$. Son principal avantage est qu'elle fonctionne dans n'importe quel sous-corps. Par exemple, on peut considérer $r=1$ et trouver les seuls $\mbf g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$ :
 $$\sum_{i=0}^{p-1} (\mbf g_p)^{ec_i} = 0.$$
 La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf{p}$-opérations : il est peu probable qu'un mauvais candidat ne soit pas détecté par le cas $e = 1$. Ainsi, nous pouvons recouvrer $\mbf g_p$ en $\O(p^2)$ opérations élémentaires.
 
-Malheureusement, le $\mbf g_{p^r}$ ne peut pas être utilisé efficacement quand $r$ est trop petit. Cependant, on peut toujours utiliser le $\mbf g_{p^r}$ des petits sous-corps pour le calculer dans des corps plus grands. Notre but est donc de calculer $\mbf g_{p^r}$ avec $r$ assez grand (tel que $r^2 \geqslant h$).
+Malheureusement, le $\mbf g_{p^r}$ ne peut pas être utilisé efficacement quand $r$ est trop petit. Toutefois, si on a calculé des $\mbf g_{p^r}$ dans des petits sous-corps, on peut s'aider de ceux-ci pour calculer un $\mbf g_{p^r}$ dans un plus grand sous-corps. En fait, notre objectif est de calculer $\mbf g_{p^r}$ avec $r$ tel que $r \geqslant h/r + 1$.
 
 Considérons le problème du calcul de $\mbf g_{p^r}$ lorsque les facteurs $r_1,\dots,r_k$  de $r$ sont connus, et les $\mbf g_{p^{r_i}}$ pour $1 \leqslant i \leqslant k$, sont connus. Comme $\mbf g_{p^{r_i}} = (\mbf g_{p^r})^{1+p^{r_i}+p^{2r_i}+\cdots+p^{r-r_i}}$, nous avons
-$$(\ast)\qquad\log(\mbf g_{p^r}) = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1},$$
+\begin{equation}\label{eqn:loggpr}
+\log(\mbf g_{p^r}) = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1},
+\end{equation}
 où la base des logarithmes est n'importe quel élément primitif $\gamma$ fixé dans le corps $\gf{p^r}$. La connaissance de tous les $\mbf g_{p^{r_i}}$ donne donc la connaissance de $\log(\mbf g_{p^r})$ modulo
 $$\ell := \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}.$$
 Nous avons donc besoin seulement de $(p^r-1)/\ell$ essais pour recouvrer $\mbf g_{p^r}$.
@@ -683,32 +677,52 @@ Cela permet d'écrire l'algorithme~\ref{algo:gprFromgpri}, recouvrant $\mbf g_{p
 \ENSURE l'ensemble des $\mbf g_{p^r}$ possibles
 \STATE{choisir $\gamma$ un élément primitif de $\gf{p^r}$}
 \FORALL{$i$ allant de $1$ à $k$}
-	\STATE{résoudre l'équation $(\ast)$ : $$x_i = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
+	\STATE{résoudre l'équation (\ref{eqn:loggpr}) : $$x_i = \frac{\log(\mbf g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
 \ENDFOR
 \STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
 \STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$, pour $1 \leqslant i \leqslant k$ et où $x$ est unique modulo $\ell$ (CRT)}
-\STATE{$\beta \gets \gamma^{x}$}
 \FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}\label{boucle:algogprFromgpri}
 	\FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}
-		\STATE{calculer la somme : $$\mathbf{res} \gets \sum_{i=0}^{p-1} \beta^{ec_i}\gamma^{ec_i\ell y}$$}
-		\IF{$\mathbf{res} \neq 0$}
+		\IF{$\sum_{i=0}^{p-1} \gamma^{ec_i(x+\ell y)} \neq 0$}
 			\STATE{continuer la boucle ligne~\ref{boucle:algogprFromgpri}}
 		\ENDIF
 	\ENDFOR
-	\STATE{ajouter $\beta\gamma^{\ell y}$ à la liste des $\mbf  g_{p^r}$ possibles}
+	\STATE{ajouter $\gamma^{x+\ell y}$ à la liste des $\mbf  g_{p^r}$ possibles}
 \ENDFOR
 \end{algorithmic}
 \end{algorithm}
 
 Chaque boucle de la ligne~\ref{boucle:algogprFromgpri} de l'algorithme~\ref{algo:gprFromgpri} demande en moyenne $\O(pr^2)$ opérations dans $\gf{p}$.
 
-\subsection{Attaque globale}
+\subsection{Attaque de Serge Vaudenay}
 
-Pour l'attaque générale, on s'intéresse aux sous-corps de $\gf{p^r}$.
+Pour l'attaque, on s'intéresse aux sous-corps de $\gf{p^r}$.
 
 \begin{defi}
-Soit $G$ un graphe orienté acyclique (\textit{DAG for directed acyclic graph}) étiqueté enraciné dont la racine est étiquetée par un corps fini $\gf{p^r}$ et tel que pour chaque arête $u \rightarrow v$ de $G$, l'étiquette $L(u)$ de $u$ est un sous-corps maximal (au sens de l'inclusion) de l'étiquette $L(v)$ de $v$ et est une extension du corps $\gf{p}$. On dit que $G$ est un \textit{DAG $p$-factorisant} de $\gf{p^r}$.
+Soit $G$ un graphe orienté acyclique (DAG pour \textit{directed acyclic graph}) étiqueté enraciné dont la racine est étiquetée par un corps fini $\gf{p^r}$ et tel que pour chaque arête $u \rightarrow v$ de $G$, l'étiquette $L(u)$ de $u$ est un sous-corps maximal (au sens de l'inclusion) de l'étiquette $L(v)$ de $v$ et est une extension du corps $\gf{p}$. On dit que $G$ est un \textit{DAG $p$-factorisant} de $\gf{p^r}$.
 \end{defi}
+
+\begin{exem}
+Soit $p$ un nombre premier. Plaçons nous dans le corps $\gf{p^{24}}$, i.e. $h := 24$. L'attaque que nous échafaudons préconise de prendre $r = 6$ comme diviseur de $24$. Soit $G$ le DAG $p$-factorisant de $\gf{p^6}$ suivant :
+\begin{figure}[h]
+\begin{center}
+\begin{tikzpicture}
+\coordinate (F) at (0,0) ;
+\coordinate (F2) at (-1.5,1.5) ;
+\coordinate (F6) at (0,3) ;
+\coordinate (F3) at (1.5,1.5) ;
+\draw (F) node[below]{$\gf{p}$} node{$\bullet$} ;
+\draw (F2) node[left]{$\gf{p^2}$} node{$\bullet$} ;
+\draw (F6) node[above]{$\gf{p^6}$} node{$\bullet$} ;
+\draw (F3) node[right]{$\gf{p^3}$} node{$\bullet$} ;
+\draw[thick, ->, >= latex] (F) -- (F2) ;
+\draw[thick, ->, >= latex] (F) -- (F3) ;
+\draw[thick, ->, >= latex] (F2) -- (F6) ;
+\draw[thick, ->, >= latex] (F3) -- (F6) ;
+\end{tikzpicture}
+\end{center}
+\end{figure}
+\end{exem}
 
 \begin{defi}
 \`A une extension $\gf{p^r}$ et $G$ son DAG $p$-factorisant, on associe :
@@ -716,10 +730,15 @@ $$C(G) := \sum_{v} \frac{\#L(v) -1}{\ppcm\{\#L(w)-1 \mid v \leftarrow w\}},$$
 où on prend pour convention : $\ppcm(\emptyset) = 1$.
 \end{defi}
 
-Nous pouvons définir un algorithme pour calculer $\mbf g_{p^r}$ avec pour complexité $\O(pr^2C(G))$, où $G$ est le DAG $p$-factorisant de $\gf{p^r}$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
+\begin{exem}
+Reprenons l'exemple précédent :
+$$C(G) = \frac{p^6 - 1}{\ppcm(p^2-1, p^3-1)} + \frac{p^3-1}{p-1} + \frac{p^2}{p-1} + p-1.$$
+Pour $p = 197$, cela donne $C(G) = 78\;014$.
+\end{exem}
+
+Nous pouvons définir un algorithme pour calculer $\mbf g_{p^r}$ avec pour complexité $\O(pr^2C(G))$, où $G$ est un DAG $p$-factorisant de $\gf{p^r}$. Donc, nous pouvons casser le cryptosystème de Chor-Rivest avec comme paramètre $h$ ni un nombre premier, ni un carré de nombre premier, avec une complexité de
 $$\O\left(\min_{\substack{r \text{ divisant } h \\ r^2 \geqslant h}} \; \min_{\substack{G \text{ est un DAG}\\p\text{-factorisant} \\ \text{ de } \gf{p^r}}} \;
 pr^2C(G)\right).$$
-
 L'algorithme~\ref{algo:attaqueGeneral} illustre l'attaque complète de Serge Vaudenay.
 
 \begin{algorithm}[h]
@@ -743,11 +762,11 @@ L'algorithme~\ref{algo:attaqueGeneral} illustre l'attaque complète de Serge Vau
 
 Serge Vaudenay a décrit une attaque du cryptosystème, lorsque $h$ admet un facteur $r$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, ayant pour complexité $\O(h^3p^r/r^2)$.
 
-L'attaque a été implémentée en \verb|sage|, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 1 heure et demie en moyenne contre 15 minutes, pour le cas $\gf{197^{24}}$.
+L'attaque a été implémentée\footnote{Consulter le fichier \textit{vaudenay-attack.sage}} en \verb|sage|, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 1 heure et demie en moyenne contre 15 minutes, pour les corps $\gf{197^{24}}$ et $\gf{211^{24}}$.
 
-Les préconisations pour réparer le cryptosystème de Chor-Rivest sont : \begin{itemize}
+Les préconisations de Serge Vaudenay pour réparer le cryptosystème de Chor-Rivest sont les suivantes : \begin{itemize}
 \item choisir un corps fini $\gf{p^h}$ avec $p$ et $h$ tous les deux premiers,
-\item ne pas inclure tous les $c_i$ dans la clé publique.
+\item ne pas divulguer tous les $c_i$ dans la clé publique.
 \end{itemize}
 
 \section{Le calcul de logarithmes discrets selon Antoine Joux}\label{sec:DLPJoux}
@@ -900,13 +919,38 @@ Les polynômes $A(X)$ et $B(X)$ sont à choisir de sorte que leur degré soit au
 L'optimisation non détaillée ici, donne une complexité asymptotique heuristique de :
 $$L_{q^k}(1/3, (32/9)^{1/3}).$$
 
+\subsubsection{Détail de la descente}\label{ss-sec:descente}
+
 \subsection{Algorithme de Joux en $L_{q^k}(1/4)$}
+
+Nous arrivons enfin à l'algorithme en $L_{q^k}(1/4 + \o(1))$ décrit par Antoine Joux \cite{joux2013}. Dans l'article, il commence par rafraichir la mémoire du lecteur sur l'algorithme de Coppersmith et le crible par corps de fonctions. Ensuite il présente prosaïquement les nouvelles idées de son algorithme, suivit par une description plus rigoureuse insistant sur la phase de crible et sur la phase de descente pour le calcul de logarithme individuel. Il conclut par l'étude de la complexité, en faisant remarquer que la phase la plus coûteuse devient la descente, ainsi que quelques exemples.
+
+L'un des changement de paradigme majeur par rapport aux autres algorithmes présentés avant est la construction et non plus la recherche de polynômes friables.
+
+\subsubsection{Présentation des idées de Joux}
+
+Nous présentons ici les idées sur lesquelles reposent l'algorithme
+
+\paragraph*{Homographies.} Si on a un polynôme qui se factorise, on souhaite le transformer en d'autres polynômes qui se factorisent eux aussi. Pour cela, on considère la transformation induite par les homographies, à savoir :
+$$X \rightarrow \frac{aX+b}{cX+d}.$$
+Cependant, faire ce changement de variable ne donne pas un polynôme : si $f(X) \in\gf{q}[X]$ est un polynôme, ce n'est pas forcement le cas de $f((aX+b)/(cX+d))$. Ainsi, nous considérons plutôt l'évaluation homogène d'un polynôme, i.e. pour un polynôme $f(X)$ de $\gf{q}[X]$, dont on note le degré $\deg f$, on considère le polynôme :
+$$F_{a,b,c,d}(X) := (cX+d)^{\deg f} f \left(\frac{aX+b}{cX+d}\right).$$
+Formalisons cela en le théorème suivant :
+\begin{theo}
+Soient $f(X) \in \gf{q}[X]$ un polynôme unitaire et $\gf{q^k}$ une extension de $\gf{q}$. Soit $(a,b,c,d) \in \gf{q^k}^4$ tel que $ad \neq bc$ et considérons le polynôme :
+$$F_{a,b,c,d}(X) := (cX+d)^{\deg f} f \left(\frac{aX+b}{cX+d}\right).$$
+Si le polynôme $f(X)$ admet la factorisation en produit de polynômes irréductibles unitaires : $$f(X) = \prod_{i=1}^k F_i(X)^{e_i},$$
+alors le polynôme $F_{a,b,c,d}(X)$ admet la factorisation suivant :
+$$F_{a,b,c,d}(X) = \prod_{i=1}^k {\left( (cX+d)^{\deg F_i} F_i\left(\frac{aX+b}{cX+d}\right)\right)}^{e_i}.$$
+Remarquons que les facteurs de cette décomposition ne sont pas nécessairement unitaires, ni irréductible, et qu'ils peuvent avoir un degré plus petit que le facteur correspondant.
+\end{theo}
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
 \section*{Conclusion}
 
 \newpage
+\thispagestyle{empty}
 \bibliographystyle{abbrv}
 \bibliography{mybib}
 

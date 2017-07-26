@@ -35,6 +35,7 @@ Use Vaudenay's attack, with `VaudenayAttack`, to make an equivalent key then try
 
     sage: %time EquivPrivKey = VaudenayAttack (PubKey)
     sage: crackedMessage = CRDecrypt (e, PubKey, EquivPrivKey)
+    sage: crackedMessage == m
 
 ---
 ## Bibliography
