@@ -315,15 +315,16 @@ sage: A.<x> = PolynomialRing (GF(p))
 sage: G = list (Minv * V(g ** (e - h * d))
 \end{verbatim}
 Ainsi le message est recouvré en factorisant le polynôme :
-$$G(X) + \mu(X) = x^6 + 2x^5 + 9x^3 + 5x^2 + 4x + 9,$$
+$$G(X) + \mu(X) = X^6 + 2X^5 + 9X^3 + 5X^2 + 4X + 9,$$
 ce que nous faisons :
 \begin{verbatim}
 sage: Q = A(G) + A(mu)
-sage: beta = [p - Q.roots()[i][0] for i in range (h)]
+sage: Q.factor()
 \end{verbatim}
-$$G(X) + \mu(X) = (x + 1)(x + 2)(x + 5)(x + 6)(x + 10)(x + 12).$$
+$$G(X) + \mu(X) = (X + 1)(X + 2)(X + 5)(X + 6)(X + 10)(X + 12).$$
 Nous pouvons alors déterminer les $\alpha_i$ utilisés et nous savons ainsi que le bit $m_{\sigma^{-1}(i)}$ du message $m$ est à $1$ :
 \begin{verbatim}
+sage: beta = [p - Q.roots()[i][0] for i in range (h)]
 sage: sInv = [s.index(i) for i in range (p)]
 sage: message = [0 for i in range (p)]
 sage: for k in beta :
@@ -415,7 +416,7 @@ Supposons connus la norme $\mbf g_{p^r}$ et la permutation $\sigma$. Nous pouvon
 
 Nous résolvons l'attaque en calculant $g$ et $d$ -- d'une clé équivalente donc -- grâce à l'attaque de Oded Goldreich exposée dans \cite[VII.A.3]{chorRivest1988}, une version simplifiée sera utilisée plus loin, c'est pour cela qu'elle est volontairement omise ici.
 
-\paragraph*{Notation :} Pour $j$ tel que $0\leqslant j \leqslant h/r$, on note $\mathcal L_j(X)$ l'interpolateur de Lagrange :
+\paragraph*{Notation :} Pour $j$ tel que $0\leqslant j \leqslant h/r$, on note $\mathcal L_j(X)$ l'\textit{interpolateur de Lagrange} :
 $$\mathcal L_j(X) := \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{X-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}.$$
 
 \begin{algorithm}[h]

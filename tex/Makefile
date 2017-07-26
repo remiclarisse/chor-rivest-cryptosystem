@@ -6,7 +6,7 @@ RAPPORT=rapport-stage
 .PHONY: all clean help open
 
 # Rules and targets
-all: clean $(LOGBOOK) $(RAPPORT)
+all: $(RAPPORT)
 
 $(LOGBOOK): clean
 	pdflatex $(LOGBOOK).tex
@@ -20,7 +20,7 @@ $(RAPPORT): clean
 	pdflatex $(RAPPORT).tex
 	pdflatex $(RAPPORT).tex
 
-open: $(LOGBOOK) $(RAPPORT)
+open: $(RAPPORT)
 	@evince $(LOGBOOK).pdf&
 	@evince $(RAPPORT).pdf&
 
@@ -29,7 +29,7 @@ clean:
 	@rm -f *~ *.aux *.bbl *.blg *.toc *.log *.gz *.out *.pdf
 
 help:
-	@echo "all:\tRun the whole build to make the PDF files."
-	@echo "open:\tBuild the PDF files and open it."
+	@echo "all:\tRun the whole build to make the PDF file '$(RAPPORT).pdf'."
+	@echo "open:\tBuild the PDF file '$(RAPPORT).pdf' and open it."
 	@echo "clean:\tRemove all files produced by the compilation."
 	@echo "help:\tDisplay the main targets of this Makefile with a short despriction."
