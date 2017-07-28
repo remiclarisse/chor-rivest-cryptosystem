@@ -805,7 +805,11 @@ $$\gf{q^k} \cong \frac{\gf{q}[X]}{(J_k(X))}.$$
 \subsubsection{Description de la méthode du calcul d'indice}
 La plupart des algorithmes de calcul de logarithmes discrets commencent par la recherche d'une \textit{autre représentation du corps $\gf{q^k}$}. Pour cela, ils sélectionnent un polynôme irréductible de degré $k$, notons le $I_k(X) \in \gf{q}[X]$. Le changement de représentation se fait de la façon suivante : soit $\alpha$ une racine du polynôme $I_k(X)$ et considérons $J_k(X)$ comme un polynôme à coefficients dans $\gf{q^k} \cong \gf{q}[\alpha]$. Ainsi $J_k(X) \in \gf{q}[\alpha]$ est scindé, et on peut exprimer toutes ses racines comme des polynômes en $\alpha$. Choisissons l'une d'entre elles au hasard et notons la $\beta$. Il est possible d'écrire $\beta = f(\alpha)$, où $f(X) \in \gf{q}[X]$. Dans le problème initial, $g$ et $h$ sont donnés comme des polynômes en $\beta$, disons $G(\beta)$ et $H(\beta)$. Dans la nouvelle représentation, il suffit de trouver le logarithme discret de $H(f(\alpha))$ en base $G(f(\alpha))$.
 
-Ensuite, il faut déterminer un ensemble de $\gf{q^k}^\times$, que l'on nomme \textit{base de friabilité}, dont les éléments sont considérés comme petit -- dans un sens restant encore à définir. Souvent, on fixe $d$ un entier assez petit, et les éléments de la base de friabilité sont ceux de la forme $F(\alpha)$, où $F(X)\in\gf{q}[X]$ est un polynôme de degré au plus $d$.
+Ensuite, il faut déterminer un ensemble de $\gf{q^k}^\times$, que l'on nomme \textit{base de friabilité}, dont les éléments sont considérés comme ``petit''. Souvent, on fixe $d$ un entier assez petit, et les éléments de la base de friabilité sont ceux de la forme $F(\alpha)$, où $F(X)\in\gf{q}[X]$ est un polynôme de degré au plus $d$.
+
+\begin{rema}
+Une fois de plus, on fait parfois l'amalgame entre deux objets : à savoir entre un \textit{élément du corps} appartenant à la base de friabilité et son \textit{polynôme} ayant servi à le représenter. Par exemple, si $h = H(\alpha)\in\gf{q^k}$ appartient à la base de friabilité, on pourra dire indistinctement que $h$  appartient à la base de friabilité ou bien que $H(X)$ appartient à la base de friabilité.
+\end{rema}
 
 Vient après la \textit{phase de collecte de relations} ou \textit{phase de crible}, à savoir, si la base de friabilité utilisée est $\{g_i : i \in I\}$, nous nous intéressons à des relations de la forme :
 $$\prod_{i\in I} {g_i}^{u_i} = \prod_{i\in I} {g_i}^{v_i},$$
@@ -826,6 +830,8 @@ En résumé, un algorithme implémentant la méthode de calcul d'indice peut se 
 
 \subsubsection{Heuristique de la méthode du calcul d'indice}
 Les algorithmes par calcul d'indice reposent sur l'idée de décomposer des éléments comme produits d'éléments considérés comme petits. Les éléments qui peuvent se factoriser de cette manière sont dits friables. Un problème essentiel pour l'analyse de ces algorithmes consiste à estimer la probabilité d'obtenir de tels éléments friables. Dans de nombreux cas, nous procédons heuristiquement en supposant que les éléments créés se comportent comme des éléments aléatoires de même taille. Bien qu'inélégante, car non prouvée, cette heuristique a permis d'obtenir de nombreux progrès algorithmiques.
+
+Autant que faire se peut, nous mettrons en exergue le(s) heuristique(s) employé(s) par chaque méthode ou algorithme.
 
 \subsection{Algorithme de Hellman-Reyneri en $L_{q^k}(1/2)$}
 
@@ -864,7 +870,7 @@ L'algorithme de Don Coppersmith \cite{coppersmith1984} est plus efficace que l'a
 
 Coppersmith propose de choisir un polynôme irréductible $I_k(X)$ de la forme : $$X^k - S(X),$$ où $S(X)$ est un polynôme de degré $d_S$ aussi petit que possible.
 
-Cependant, Cécile Pierrot \cite{pierrot2016} indique divers résultats \cite{joux2006, joux2013} suggérant de choisir $I_k(X)$ comme facteur irréductible de $X^{q^n}-S(X)$. Détaillons : soit $n$ l'unique entier tel que $q^{n-1} < k \leqslant q^n$ et choisissons $S(X)$ de petit degré tel que $X^{q^n}-S(X)$ ait un unique facteur irréductible de degré $k$. Nous prenons alors ce facteur pour définir notre corps $\gf{q^k}$.
+Cependant, Cécile Pierrot \cite{pierrot2016} indique divers résultats \cite{joux2006, joux2013} suggérant de choisir $I_k(X)$ comme facteur irréductible de $X^{q^n}-S(X)$. Détaillons : soit $n$ l'unique entier tel que $q^{n-1} < k \leqslant q^n$ et choisissons $S(X)$ de petit degré tel que $X^{q^n}-S(X)$ ait un facteur irréductible de degré $k$. Nous prenons alors ce facteur pour définir notre corps $\gf{q^k}$.
 
 Décomposons $n = n_1 + n_2$ pour des valeurs $n_1$ et $n_2$ que l'on déterminera plus tard. L'idée pour la construction des relations est que pour chaque paire de polynôme $A(X)$ et $B(X)$ de $\gf{q}[X]$, on a l'égalité :
 $$(\dagger) \qquad {\left( A(X) + X^{q^{n_1}}B(X)\right)}^{q^{n_2}} = A(X^{q^{n_2}}) + S(X)B(X^{q^{n_2}}) \pmod{I_k(X)},$$
@@ -934,10 +940,14 @@ Soient $H(X)\in\gf{q}[X]$ le polynôme tel que $H(\alpha) = h$. Considérons l'e
 $$\mathcal S_H = \{X^iY^j : 0 \leqslant i \leqslant D_\alpha(H), 0 \leqslant j \leqslant D_\beta(H)\},$$
 où $D_\alpha(H)$ et $D_\beta(H)$ sont des paramètres que nous déterminerons plus tard. Chaque monôme dans $\mathcal S_H$ peut être exprimé comme un polynôme univarié en $X$ en substituant $Y$ par $f(X)$. Pour $m(X,Y)$ un monôme de $\mathcal S_H$, notons $V_H(m)(X)$ la valeur modulo $H(X)$ du polynôme univarié correspondant à $m(X,Y)$, i.e. 
 $$V_H(m)(X) := m(X,f(X)) \pmod{H(X)}.$$
-Clairement, $V_H(m)(X)$ peut être représenté par un vecteur de dimension $\deg(H(X))$ à coefficients dans le corps fini $\gf{q}$. Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)(X)$ pour $m(X,Y) \in \mathcal S_H$. N'importe quel vecteur du noyau de $M_H$ peut être alors interprété comme un polynôme univarié $U(X)$ divisible par $H(X)$. Si, à la fois, le polynôme $U(X)/H(X)$ et la représentation univarée en l'autre indéterminée $U(g(Y))$ se factorise en polynôme de degré au plus $d$, nous obtenons la relation désirée.
+Clairement, $V_H(m)(X)$ peut être représenté par un vecteur $V_H(m)$ à $\deg(H(X))$ coefficients dans le corps fini $\gf{q}$. Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)$ pour $m(X,Y) \in \mathcal S_H$. Concrètement, la matrice $M_H$ contient en colonnes des restes de divisions euclidiennes par le polynôme $H(X)$. N'importe quel vecteur du noyau de $M_H$ peut être alors interprété comme combinaison linéaire de ces restes modulo $H(X)$. Ainsi, à chaque vecteur du noyau de $M_H$, on peut associer une combinaison linéaire d'éléments de $\mathcal S_H$, qui est un polynôme $U(X)$ divisible par $H(X)$. Si, à la fois, le polynôme $U(X)/H(X)$ et la représentation univarée en l'autre indéterminée $U(g(Y))$, se factorisent en polynômes de degré au plus $d$, nous obtenons la relation désirée.
 
 L'étude faite dans \cite{joux2006, joux2002} et rappelée dans \cite{joux2013}, donne :
 $$D_\alpha(H) D_\beta(H) \geqslant \deg(H(X)) \quad\text{et}\quad \frac{D_\beta(H)}{D_\alpha(H)} \approx d.$$
+
+\begin{rema}
+L'exposé fait ici avec $H(X)\in\gf{q}[X]$ tel que $H(\alpha) = h$, peut aussi être fait avec $H(Y)\in\gf{q}[Y]$ tel que $H(\beta) = h$, en gardant à l'esprit que $X = g(Y)$ et $Y = f(X).$
+\end{rema}
 
 \subsection{Algorithme de Joux en $L_{q^k}(1/4)$}
 
@@ -945,7 +955,7 @@ Nous arrivons enfin à l'algorithme en $L_{q^k}(1/4 + \o(1))$ décrit par Antoin
 
 L'un des changement de paradigme majeur par rapport aux autres algorithmes présentés avant est la construction et non plus la recherche de polynômes friables.
 
-\subsubsection{Présentation des idées de Joux}
+\subsubsection{Présentation des idées de Joux}\label{ss-sec:idees}
 
 Nous présentons ici les idées sur lesquelles reposent l'algorithme.
 
@@ -968,13 +978,64 @@ $$(cX+d)^{\deg F_i} F_i\left(\frac{aX+b}{cX+d}\right)$$
 sont en effet des polynômes. Visiblement, il n'y a aucune raison pour que les facteurs ainsi transformés soient irréductibles dans $\gf{q^k}[X]$. Remarquons que lorsque $c \neq 0$, le coefficient de $X^{\deg{F_i}}$ venant de $F_i$ est $c^{\deg F_i}F_i(a/c)$. Comme il n'est pas nécessairement égal à $1$ et peut même être nul, on observe que les facteurs transformés ne sont pas nécessairement unitaires et peuvent être de degré strictement inférieur que le $F_i$ correspondant.
 \end{proof}
 
-\paragraph*{Polynôme toujours scindé.} La seconde idée découle directement de la première. Comme on sait faire plusieurs ``copies'' d'un polynôme, on peut commencer par considérer un polynôme qui se factorise agréablement. Sur $\gf{q}$, un candidat naturel est : $$X^q -X = \prod_{\alpha\in\gf{q}} X-\alpha.$$
+\paragraph*{Polynôme toujours scindé.} La seconde idée découle directement de la première. Comme on sait faire plusieurs ``copies'' d'un polynôme, on peut commencer par considérer un polynôme qui se factorise agréablement. Sur $\gf{q}$, un candidat naturel est : $$X^q -X = \prod_{\gamma\in\gf{q}} X-\gamma.$$
 
 \paragraph*{Représentation du corps.} L'image de $X^q-X$ par une homographie est un polynôme combinaison linéaire des monômes $X^{q+1}$, $X^q$, $X$ et $1$. Pour obtenir une relation multiplicative, on désire donc trouver une représentation du corps fini qui transforme un tel polynôme en un polynôme de bas degré. Une façon de faire est de demander la satisfaction dans $\gf{q^k}$ de la relation :
 $$x^q = \frac{h_0(x)}{h_1(x)}.$$
 Cela défini le corps $\gf{q^k}$ si, et seulement si, le polynôme $h_1(X)X^q - h_0(X)$ admet un facteur irréductible $I_k(X)$ de degré $k$, et alors $x = X \pmod{I_k(X)}$ vérifie bien la relation demandée.
 
 \subsubsection{Description de l'algorithme}
+
+L'algorithme de Joux combine les idées précédentes pour calculer des logarithmes discrets dans des corps de petite caractéristique. La description laisse de côté l'étude de la phase d'algèbre linéaire.
+
+\paragraph*{Choix des paramètres.}Étant donné un corps $\gf{p^n}$ de petite caractéristique ($p$ peut être une puissance de nombre premier), nous commençons par l'imbriquer dans un corps de la forme $\gf{q^{2k}}$, avec $k \leqslant q$. Cela se fait, par exemple, en prenant une extension de degré $e$ de $\gf{p^n}$, où $e \leqslant 2 \ceil{\log_p n}$.
+
+Ensuite, le corps fini $\gf{q^{2k}}$ est construit comme une extension de degré $k$ de $\gf{q^2}$. Plus précisément, nous appliquons la troisième idée du paragraphe~\ref{ss-sec:idees} : on choisit deux polynômes $h_0(X)$ et $h_1(X)$ de $\gf{q^2}[X]$ de bas degré de sorte que $h_1(X)X^q - h_0(X)$ ait un facteur irréductible $I_k(X)$ de degré $k$.
+\begin{heur}
+Quel que soit le degré de l'extension $k$, on peut trouver $h_0(X)$ et $h_1(X)$  tel que $h_1(X)X^q - h_0(X)$ ait un facteur irréductible de degré $k$.
+\end{heur}
+Et en fait, \cite{joux2013} indique que nous pouvons même nous limiter aux polynômes de degré 2, et espérer malgré tout avoir une bonne représentation de notre corps.
+
+\paragraph*{Logarithmes des polynômes linéaires.}Nous voulons déterminer les logarithmes de tous les polynômes linéaires de notre corps. Pour cela, nous construisons des relations multiplicatives entre de tels éléments.
+
+Pour générer de telles relations, partons de l'identité polynomiale:
+\begin{equation}\label{eqn:identitySplit}
+\prod_{\gamma\in\gf{q}} X-\gamma = X^q-X,
+\end{equation}
+et appliquons la transformation homographique $X \mapsto (aX+b)/(cX+d)$, où $(a,b,c,d)\in\gf{q^2}$ satisfait à $ad\neq bc$, puis multiplions par $(cX+d)^{q+1}$, ce qui donne d'une part, en prenant seulement le membre de gauche de l'équation~\ref{eqn:identitySplit} :
+\begin{align*}
+(cX+d)^{q+1} \prod_{\gamma\in\gf{q}} \left(\frac{aX+b}{cX+d}-\gamma\right) &= (cX+d) \prod_{\gamma\in\gf{q}} (aX+b-\gamma(cX+d)), \\ 
+&= (cX+d) \prod_{\gamma\in\gf{q}} ((a-\gamma c)X+b-\gamma d),\\
+\end{align*}
+et d'autre part, en considérant uniquement le membre de droite :
+\begin{align*}
+(cX+d)^{q+1}\left({\left(\frac{aX+b}{cX+d}\right)}^q - \frac{aX+b}{cX+d}\right) &= (aX+b)^q(cX+d) - (aX+b)(cX+d)^q. \\
+\end{align*}
+D'où enfin :
+$$(cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d)) = (aX+b)^q(cX+d) - (aX+b)(cX+d)^q.$$
+Développons le membre de droite de cette dernière équation et réduisons modulo $I_k(X)$ :
+$$a^qcX^{q+1} + a^qdX^q + b^qcX + b^qd - ac^qX^{q+1} - ad^qX - bc^qX^q - bd^q$$
+$$= (a^qc - ac^q)X^{q+1} + (a^qd - bc^q)X^q + (b^qc - ad^q)X + b^qd - bd^q,$$
+$$\equiv (a^qc - ac^q)X\frac{h_0(X)}{h_1(X)} + (a^qd - bc^q)\frac{h_0(X)}{h_1(X)} + (b^qc - ad^q)X + b^qd - bd^q \pmod{I_k(X)}.$$
+Cela nous donne l'égalité, modulo $I_k(X)$, suivante:
+$$\frac{(a^qc - ac^q)Xh_0(X) + (a^qd - bc^q)h_0(X) + (b^qc - ad^q)Xh_1(X) + (b^qd - bd^q)h_1(X)}{h_1(X)}$$
+$$= (cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d)).$$
+Par conséquence, nous obtenons une égalité dans $\gf{q^2}[X]/(I_k(X)) \cong \gf{q^{2k}}$ entre un produit de polynômes linéaires et une fraction avec un numérateur de bas degré et un dénominateur constant. En ajoutant $h_1(X)$ à la base de friabilité, nous obtenons une relation satisfaisant dès que le membre de gauche se factorise en polynômes linéaires.
+
+\paragraph*{Comptage des relations.}La description ci-dessus génère une relation candidate pour chaque quadruplet $(a,b,c,d) \in \gf{q^2}^4$. Cependant, certaines de ses relations sont générées plusieurs fois, avec des $(a,b,c,d)\in\gf{q^2}^4$ distincts. Par exemple, si $(a,b,c,d)\in\gf{q}^4$, nous obtenons une équation triviale.
+
+Pour cette raison, Joux \cite{joux2013} préconise de prendre les coefficients $a,b,c,d$ dans $\gf{q^2}$. En étudiant l'action de $\operatorname{PGL}_2(\gf{q^2})$ sur la droite projective $\mathbb{P}_1(\gf{q})$ et du fait que $\operatorname{PGL}_2(\gf{q})$ laisse $\mathbb{P}_1(\gf{q})$ globalement invariant, Joux déduit le nombre de équations candidates : 
+$$\frac{q^6 - q^2}{q^3 - q} = q^3 + q.$$
+
+\paragraph*{Étendre la base aux polynômes de degré $2$.} Si nous appliquons la même stratégie que précédemment, nous tombons sur un os. En effet, on pourrait garder les relations comprenant à la fois des polynômes de degré $1$ et de degré $2$. Mais, étant donné qu'il y a $\O(q^4)$ polynômes irréductibles de degré $2$ à coefficients dans $\gf{q^2}$ et qu'on ne peut fabriquer qu'environ $q^3$ relations par la méthode précédente, en enlevant les duplicatas, il serait impossible de recouvrir le logarithme de tous les polynômes irréductibles de degré $2$.
+
+Une stratégie qui fonctionne est d'accomplir la transformation suivante :
+$$X \mapsto \frac{a(X^2+\theta X) + b}{c(X^2 + \theta X) +d},$$
+pour $\theta \in \gf{q^2}$ et $(a,b,c,d) \in \gf{q^2}^4$. Ce que Joux \cite{joux2013} fait ici est qu'il partitionne l'ensemble des polynômes de degré $2$ en plusieurs sous-ensembles, indexés par $\theta$.
+
+$$\left(c(X^2 + \theta X) +d\right)^{q+1} \prod_{\gamma\in\gf{q}} \left(\frac{a(X^2+\theta X) + b}{c(X^2 + \theta X) +d}-\gamma\right)$$
+$$= \left(c(X^2 + \theta X) +d\right) \prod_{\gamma\in\gf{q}} \left(\left(a(X^2+\theta X) + b\right)-\gamma\left(c(X^2 + \theta X) +d\right)\right),$$
+$$= \left(c(X^2 + \theta X) +d\right) \prod_{\gamma\in\gf{q}} \left(\left(a-\gamma c\right)(X^2+\theta X) + b - \gamma d\right).$$
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
