@@ -21,12 +21,11 @@ $(RAPPORT): clean
 	pdflatex $(RAPPORT).tex
 
 open: $(RAPPORT)
-	@evince $(LOGBOOK).pdf&
 	@evince $(RAPPORT).pdf&
 
 clean:
 	@echo "./tex/ : Cleaning..."
-	@rm -f *~ *.aux *.bbl *.blg *.toc *.log *.gz *.out *.pdf
+	@rm -f *~ *.aux *.bbl *.blg *.toc *.log *.gz *.out *.pdf *.gz\(busy\)
 
 help:
 	@echo "all:\tRun the whole build to make the PDF file '$(RAPPORT).pdf'."

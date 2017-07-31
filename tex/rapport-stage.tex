@@ -965,13 +965,16 @@ Soient $H(X)\in\gf{q}[X]$ le polynôme tel que $H(\alpha) = h$. Considérons l'e
 $$\mathcal S_H = \{X^iY^j : 0 \leqslant i \leqslant D_\alpha(H), 0 \leqslant j \leqslant D_\beta(H)\},$$
 où $D_\alpha(H)$ et $D_\beta(H)$ sont des paramètres que nous déterminerons plus tard. Chaque monôme dans $\mathcal S_H$ peut être exprimé comme un polynôme univarié en $X$ en substituant $Y$ par $f(X)$. Pour $m(X,Y)$ un monôme de $\mathcal S_H$, notons $V_H(m)(X)$ la valeur modulo $H(X)$ du polynôme univarié correspondant à $m(X,Y)$, i.e. 
 $$V_H(m)(X) := m(X,f(X)) \pmod{H(X)}.$$
-Clairement, $V_H(m)(X)$ peut être représenté par un vecteur $V_H(m)$ à $\deg(H(X))$ coefficients dans le corps fini $\gf{q}$. Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)$ pour $m(X,Y) \in \mathcal S_H$. Concrètement, la matrice $M_H$ contient en colonnes des restes de divisions euclidiennes par le polynôme $H(X)$. N'importe quel vecteur du noyau de $M_H$ peut être alors interprété comme combinaison linéaire de ces restes modulo $H(X)$. Ainsi, à chaque vecteur du noyau de $M_H$, on peut associer une combinaison linéaire d'éléments de $\mathcal S_H$, qui est un polynôme $U(X)$ divisible par $H(X)$. Si, à la fois, le polynôme $U(X)/H(X)$ et la représentation univarée en l'autre indéterminée $U(g(Y))$, se factorisent en polynômes de degré au plus $d$, nous obtenons la relation désirée.
+Clairement, $V_H(m)(X)$ peut être représenté par un vecteur $V_H(m)$ à $\deg(H(X))$ coefficients dans le corps fini $\gf{q}$. Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)$ pour $m(X,Y) \in \mathcal S_H$. Concrètement, la matrice $M_H$ contient en colonnes des restes de divisions euclidiennes par le polynôme $H(X)$. N'importe quel vecteur du noyau de $M_H$ peut être alors interprété comme combinaison linéaire de ces restes modulo $H(X)$. Ainsi, à chaque vecteur du noyau de $M_H$, on peut associer une combinaison linéaire d'éléments de $\mathcal S_H$ qui est un polynôme $U(X,Y)$, tel que $U(X,f(X))$ est divisible par $H(X)$. Si, à la fois, les polynômes $U(X,f(X))/H(X)$ et $U(g(Y),Y)$, se factorisent en polynômes de degré au plus $d$, nous obtenons la relation désirée.
 
 L'étude faite dans \cite{joux2006, joux2002} et rappelée dans \cite{joux2013}, donne :
 $$D_\alpha(H) D_\beta(H) \geqslant \deg(H(X)) \quad\text{et}\quad \frac{D_\beta(H)}{D_\alpha(H)} \approx d.$$
 
 \begin{rema}
 L'exposé fait ici avec $H(X)\in\gf{q}[X]$ tel que $H(\alpha) = h$, peut aussi être fait avec $H(Y)\in\gf{q}[Y]$ tel que $H(\beta) = h$, en gardant à l'esprit que $X = g(Y)$ et $Y = f(X).$
+\end{rema}
+\begin{rema}
+Le coût de cette descente augmente lorsque le degré de $H(X)$ diminue.
 \end{rema}
 
 \subsection{Algorithme de Joux en $L_{q^k}(1/4)$}
@@ -1019,9 +1022,9 @@ Ensuite, le corps fini $\gf{q^{2k}}$ est construit comme une extension de degré
 \begin{heur}
 Quel que soit le degré de l'extension $k$, on peut trouver $h_0(X)$ et $h_1(X)$  tel que $h_1(X)X^q - h_0(X)$ ait un facteur irréductible de degré $k$.
 \end{heur}
-Et en fait, \cite{joux2013} indique que nous pouvons même nous limiter aux polynômes de degré 2, et espérer malgré tout avoir une bonne représentation de notre corps.
+Et en fait, Antoine Joux \cite{joux2013} indique que nous pouvons même nous limiter aux polynômes de degré 2, et espérer malgré tout avoir une bonne représentation de notre corps.
 
-\paragraph{Logarithmes des polynômes linéaires.}Nous voulons déterminer les logarithmes de tous les polynômes linéaires de notre corps. Pour cela, nous construisons des relations multiplicatives entre de tels éléments.
+\paragraph{Logarithmes des polynômes linéaires.}Nous voulons déterminer les logarithmes de tous les polynômes linéaires de notre corps. Pour cela, nous construisons des relations multiplicatives entre de tels éléments, en utilisant la première et la seconde idées du paragraphe~\ref{ss-sec:idees}.
 
 Pour générer de telles relations, partons de l'identité polynomiale:
 \begin{equation}\label{eqn:identitySplit}
@@ -1058,7 +1061,34 @@ Une stratégie qui fonctionne est d'accomplir la transformation suivante :
 $$X \mapsto \frac{a(X^2+\theta X) + b}{c(X^2 + \theta X) +d},$$
 pour $\theta \in \gf{q^2}$ et $(a,b,c,d) \in \gf{q^2}^4$. Ce que Joux \cite{joux2013} fait ici est qu'il partitionne l'ensemble des polynômes de degré $2$ en plusieurs sous-ensembles, indexés par $\theta$. Après ce changement dans l'équation~\ref{eqn:identitySplit}, le membre de gauche se factorise en  produit d'une constante de $\gf{q^2}$ et de polynômes irréductibles de degré $2$ ayant la forme $X^2 + \theta X + \kappa \in \gf{q^2}[X]$. Si nous gardons seulement les relations où le membre de droite se factorise en polynômes linéaires, nous pouvons déterminer les logarithmes des polynômes $X^2 +\theta X + \kappa$ irréductibles, où $\theta$ est fixé. Cela nous fait résoudre $q^2$ systèmes (un pour chaque $\theta$) de taille $\O(q^2)$ chacun.
 
-\paragraph{Première phase de descente.}Avant de commencer la descente proprement dit, il peut être utile de trouver un bon représentant de l'élément $h$ dont nous souhaitons déterminer le logarithme. Tout d'abord, $h$ est écrit comme un polynôme de degré au plus $k-1$ sur $\gf{q^2}$, et si elle n'est pas satisfaisante, supposons que la base de logarithme que nous choisissons est l'élément primitif $g$, on peut considérer plutôt la représentation polynomiale de $hg^r$, en faisant varier $r$ jusqu'à ce que l'on ait une décomposition en polynômes de degré suffisamment petit.
+\paragraph{Étape préliminaire de la descente.}Avant de commencer la descente proprement dit, il peut être utile de trouver un bon représentant de l'élément $h$ dont nous souhaitons déterminer le logarithme. Tout d'abord, $h$ est écrit comme un polynôme de degré au plus $k-1$ sur $\gf{q^2}$, et si elle n'est pas satisfaisante, supposons que la base de logarithme que nous choisissons est l'élément primitif $g$, on peut considérer plutôt la représentation polynomiale de $hg^r$, en faisant varier $r$ jusqu'à ce que l'on ait une décomposition en polynômes de degré suffisamment petit.
+
+\paragraph{Descente special-$\mathfrak{q}$.}La première phase de descente fait appel à la descente special-$\mathfrak{q}$, déjà exposée au paragraphe~\ref{ss-sec:special-q}. Cependant, nous ne possédons pas de seconde indéterminée $Y$. Il faut donc créer $Y$ en fonction de $X$. Cependant, Joux \cite{joux2013} précise que la méthode que nous nous apprêtons à exposer, ne marche que dans le cas d'un corps de petite caractéristique.
+
+Notons $p$ la caractéristique du corps fini, soit $\ell$ tel que $q = p^\ell$ et posons $r := \floor{\ell/2}$. Si $Y = X^{p^{r}}$ alors, la représentation de notre corps donne:
+$$Y^{qp^{-r}} = X^q = \frac{h_0(X)}{h_1(X)}.$$
+Si $h_0(X)$ pu $h_1(X)$ est de degré $2$ ou plus, il faut recourir à un légère variation par rapport à la descente special-$\mathfrak{q}$. À	savoir, là où dans \ref{ss-sec:special-q} on considérer une relation de la forme $U(X,f(X)) = U(g(Y),Y)$, on considère la relation
+$${\left({U(X,X^{p^r})}\right)}^{qp^{-r}} = U'\left( X^{qp^{-r}},\frac{h_0(X)}{h_1(X)}\right),$$
+où $U'(X,Y) \in \gf{q^2}[X,Y]$ est obtenu à partir de $U(X,Y)\in \gf{q^2}[X,Y]$ en élevant les coefficients à la puissance $qp^{-r}$.
+
+Comme cette méthode est coûteuse si nous souhaitons atteindre les éléments de la base de friabilité, Antoine Joux \cite{joux2013} introduit une nouvelle méthode à employer lorsque nous avons affaire à des polynômes de degré bas, mais pas encore dans la base de friabilité.
+
+\paragraph{Descente basée sur un système bilinéaire.}L'idée de cette descente qui vient compléter la descente classique précédente est: étant donné un polynôme $H(X)$, nous cherchons une paire de polynômes de bas degré, $k_1(X)$ et $k_2(X)$, de $\gf{q^2}[X,Y]$, tels que $H(X)$ divise la différence $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$. Ainsi, la relation:
+$$(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \equiv (k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}.$$
+a un facteur égal à $H(X)$ dans le membre de droite et le membre de gauche se factorise en polynôme de degré au plus $D_m := \max(\deg k_1, \deg k_2)$. Comme le degré total du membre de droite est majoré par un petit multiple de $D_m$ (lié au degré de $h_0$ et $h_1$), avec un bonne probabilité, nous obtenons une relation polynomiale entre $H(X)$ et des polynômes de degré au plus $D_m$.
+
+Reste à construire de tel polynôme $k_1(X)$ et $k_2(X)$. Antoine Joux \cite{joux2013} remarque que la condition $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$ s'annule modulo $H(X)$ se réécrit comme un système d'équations multivariées sur $\gf{q}$, qui peut être efficacement résolue après en avoir trouver une base de Gröbner. 
+
+Plus précisément, considérons chaque coefficient de $k_1(X)$ et $k_2(X)$ comme une indéterminée appartenant au corps des coefficients $\gf{q^2}$. Si $x$ est une telle inconnue, nous l'écrivons $x_0 + zx_1$, où $(1,z)$ est une base de $\gf{q^2}$ sur $\gf{q}$, et $x_0$ et $x_1$ sont des inconnues appartenant à $\gf{q}$. Avec une telle convention, $x^q = x_0 + z^qx_1$ et le système a $\deg H(X)$ équations sur $\gf{q^2}$ peut s'écrire comme un système à $2\deg H(X)$ équations sur $\gf{q}$. En supposant que $k_1(X)$ est unitaire, le nombre maximum d'inconnues est $2(\deg k_1(X) + \deg k_2(X) + 1)$. Cependant, à cause de l'action de $\operatorname{PGL}_2(\gf{q})$, plusieurs couples $(k_1(X),k_2(X))$ distincts donnent le même polynôme $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q)$. Pour éviter cela, il faut fixer au moins une inconnue dans $\gf{q^2} - \gf{q}$, laissant ainsi $2(\deg k_1(X) + \deg k_2(X))$ inconnues dans $\gf{q}$. 
+
+Antoine Joux \cite{joux2013} fait ensuite un raisonnement heuristique pour avoir une bonne probabilité que le système précédent admet une solution, à savoir: nous avons besoin que 
+$$\deg k_1(X) + \deg k_2(X) \geqslant \deg H(X) + 1.$$
+
+Enfin, il étudie la complexité de la descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donne celle-ci : la complexité est exponentielle en $$\min(\deg k_1(X), \deg k_2 (X)).$$
+Plus précisément, en posant $d = \deg k_2(X)$ et donc $\deg k_1(X) = \deg H(X) +1 - d$, le complexité est :
+$$\binom{2 (\deg H(X)) + 3}{2d+1}^\omega,$$
+où $2 \leqslant \omega \leqslant 3$ est une constante. 
+Le choix de $d$ est donné dans la section suivante.
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
