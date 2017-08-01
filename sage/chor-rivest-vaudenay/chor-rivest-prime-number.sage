@@ -76,7 +76,7 @@ def CRDecrypt (e, PubKey, PrivKey) :
 
 @parallel
 def computeLog (h, g, i) :
-    return i, log (h, g)
+    return i, discrete_log (h, g)
 
 def computePubKey (d, t, alpha, s, g, p, h) :
     w = [ t + alpha[s[i]] for i in range (p) ]
