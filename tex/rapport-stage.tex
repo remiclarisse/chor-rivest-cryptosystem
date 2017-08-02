@@ -113,15 +113,21 @@
 \thispagestyle{empty}
 \section*{Introduction}
 
-En section~\ref{sec:presInria}, nous présentons Inria (Institut National de Recherche en Informatique et en Automatique), ainsi que l'équipe-projet GRACE. Les section~\ref{sec:cryptosysteme} et section~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} résume le papier de Joux sur le calcul de logarithmes discrets dans des corps finis de petite caractéristique, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
+De mai à août 2017, j'ai intégré en tant que stagiaire l'équipe GRACE de Inria Saclay - Île-de-France. Sous la supervision de Daniel Augot, responsable de l'équipe, et Luca De Feo, j'ai étudié le cryptosystème \cite{chorRivest1988} présenté par Benny Chor et Ronald Rivest en 1984, ainsi que l'algorithme \cite{joux2013} qu'Antoine Joux à conçu en 2013 pour le calcul de logarithme discret dans un corps fini de petite caractéristique. 
 
-\setcounter{tocdepth}{3}
+Le cryptosystème de Chor-Rivest est un cryptosytème asymétrique qui base sa sécurité sur un problème de sac à dos. Cependant, pour produire la clé publique, il faut avoir recours à des calculs de logarithmes discrets dans un corps fini $\gf{p^h}$. C'est pour cela que Chor et Rivest incitent l'utilisateur à prendre des paramètres facilitant la résolution du problème du logarithme discret, en sélectionnant par exemple un exposant $h$ friable. C'est justement ce pré-requis qui à permis à Serge Vaudenay en 2000 de confectionner une cryptanalyse \cite{vaudenay2000}, qui lui fait arriver à la conclusion qu'il faut choisir un exposant $h$ premier.
+
+Nous sommes donc au croisement de deux recommandations : l'une facilitant le calcul de logarithme pour fabriquer les clés et l'autre rendant le cryptosystème résistant à la meilleure cryptanalyse existante à ce jour. Il est clair qu'avoir un cryptosystème cassé est inutile. C'est pour cela que nous nous intéressons à l'algorithme de Joux, afin que le calcul des logarithmes ne soit plus un obstacle.
+
+Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet GRACE. Les section~\ref{sec:cryptosysteme} et section~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers resultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
+
+\setcounter{tocdepth}{1}
 \tableofcontents
 \newpage
 
 \section{La présentation de Inria}\label{sec:presInria}
 
-Inria emploie 2\;600 collaborateurs issus des meilleures universités mondiales, qui relèvent les défis des sciences informatiques et mathématiques. Inria est organisé en \og{}équipes-projets\fg{} qui rassemblent des chercheurs aux compétences complémentaires autour d’un projet scientifique focalisé. Ce modèle ouvert et agile lui permet d’explorer des voies originales avec ses partenaires industriels et académiques. Inria répond ainsi aux enjeux pluridisciplinaires et applicatifs de la transition numérique. À l'origine de nombreuses innovations créatrices de valeur et d'emploi, Inria transfère vers les entreprises (start-up, PME et grands groupes) ses résultats et ses compétences, dans des domaines tels que la santé, les transports, l'énergie, la communication, la sécurité et la protection de la vie privée, la ville intelligente, l’usine du futur\dots
+Inria (Institut National de Recherche en Informatique et en Automatique) emploie 2\;600 collaborateurs issus des meilleures universités mondiales, qui relèvent les défis des sciences informatiques et mathématiques. Inria est organisé en \og{}équipes-projets\fg{} qui rassemblent des chercheurs aux compétences complémentaires autour d’un projet scientifique focalisé. Ce modèle ouvert et agile lui permet d’explorer des voies originales avec ses partenaires industriels et académiques. Inria répond ainsi aux enjeux pluridisciplinaires et applicatifs de la transition numérique. À l'origine de nombreuses innovations créatrices de valeur et d'emploi, Inria transfère vers les entreprises (start-up, PME et grands groupes) ses résultats et ses compétences, dans des domaines tels que la santé, les transports, l'énergie, la communication, la sécurité et la protection de la vie privée, la ville intelligente, l’usine du futur\dots
 
 \subsection{Centre Inria Saclay - Île-de-France}
 
@@ -131,6 +137,8 @@ Inria emploie 2\;600 collaborateurs issus des meilleures universités mondiales,
 --- Bertrand Braunschweig, directeur du centre Inria Saclay - Île-de-France.
 
 \paragraph{Source:} \url{https://www.inria.fr/}
+
+\subsection{L'équipe-projet GRACE}
 
 %(Luca) Avant de présenter le système, tu devrais présenter ton stage: objectifs, outils, résultats.
 
@@ -1034,7 +1042,7 @@ Pour générer de telles relations, partons de l'identité polynomiale:
 \begin{equation}\label{eqn:identitySplit}
 \prod_{\gamma\in\gf{q}} X-\gamma = X^q-X,
 \end{equation}
-et appliquons la transformation homographique $X \mapsto (aX+b)/(cX+d)$, où $(a,b,c,d)\in\gf{q^2}$ satisfait à $ad\neq bc$, puis multiplions par $(cX+d)^{q+1}$, ce qui donne d'une part, en prenant seulement le membre de gauche de l'équation~\ref{eqn:identitySplit} :
+et appliquons la transformation homographique $X \mapsto (aX+b)/(cX+d)$, où $(a,b,c,d)\in\gf{q^2}^4$ satisfait à $ad\neq bc$, puis multiplions par $(cX+d)^{q+1}$, ce qui donne d'une part, en prenant seulement le membre de gauche de l'équation~\ref{eqn:identitySplit} :
 \begin{align*}
 (cX+d)^{q+1} \prod_{\gamma\in\gf{q}} \left(\frac{aX+b}{cX+d}-\gamma\right) &= (cX+d) \prod_{\gamma\in\gf{q}} (aX+b-\gamma(cX+d)), \\ 
 &= (cX+d) \prod_{\gamma\in\gf{q}} ((a-\gamma c)X+b-\gamma d),\\
@@ -1100,7 +1108,27 @@ Le choix de $d$ est donné dans la section suivante.
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
-
+Puisque nous voulons appliquer l'algorithme d'Antoine Joux \cite{joux2013} au cryptosystème de Chor-Rivest \cite{chorRivest1988}, nous devons prendre $h \leqslant p$, $p$ et $h$ premiers. On souhaite donc calculer des logarithmes dans $\gf{p^h}$. L'algorithme commence par faire une extension de degré de $\gf{p^h}$, puis cherche un polynôme convenable $I_k(X)$ représentant l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme :
+\begin{figure}[h]
+\begin{center}
+\begin{tikzpicture}
+\coordinate (Fp) at (0,0) ;
+\coordinate (Fph) at (-1.5,1.5) ;
+\coordinate (Fp2h) at (0,3) ;
+\coordinate (Fp2) at (1.5,1.5) ;
+\draw (Fp) node[below]{$\gf{p}$} node{$\bullet$} ;
+\draw (Fph) node[left]{$\gf{p^h}$} node{$\bullet$} ;
+\draw (Fp2h) node[above]{$\gf{p^{2h}}$} node{$\bullet$} ;
+\draw (Fp2) node[right]{$\gf{p^2}$} node{$\bullet$} ;
+\draw[thick, ->, >= latex] (Fp) -- (Fp2) ;
+\draw[thick, ->, >= latex] (Fp) -- (Fph) ;
+\draw[thick, ->, >= latex] (Fp2) -- (Fp2h) ;
+\draw[thick, ->, >= latex] (Fph) -- (Fp2h) ;
+\end{tikzpicture}
+\end{center}
+\end{figure}
+ 
+Dans \verb|sage|, cela donne :
 
 \section*{Conclusion}
 
@@ -1108,5 +1136,10 @@ Le choix de $d$ est donné dans la section suivante.
 \thispagestyle{empty}
 \bibliographystyle{abbrv}
 \bibliography{mybib}
+
+\newpage
+\appendix
+
+\section{Les documents sur GitHub}
 
 \end{document}
