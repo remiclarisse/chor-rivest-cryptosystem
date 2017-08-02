@@ -2,9 +2,9 @@
 
 ## How does it work?
 
-Launch `sage` in your favorite shell and attach or load the file `chor-rivest-prime-power.sage`, like so:
+Launch `sage` in your favorite shell and attach or load the files `chor-rivest-joux-prime-number.sage` and `joux-algorithm.sage`, like so:
 
-    sage: load("chor-rivest-prime-power.sage")
+    sage: load("chor-rivest-joux.sage")
 
 Define parameters for the cryptosystem: `q` a prime-power of 2 (3 may also work) and `k` a prime number, e.g.
 

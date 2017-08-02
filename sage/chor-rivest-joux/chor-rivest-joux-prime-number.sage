@@ -82,13 +82,3 @@ def is_primitive (x) :
         if x ** (card / p) == A.one() :
             return False
     return True
-
-def pickRepresentationPolynome (q, k, X) :
-    A = X.parent()
-    while true :
-        h0 = A.random_element(2)
-        h1 = A.random_element(2)
-        fac = list((h1 * X ** q - h0).factor())
-        deg = [ poly.degree() for poly, mult in fac ]
-        if k in deg :
-            return fac[deg.index(k)]
