@@ -26,7 +26,7 @@ clean:
 	@rm -f *~ *.o $(EXE) $(EXE)_nodebug
 
 help:
-	@echo "all:\t Run the whole build of pollard's rho computing program."
+	@echo "all:\t Run the whole build of pollard's rho logarithm computing program."
 	@echo "reversi: Build the executable file from rho-pollard.c"
 	@echo "clean:\t Remove all files produced by the compilation."
 	@echo "help:\t Display the main targets of this Makefile with a short despriction."

@@ -1,21 +1,29 @@
-def pohlig_hellman (g, h, Fa) :
+def pohlig_hellman (g, h, fa) :
     n = 1
-    for i in range (len (Fa)) :
-        n = n * Fa[i][0] ** Fa[i][1]
-    K = GF(n + 1)
-    a = [0 for i in range (len (Fa))]
-    for i in range (len (Fa)) :
-        for j in range (1, Fa[i][1] + 1) :
-            g0 = g ** (n / (Fa[i][0] ** j))
-            h0 = (g0 ** (-a[i])) * (h ** (n / (Fa[i][0] ** j)))
+    for p, i in fa :
+        n = n * p ** i
+    a = [0 for i in range (len (fa))]
+    index = 0
+    for p, i in fa :
+        for j in range (1, i + 1) :
+            g0 = g ** (n / (p ** j))
+            h0 = (g0 ** (-a[index])) * (h ** (n / (p ** j)))
             if h0 != 1 :
-                g0 = g ** (n / Fa[i][0])
-                b = 1
-                t = g0
-                while h0 != t :
-                    b = b + 1
-                    t = t * g0
-                a[i] = a[i] + b * Fa[i][0] ** (j - 1)
-    moduli = [Fa[i][0] ** Fa[i][1] for i in range (len (Fa))]
+                g0 = g ** (n / p)
+                lg = baby_step_giant_step (g0, h0, p ** j)
+                a[index] = a[index] + lg * p ** (j - 1)
+        index += 1
+    moduli = [ p ** i for p, i in fa ]
     res = CRT (a, moduli)
     return res
+
+def baby_step_giant_step (g, h, n) :
+    m = int(ceil (sqrt (n)))
+    L = [ g ** i for i in range (m + 1) ]
+    u = g ** (-m)
+    y = h
+    j = 0
+    while y not in L :
+        y = y * u
+        j = j + 1
+    return L.index(y) + m * j
