@@ -1121,9 +1121,9 @@ $p$ et $h$ deux nombres premiers et tels que $h \leqslant p$ pour ``réparer'' l
 
 \paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en nous ayant recourt à l'algorithme de Joux, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement que ce n'est pas possible, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficient dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle porte ses fruits, permettrait de surmonter l'obstacle du calcul des logarithmes. Nous examinerons après si cela rend vulnérable le cryptosystème.
 
-Pour fixer les idées, nous donnerons en \verb|sage| les commandes utilisées pour effectuer les différents calculs ainsi qu'un exemple à taille humaine pour les paramètres:
+Pour fixer les idées, nous donnerons en \verb|sage| les commandes utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
 \begin{verbatim}
-sage: p = 17
+sage: p = 17 # peu importe les valeurs, il faut juste des nombres premiers
 sage: k = 7 # joue le rôle du h, degré de l'extension
 \end{verbatim}
 
@@ -1164,15 +1164,10 @@ sage:     if k in deg :
 sage:         break
 sage: Ik = fa[deg.index(k)][0]
 \end{verbatim}
-
-Dans cette exécution ces lignes de code nous ont donné:
-$$\gf{17^{2}} = \frac{\gf{17}[X]}{(\mu(X))}, \text{ où } \mu(X) := X^2 + 16X +3\in  \gf{17}[X],$$
-et, en notant $\alpha = X \pmod{\mu(X)}$, les polynômes:
-\begin{eqnarray*}
-h_0(X) &=& (11\alpha + 16)X^2 + (6\alpha + 16)X + \alpha+ 10, \\
-h_1(X) &=& (16\alpha + 13)X + 10\alpha+7, \\
-I_h(X) &=& X^7 + (11\alpha + 6)X^6 + (3\alpha + 7)X^5 + (11\alpha + 8)X^4  \\&& + (5\alpha + 8)X^3 +(4\alpha + 8)X^2 + (9\alpha + 5)X + 11\alpha + 16. \\
-\end{eqnarray*}
+La représentation en \verb|sage| donne:
+\begin{verbatim}
+sage: Fp2k.<b> = Fp2X.quotient_ring(Ik)
+\end{verbatim}
 
 \paragraph{Crible.}Dans son article \cite{joux2013}, Antoine Joux propose de garder des \textit{hashs} de nos relations pour ne pas avoir de duplicatas. C'est ce que nous faisons. Pour rappel de la méthode, nous choisissons $(a,b,c,d) \in \gf{p^2}$, et nous avons l'égalité modulo $I_h(X)$ entre, d'une part:
 \begin{equation}\label{eqn:exemAlgoJoux}
@@ -1225,10 +1220,6 @@ sage:                 print (nbIter * 100 / sieveSize).n(digits=3)
 \end{verbatim}
 
 \paragraph{Relations.}On souhaite avoir des relations seulement entre les polynômes linéaires unitaires, sans les coefficients de $\gf{p^2}$. Pour cela, nous allons fixer un élément primitif $g \in \gf{p^{2h}}$, où: $$\gf{p^{2h}} = \frac{\gf{p^2}[X]}{(I_h(X))}.$$
-La représentation en \verb|sage| donne:
-\begin{verbatim}
-sage: Fp2k.<b> = Fp2X.quotient_ring(Ik)
-\end{verbatim}
 Cependant, les éléments de \verb|Fp2k| ont certaines méthodes qui ne sont pas implémentées, comme par exemple \verb|.multiplicative_order()| ou \verb|.is_primitive()|. Nous les faisons:
 \begin{verbatim}
 sage: def multorder (x) :
@@ -1236,9 +1227,9 @@ sage:     A = x.parent()
 sage:     card = A.cardinality()
 sage:     if card.parent() != ZZ :
 sage:         raise ArithmeticError("ring not finite")
-sage:     return recurcive_multorder (x, card - 1, prime_factors (card - 1))
+sage:     return recursive_multorder (x, card - 1, prime_factors (card - 1))
 
-sage: def recurcive_multorder (x, order, prime_fa) :
+sage: def recursive_multorder (x, order, prime_fa) :
 sage:     A = x.parent()
 sage:     for p in prime_fa :
 sage:         if x ** (order / p) == A.one() :
@@ -1264,10 +1255,15 @@ sage:     g = Fp2k.random_element()
 sage:     if is_primitive(g) :
 sage:         break
 \end{verbatim}
-Pour nous débarrasser des facteurs de $\gf{p^2}$ dans notre système, nous déterminons les logarithmes en base $g$ de ceux-ci. Cela se fait à l'aide, par exemple, de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}, que nous n'écrivons pas ici, il est dans le fichier \textit{joux-algorithm.sage}. De plus, comme il y a la décoration \verb|@parallel|, il y a quelques manipulations excentrique à faire:
+Pour nous débarrasser des facteurs de $\gf{p^2}$ dans notre système, nous déterminons les logarithmes en base $g$ de ceux-ci. Cela se fait à l'aide, par exemple, de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}, que nous n'écrivons pas ici. Après avoir attaché le fichier \textit{joux-algorithm.sage}\footnote{Comme il y a la décoration \textit{@parallel}, il y a quelques manipulations excentriques à faire.} à \verb|sage|, écrire la commande:
 \begin{verbatim}
-sage: 
+sage: baseFieldLogs = get_base_field_logs (g)
 \end{verbatim}
+Maintenant, nous pouvons continuer en séparant les polynômes linéaires des constantes. Nous obtenons un système qui semblable à celui de l'algorithme de Hellman-Reyneri \cite{hellman1982}.
+\begin{verbatim}
+
+\end{verbatim}
+
 
 \section*{Conclusion}
 

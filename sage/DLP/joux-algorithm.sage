@@ -60,9 +60,9 @@ def multorder (x) :
     card = A.cardinality()
     if card.parent() != ZZ :
         raise ArithmeticError("ring not finite")
-    return recurcive_multorder (x, card - 1, prime_factors (card - 1))
+    return recursive_multorder (x, card - 1, prime_factors (card - 1))
 
-def recurcive_multorder (x, order, prime_fa) :
+def recursive_multorder (x, order, prime_fa) :
     A = x.parent()
     for p in prime_fa :
         if x ** (order / p) == A.one() :
@@ -97,8 +97,8 @@ def pohlig_hellman (g, h, fa) :
                 a[index] = a[index] + lg * p ** (j - 1)
         index += 1
     moduli = [ p ** i for p, i in fa ]
-    res = CRT (a, moduli)
-    return res
+    l = CRT (a, moduli)
+    return h, l
 
 def baby_step_giant_step (g, h, n) :
     m = int(ceil (sqrt (n)))
@@ -111,29 +111,56 @@ def baby_step_giant_step (g, h, n) :
         j = j + 1
     return L.index(y) + m * j
 
-def get_unknowns (sieveTable) :
-    unknowns = []
-    i = 0
-    sieveSize = len(sieveTable)
-    for left, right in sieveTable :
-        i += 1
-        for poly, mult in left :
-            unknowns.append(poly)
-        for poly, mult in right :
-            unknowns.append(poly)
-        print (i * 100 / sieveSize).n(digits=3)
-    unknowns = list(set(unknowns))
-    return unknowns
+def get_base_field_logs (g) :
+    baseField = g.parent().base().base()
+    multGpr = baseField.list()[1:]
+    orderGpr = len(multGpr)
+    orderExtMultGpr = multorder(g)
+    g0 = g ** (orderExtMultGpr / orderGpr)
+    fa = list(factor(orderGpr))
+    res = list( pohlig_hellman ([ (g0, multGpr[i], fa) for i in range (orderGpr) ]) )
+    res = [ ans for arg, ans in res ]
+    logs = [ [ elem for elem, l in res ] ] + [ [ mod (l * orderExtMultGpr / orderGpr, orderExtMultGpr) for elem, l in res ] ]
+    return logs
 
-def make_matrix_relation (sieveTable, basis) :
-    sieveSize = len(sieveTable)
-    M = Matrix(ZZ, sieveSize, len(basis), sparse=True)
+def make_equations (sieveTable, baseFieldLogs, modulus) :
+    unknownsSide = []
+    solutionSide = []
+    for left, right in sieveTable :
+        linear_poly = []
+        sol = 0
+        for poly, mult in left :
+            if poly in baseFieldLogs[0] :
+                sol = Integer(mod (sol - mult * baseFieldLogs[1][baseFieldLogs[0].index(poly)], modulus))
+            else :
+                linear_poly += [ (poly, mult) ]
+        for poly, mult in right :
+            if poly in baseFieldLogs[0] :
+                sol = Integer(mod (sol + mult * baseFieldLogs[1][baseFieldLogs[0].index(poly)], modulus))
+            else :
+                linear_poly += [ (poly, -mult) ]
+        unknownsSide += [linear_poly]
+        solutionSide += [sol]
+    return unknownsSide, solutionSide
+
+def make_basis (unknownsSide) :
+    basis = []
+    for cluster in unknownsSide :
+        for poly, mult in cluster :
+            basis.append(poly)
+    basis = list(set(basis))
+    return basis
+
+def make_matrix (unknownsSide, basis) :
+    M = Matrix(ZZ, len(unknownsSide), len(basis), sparse=True)
     i = 0
-    for P, Q in sieveTable :
-        for poly, mult in P :
+    for cluster in unknownsSide :
+        for poly, mult in cluster :
             M[i, basis.index(poly)] = mult
-        for poly, mult in Q :
-            M[i, basis.index(poly)] = -mult
         i += 1
         print (i * 100 / sieveSize).n(digits=3)
     return M
+
+def solve_logs_basis (M, solutionSide, modulus) :
+    B = vector (IntegerModRing(modulus), solutionSide)
+    return M.solve_right(B)
