@@ -66,7 +66,7 @@ def recursive_multorder (x, order, prime_fa) :
     A = x.parent()
     for p in prime_fa :
         if x ** (order / p) == A.one() :
-            return recurcive_multorder (x, order / p, [ f for f in prime_fa if (order / p) % f == 0 ])
+            return recursive_multorder (x, order / p, [ f for f in prime_fa if (order / p) % f == 0 ])
     return order
 
 def is_primitive (x) :
@@ -145,17 +145,17 @@ def make_equations (sieveTable, baseFieldLogs, modulus) :
 
 def make_basis (unknownsSide) :
     basis = []
-    for cluster in unknownsSide :
-        for poly, mult in cluster :
+    for line in unknownsSide :
+        for poly, mult in line :
             basis.append(poly)
     basis = list(set(basis))
     return basis
 
-def make_matrix (unknownsSide, basis) :
-    M = Matrix(ZZ, len(unknownsSide), len(basis), sparse=True)
+def make_matrix (unknownsSide, basis, modulus) :
+    M = Matrix(IntegerModRing(modulus), len(unknownsSide), len(basis), sparse=True)
     i = 0
-    for cluster in unknownsSide :
-        for poly, mult in cluster :
+    for line in unknownsSide :
+        for poly, mult in line :
             M[i, basis.index(poly)] = mult
         i += 1
         print (i * 100 / sieveSize).n(digits=3)

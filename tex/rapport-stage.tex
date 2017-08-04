@@ -1121,7 +1121,7 @@ $p$ et $h$ deux nombres premiers et tels que $h \leqslant p$ pour ``réparer'' l
 
 \paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en nous ayant recourt à l'algorithme de Joux, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement que ce n'est pas possible, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficient dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle porte ses fruits, permettrait de surmonter l'obstacle du calcul des logarithmes. Nous examinerons après si cela rend vulnérable le cryptosystème.
 
-Pour fixer les idées, nous donnerons en \verb|sage| les commandes utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
+Pour fixer les idées, nous donnerons en \verb|sage| les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
 \begin{verbatim}
 sage: p = 17 # peu importe les valeurs, il faut juste des nombres premiers
 sage: k = 7 # joue le rôle du h, degré de l'extension
@@ -1150,7 +1150,7 @@ sage: k = 7 # joue le rôle du h, degré de l'extension
 Dans \verb|sage|, cela donne:
 
 \begin{verbatim}
-sage: Fp2.<a> = GF(p ** 2)
+sage: Fp2.<alpha> = GF(p ** 2)
 sage: Fp2X.<X> = PolynomialRing(Fp2)
 \end{verbatim}
 On cherche deux polynômes $h_0(X)$ et $h_1(X)$ tels que $h_1(X)X^p - h_0(X)$ ait un facteur irréductible de degré $h$, ici on cherche même $h_1(X)$ affine pour qu'il soit dans la base de friabilité:
@@ -1166,7 +1166,7 @@ sage: Ik = fa[deg.index(k)][0]
 \end{verbatim}
 La représentation en \verb|sage| donne:
 \begin{verbatim}
-sage: Fp2k.<b> = Fp2X.quotient_ring(Ik)
+sage: Fp2k.<beta> = Fp2X.quotient_ring(Ik)
 \end{verbatim}
 
 \paragraph{Crible.}Dans son article \cite{joux2013}, Antoine Joux propose de garder des \textit{hashs} de nos relations pour ne pas avoir de duplicatas. C'est ce que nous faisons. Pour rappel de la méthode, nous choisissons $(a,b,c,d) \in \gf{p^2}$, et nous avons l'égalité modulo $I_h(X)$ entre, d'une part:
@@ -1219,7 +1219,7 @@ sage:                 nbIter += 1
 sage:                 print (nbIter * 100 / sieveSize).n(digits=3)
 \end{verbatim}
 
-\paragraph{Relations.}On souhaite avoir des relations seulement entre les polynômes linéaires unitaires, sans les coefficients de $\gf{p^2}$. Pour cela, nous allons fixer un élément primitif $g \in \gf{p^{2h}}$, où: $$\gf{p^{2h}} = \frac{\gf{p^2}[X]}{(I_h(X))}.$$
+\paragraph{Relations.}On souhaite avoir des relations seulement entre les polynômes linéaires unitaires, sans les coefficients de $\gf{p^2}$. Pour cela, nous déterminons leur logarithme. Nous allons fixer un élément primitif $g \in \gf{p^{2h}}$, où: $$\gf{p^{2h}} = \frac{\gf{p^2}[X]}{(I_h(X))}.$$
 Cependant, les éléments de \verb|Fp2k| ont certaines méthodes qui ne sont pas implémentées, comme par exemple \verb|.multiplicative_order()| ou \verb|.is_primitive()|. Nous les faisons:
 \begin{verbatim}
 sage: def multorder (x) :
@@ -1233,7 +1233,7 @@ sage: def recursive_multorder (x, order, prime_fa) :
 sage:     A = x.parent()
 sage:     for p in prime_fa :
 sage:         if x ** (order / p) == A.one() :
-sage:             return recurcive_multorder (x, order / p, 
+sage:             return recursive_multorder (x, order / p, 
 sage:                    [ f for f in prime_fa if (order / p) % f == 0 ])
 sage:     return order
 
@@ -1255,15 +1255,54 @@ sage:     g = Fp2k.random_element()
 sage:     if is_primitive(g) :
 sage:         break
 \end{verbatim}
-Pour nous débarrasser des facteurs de $\gf{p^2}$ dans notre système, nous déterminons les logarithmes en base $g$ de ceux-ci. Cela se fait à l'aide, par exemple, de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}, que nous n'écrivons pas ici. Après avoir attaché le fichier \textit{joux-algorithm.sage}\footnote{Comme il y a la décoration \textit{@parallel}, il y a quelques manipulations excentriques à faire.} à \verb|sage|, écrire la commande:
+Pour nous débarrasser des facteurs de $\gf{p^2}$ dans notre système, nous déterminons les logarithmes en base $g$ de ceux-ci. Cela se fait à l'aide, par exemple, de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}, que nous n'écrivons pas ici. Après avoir attaché le fichier \textit{joux-algorithm.sage} à \verb|sage|, écrire la commande:
 \begin{verbatim}
 sage: baseFieldLogs = get_base_field_logs (g)
 \end{verbatim}
-Maintenant, nous pouvons continuer en séparant les polynômes linéaires des constantes. Nous obtenons un système qui semblable à celui de l'algorithme de Hellman-Reyneri \cite{hellman1982}.
+Maintenant, nous pouvons reformuler le système obtenu par le crible. Nous en faisons un semblable à celui de l'algorithme de Hellman-Reyneri \cite{hellman1982}:
 \begin{verbatim}
-
+sage: unknownsSide = []
+sage: solutionSide = []
+sage: for left, right in sieveTable :
+sage:     linear_poly = []
+sage:     sol = 0
+sage:     for poly, mult in left :
+sage:         if poly in baseFieldLogs[0] :
+sage:             sol = Integer(mod (sol - mult * baseFieldLogs[1]
+sage:                   [baseFieldLogs[0].index(poly)], p ** (2 * k) - 1))
+sage:         else :
+sage:             linear_poly += [ (poly, mult) ]
+sage:     for poly, mult in right :
+sage:         if poly in baseFieldLogs[0] :
+sage:             sol = Integer(mod (sol + mult * baseFieldLogs[1]
+sage:                   [baseFieldLogs[0].index(poly)], p ** (2 * k) - 1))
+sage:         else :
+sage:             linear_poly += [ (poly, -mult) ]
+sage:     unknownsSide += [linear_poly]
+sage:     solutionSide += [sol]
 \end{verbatim}
 
+\paragraph{Algèbre linéaire.}Il est possible de composer la base de friabilité et la matrice du système:
+\begin{verbatim}
+sage: basis = []
+sage: for line in unknownsSide :
+sage:    for poly, mult in line :
+sage:        basis.append(poly)
+sage: basis = list(set(basis))
+
+sage: M = Matrix(IntegerModRing(p ** (2 * k) - 1), 
+sage:            len(unknownsSide), len(basis), sparse=True)
+sage: for line in unknownsSide :
+sage:      for poly, mult in line :
+sage:          M[i, basis.index(poly)] = mult
+\end{verbatim}
+Et enfin, nous résolvons le système:
+\begin{verbatim}
+sage: B = vector (IntegerModRing(p ** (2 * k) - 1), solutionSide)
+sage: basisLogs = M.solve_right(B)
+\end{verbatim}
+
+\paragraph{Logarithmes dans $\gf{p^h}$.}
 
 \section*{Conclusion}
 
