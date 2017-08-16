@@ -1104,7 +1104,7 @@ Le système a $\deg H(X)$ équations sur $\gf{q^2}$ et peut s'écrire comme un s
 
 Antoine Joux \cite{joux2013} fait ensuite un raisonnement heuristique pour avoir une bonne probabilité que le système précédent admette une solution, à savoir: nous avons besoin que 
 $$\deg k_1(X) + \deg k_2(X) \geqslant \deg H(X) + 1.$$
-Enfin, il étudie la complexité de la descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donne que la complexité est exponentielle en $\min(\deg k_1(X), \deg k_2 (X))$.
+Enfin, il étudie la complexité de la descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donnent que la complexité est exponentielle en $\min(\deg k_1(X), \deg k_2 (X))$.
 Plus précisément, en posant $d = \deg k_2(X)$ et donc $\deg k_1(X) = \deg H(X) +1 - d$, la complexité est :
 $$\binom{2 (\deg H(X)) + 3}{2d+1}^\omega,$$
 où $2 \leqslant \omega \leqslant 3$ est une constante. 
@@ -1114,20 +1114,26 @@ Le choix de $d$ est donné dans la section suivante.
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
-L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incite à prendre
-$p$ et $h$ deux nombres premiers et tels que $h \leqslant p$ pour ``réparer'' le cryptosystème.
+L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incite à prendre $p$ et $h$ deux nombres premiers et tels que $h \leqslant p$ pour ``réparer'' le cryptosystème.
 
 %Donner résultats précédents sur les tentatives d'amélioration (Madrid)
 
-\paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en nous ayant recourt à l'algorithme de Joux, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement que ce n'est pas possible, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficient dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle porte ses fruits, permettrait de surmonter l'obstacle du calcul des logarithmes. Nous examinerons après si cela rend vulnérable le cryptosystème.
+\subsection{Idées théoriques}
 
-Pour fixer les idées, nous donnerons en \verb|sage| les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
-\begin{verbatim}
-sage: p = 17 # peu importe les valeurs, il faut juste des nombres premiers
-sage: k = 7 # joue le rôle du h, degré de l'extension
-\end{verbatim}
+\paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en nous ayant recourt à l'algorithme de Joux, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement qu'il y a a priori un problème, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficient dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle porte ses fruits, permettrait de surmonter l'obstacle du calcul des logarithmes. Nous examinerons après si cela rend vulnérable le cryptosystème.
 
-\paragraph{Imbrication.} Étant donné que $h \leqslant p$, nous pouvons imbriquer $\gf{p^h}$ dans $\gf{p^{2h}}$, et satisfaire à la toute première étape de l'algorithme. Nous faisons donc une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant $h_1(X)X^p - h_0(X)$, représentant l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme :
+\paragraph{Rappels.}La génération de la clé privée consiste à choisir:
+\begin{enumerate}
+\item un générateur $g$ du groupe cyclique $\gf{p^h}^\times$,
+\item un élément $t \in \gf{p^h}$ algébrique de degré $h$ sur $\gf{p}$,
+\item une permutation $\sigma$ de l'ensemble $\{0, \dots, p-1\}$,
+\item un entier $d$ tel que $0 \leqslant d \leqslant p^h-2$.
+\end{enumerate}
+et la clé publique est formée des:
+$$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
+Clairement, les éléments intéressant ici sont $g$ et $t$.
+
+\paragraph{Adaptation.} Étant donné que $h \leqslant p$, nous pouvons imbriquer $\gf{p^h}$ dans $\gf{p^{2h}}$, et satisfaire à la toute première étape de l'algorithme. Nous faisons donc une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant $h_1(X)X^p - h_0(X)$, représentant l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme :
 \begin{figure}[h]
 \begin{center}
 \begin{tikzpicture}
@@ -1147,18 +1153,34 @@ sage: k = 7 # joue le rôle du h, degré de l'extension
 \end{center}
 \end{figure}
 
-Dans \verb|sage|, cela donne:
+Comme indiqué dans le prélude, nous aimerions pouvoir prendre $t = X \pmod{I_h(X)}$. Le seul écueil est que $I_h(X)$ est à coefficients dans $\gf{p^2}$. Cependant, la résultat suivant permet d'obtenir satisfaction:
+\begin{prop}
+Un polynôme irréductible de degré $h$ sur $\gf{p}$ est irréductible sur $\gf{p^2}$ si, et seulement si, $h$ est impair.
+\end{prop}
+Cela permet dont de choisir $I_h(X)$ comme un facteur irréductible de degré $h$ du polynôme $h_1(X)X^p-h_0(X) \in \gf{p}[X]$. Donc, si on pose $t = X \pmod{I_h(X)}$, la représentation de $\gf{p^{2h}}$ est $$\frac{\gf{p^2}[X]}{(I_h(X))} = \gf{p^2}(t).$$
 
+Ainsi, il ne reste plus qu'à choisir l'élément primitif $g$. Comme l'algorithme de Joux permet de trouver les logarithmes dans $\gf{p^{2h}}$, si on choisit aléatoirement $\gamma \in \gf{p^{2h}}$ primitif et que l'on pose $g = \gamma^{(p^{2h}-1) / (p^h-1)} = \gamma^{p^h+1}$, alors $g$ engendre $\gf{p^h}^\times$ et il suffit de prendre les logarithmes en base $\gamma$ est de les réduire modulo $p^h-1$.
+
+\subsection{Implémentation spécifique de l'algorithme}
+
+Pour fixer les idées, nous donnerons en \verb|sage| les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
+\begin{verbatim}
+sage: p = 13 # peu importe les valeurs, il faut juste des nombres premiers
+sage: k = 5 # joue le rôle du h, degré de l'extension
+\end{verbatim}
+
+Commençons par l'imbrication de corps. Dans \verb|sage| cela donne:
 \begin{verbatim}
 sage: Fp2.<alpha> = GF(p ** 2)
+sage: FpY.<Y> = PolynomialRing(GF(p))
 sage: Fp2X.<X> = PolynomialRing(Fp2)
 \end{verbatim}
 On cherche deux polynômes $h_0(X)$ et $h_1(X)$ tels que $h_1(X)X^p - h_0(X)$ ait un facteur irréductible de degré $h$, ici on cherche même $h_1(X)$ affine pour qu'il soit dans la base de friabilité:
 \begin{verbatim}
 sage: while true :
-sage:     h0 = Fp2X.random_element(2)
-sage:     h1 = Fp2X.random_element(1)
-sage:     fa = list((h1 * X ** p - h0).factor())
+sage:     h0 = FpY.random_element(2)
+sage:     h1 = FpY.random_element(1)
+sage:     fa = list((h1 * Y ** p - h0).factor())
 sage:     deg = [ poly.degree() for poly, mult in fa ]
 sage:     if k in deg :
 sage:         break
@@ -1166,7 +1188,7 @@ sage: Ik = fa[deg.index(k)][0]
 \end{verbatim}
 La représentation en \verb|sage| donne:
 \begin{verbatim}
-sage: Fp2k.<beta> = Fp2X.quotient_ring(Ik)
+sage: Fp2k.<beta> = Fp2X.quotient_ring(Fp2X(Ik))
 \end{verbatim}
 
 \paragraph{Crible.}Dans son article \cite{joux2013}, Antoine Joux propose de garder des \textit{hashs} de nos relations pour ne pas avoir de duplicatas. C'est ce que nous faisons. Pour rappel de la méthode, nous choisissons $(a,b,c,d) \in \gf{p^2}$, et nous avons l'égalité modulo $I_h(X)$ entre, d'une part:
@@ -1197,6 +1219,8 @@ sage: sieveTable = []
 \end{verbatim}
 Et commençons le crible\footnote{le \textit{print} n'est pas obligatoire, il indique un pourcentage d'exécution.}:
 \begin{verbatim}
+sage: h0 = Fp2X(h0)
+sage: h1 = Fp2X(h1)
 sage: while nbIter < sieveSize :
 sage:     a = Fp2.random_element()
 sage:     b = Fp2.random_element()
@@ -1292,17 +1316,17 @@ sage: basis = list(set(basis))
 
 sage: M = Matrix(IntegerModRing(p ** (2 * k) - 1), 
 sage:            len(unknownsSide), len(basis), sparse=True)
+sage: i = 0
 sage: for line in unknownsSide :
 sage:      for poly, mult in line :
 sage:          M[i, basis.index(poly)] = mult
+sage:      i += 1
 \end{verbatim}
 Et enfin, nous résolvons le système:
 \begin{verbatim}
 sage: B = vector (IntegerModRing(p ** (2 * k) - 1), solutionSide)
 sage: basisLogs = M.solve_right(B)
 \end{verbatim}
-
-\paragraph{Logarithmes dans $\gf{p^h}$.}
 
 \section*{Conclusion}
 
