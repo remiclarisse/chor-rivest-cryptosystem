@@ -16,7 +16,7 @@
      linkcolor    = cyan,
      linktoc      = page
 }
-\usepackage[top=3cm, bottom=3cm, left=3cm , right=3cm]{geometry}
+\usepackage[top=2.75cm, bottom=2.75cm, left=2.75cm, right=2.75cm]{geometry}
 
 \newtheorem{theo}{Théorème}[section]
 \newtheorem{lemm}[theo]{Lemme}
@@ -113,13 +113,13 @@
 \thispagestyle{empty}
 \section*{Introduction}
 
-De mai à août 2017, j'ai intégré en tant que stagiaire l'équipe GRACE de Inria Saclay - Île-de-France. Sous la supervision de Daniel Augot, responsable de l'équipe, et Luca De Feo, j'ai étudié le cryptosystème \cite{chorRivest1988} présenté par Benny Chor et Ronald Rivest en 1984, ainsi que l'algorithme \cite{joux2013} qu'Antoine Joux à conçu en 2013 pour le calcul de logarithme discret dans un corps fini de petite caractéristique. Pour des raisons de limite temporelle, je n'ai pas vu l'algorithme quasi-polynomial \cite{barbulescu2013}, qui pourrait \textit{peut-être} mieux répondre à la problématique que nous nous posons.
+Du 15 mai au 31 août 2017, j'ai intégré en tant que stagiaire l'équipe GRACE de Inria Saclay - Île-de-France. Sous la supervision de Daniel Augot, responsable de l'équipe, et Luca De Feo, j'ai étudié le cryptosystème \cite{chorRivest1988} présenté par Benny Chor et Ronald Rivest en 1984, ainsi que l'algorithme \cite{joux2013} qu'Antoine Joux à conçu en 2013 pour le calcul de logarithme discret dans un corps fini de petite caractéristique. Pour des raisons de limite temporelle, je n'ai pas vu l'algorithme quasi-polynomial \cite{barbulescu2013}, qui pourrait \textit{peut-être} mieux répondre à la problématique que nous nous posons.
 
 Le cryptosystème de Chor-Rivest est un cryptosytème asymétrique qui base sa sécurité sur un problème de sac à dos. Cependant, pour produire la clé publique, il faut avoir recours à des calculs de logarithmes discrets dans un corps fini $\gf{p^h}$. C'est pour cela que Chor et Rivest incitent l'utilisateur à prendre des paramètres facilitant la résolution du problème du logarithme discret, en sélectionnant par exemple un exposant $h$ friable. C'est justement ce pré-requis qui à permis à Serge Vaudenay en 2000 de confectionner une cryptanalyse \cite{vaudenay2000}, qui lui fait arriver à la conclusion qu'il faut choisir un exposant $h$ premier.
 
 Nous sommes donc au croisement de deux recommandations: l'une facilitant le calcul de logarithme pour fabriquer les clés et l'autre rendant le cryptosystème résistant à la meilleure cryptanalyse existante à ce jour. Il est clair qu'avoir un cryptosystème cassé est inutile. C'est pour cela que nous nous intéressons à l'algorithme de Joux, afin que le calcul des logarithmes ne soit plus un obstacle.
 
-Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet GRACE. Les section~\ref{sec:cryptosysteme} et section~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers resultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
+Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet Grace. Les section~\ref{sec:cryptosysteme} et section~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers resultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
 
 \setcounter{tocdepth}{1}
 \tableofcontents
@@ -142,7 +142,25 @@ Inria (Institut National de Recherche en Informatique et en Automatique) emploie
 
 \paragraph{Source.} \url{https://www.inria.fr/}
 
-\subsection{L'équipe-projet GRACE}
+\subsection{L'équipe-projet Grace}
+Voici la description publique de l'équipe-projet Grace (Geometry, aRithmetic, Algorithms, Codes and Encryption): \og{}La théorie algorithmique des nombres et les problèmes computationnels associés aux courbes algébriques sur les corps, les anneaux, sont centraux dans notre thème de recherche. Ce domaine très riche des mathématiques et de l'informatique a déjà montré son importance dans la cryptographie à clé publique, avec des succès industriels comme le système RSA et la cryptographie à base de courbes elliptiques. Il est moins connu que de bons codes correcteurs d'erreur ou autres peuvent être construits avec les mêmes objets mathématiques, qui sont aussi au c\oe ur de Grace. Nous pensons qu'une interprétation géométrique et unifiée donne une vue profonde sur la nature et les performances des ces problèmes en théorie des codes et cryptographie. Ces deux domaines d'applications interviennent pour la fiabilité et la sécurité des applications. Alors que la cryptologie est traditionnellement au c\oe ur de l'informatique, ce n'est que plus récemment que la théorie des codes y trouve des applications, en sortant du document des télécommunications.\fg{}
+
+L'équipe Grace est en partenariat avec le CNRS et l'École polytechnique, et en collaboration avec le Laboratoire Informatique de l'École polytechnique (LIX).
+L'équipe est composée de 10 membres. Outre Daniel Augot, le responsable, il y a 5 membres permanents: Alain Couvreur, Luca De Feo, Françoise Levy-dit-Vehel, François Morain et Benjamin Smith. Les quatre autres membres sont Nicholas Coxon et William Georges, qui effectuent leur post-doctorat, et Élise Barelli et Julien Lavauzelle, qui sont en dernière année de thèse.
+Et n'oublions pas leur fabuleuse assistante, Jessica Gameiro!
+Aussi, au moment de la rédaction de ces lignes, nous sommes trois stagiaires en master avec Benoît Billaudel et Jean Kieffer.
+
+\paragraph{Sources.} \url{https://www.inria.fr/equipes/grace} \& \url{https://team.inria.fr/grace/}
+
+\section*{Le stage}
+
+Les objectifs du stage donnés par Daniel et Luca sont:\begin{enumerate}
+\item comprendre le cryptosystème de Chor-Rivest,
+\item l’implémenter en \verb|sage| selon la proposition d'origine,
+\item si le temps le permet, implanter une version modifiée, qui utilise des extensions d'extensions de corps.
+\end{enumerate}
+Les deux premiers points sont traités dans la section suivante (\ref{sec:cryptosysteme}), les codes \verb|sage| sont sur le GitHub. Quant au troisième point, il convient d'expliquer pourquoi nous souhaitons implanter une version modifiée. Le cryptosytème de Chor-Rivest \cite{chorRivest1988} est réputé \og{}cassé \fg{} par Serge Vaudenay \cite{vaudenay2000}, ce que nous détaillons en section \ref{sec:cryptanalyse}. Cependant, la cryptanalyse s’appuie sur ce que l'on pourrait appeler une avarie du système: la fabrication de la clé publique requiert que l'on se place dans un corps fini dans lequel le calcul de logarithme discret n'est pas rédhibitoire. Cette exigence est satisfaite en particulier lorsque le corps fini considéré a de nombreux sous-corps, ce qui est d'ailleurs le choix de Benny Chor et Ronald Rivest. Donc, une façon efficace de rendre impraticable l'attaque de Vaudenay est de choisir un corps fini sans sous-corps, dans le meilleur des cas bien sûr. Cela rend par conséquence le calcul \og{}naïf \fg{} de logarithmes discrets difficile. Pour ne pas déshabiller Pierre pour habiller Paul, il nous faut donc nous pencher plus sérieusement sur le problème du calcul de logarithme discret dans les corps finis, ce que nous faisons dans la section \ref{sec:DLPJoux}, en étudiant notamment l'algorithme d'Antoine Joux \cite{joux2013}. Ceci nous permet de traiter le dernier point de la liste, en section \ref{sec:consequences}.
+
 
 %(Luca) Avant de présenter le système, tu devrais présenter ton stage: objectifs, outils, résultats.
 
@@ -274,7 +292,7 @@ sage: d = randint (0, q - 2)
 \end{verbatim}
 assigne la valeur $1\;530\;545$ à l'entier $d$.
 
-Nous avons fini de fabriquer la clé privée ! Reste à construire la clé publique :
+Nous avons fini de fabriquer la clé privée ! Reste à construire la clé publique\footnote{À toutes fins utiles, la méthode utilisée pour le calcul des logarithmes discret est Pohlig-Hellman \cite{pohligHellman1978} avec du pas-de-bébé--pas-de-géant.} :
 \begin{verbatim}
 sage: c = [mod (d + log (t + alpha[s[i]], g), q - 1)
                                               for i in range (p)]
@@ -846,7 +864,7 @@ La plupart des algorithmes de calcul de logarithmes discrets commencent par la r
 Ensuite, il faut déterminer un ensemble de $\gf{q^k}^\times$, que l'on nomme \textit{base de friabilité}, dont les éléments sont considérés comme ``petit''. Souvent, on fixe $d$ un entier assez petit, et les éléments de la base de friabilité sont ceux de la forme $F(\alpha)$, où $F(X)\in\gf{q}[X]$ est un polynôme de degré au plus $d$.
 
 \begin{rema}
-Une fois de plus, on se permet de faire l'amalgame entre deux objets : à savoir entre un \textit{élément du corps} appartenant à la base de friabilité et le \textit{polynôme} ayant servi à le représenter. Par exemple, si $h = H(\alpha)\in\gf{q^k}$ appartient à la base de friabilité, on pourra dire indistinctement que $h$  appartient à la base de friabilité ou bien que $H(X)$ appartient à la base de friabilité.
+Une fois de plus, on se permet de faire l'amalgame entre deux objets : à savoir entre un \textit{élément du corps} appartenant à la base de friabilité et le \textit{polynôme} ayant servi à le représenter. Par exemple, si $h = H(\alpha)\in\gf{q^k}$ appartient à la base de friabilité, on dira indistinctement que $h$  appartient à la base de friabilité ou bien que $H(X)$ appartient à la base de friabilité.
 \end{rema}
 
 Vient après la \textit{phase de collecte de relations} ou \textit{phase de crible}, à savoir, si la base de friabilité utilisée est $\{g_i : i \in I\}$, nous nous intéressons à des relations de la forme :
@@ -1120,7 +1138,7 @@ L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanaly
 
 \subsection{Idées théoriques}
 
-\paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en nous ayant recourt à l'algorithme de Joux, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement qu'il y a a priori un problème, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficient dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle porte ses fruits, permettrait de surmonter l'obstacle du calcul des logarithmes. Nous examinerons après si cela rend vulnérable le cryptosystème.
+\paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en ayant recourt à l'algorithme de Joux, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement qu'il y a a priori un problème, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficients dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle porte ses fruits, permettrait de surmonter l'obstacle du calcul des logarithmes. Nous examinerons après si cela rend vulnérable le cryptosystème.
 
 \paragraph{Rappels.}La génération de la clé privée consiste à choisir:
 \begin{enumerate}
@@ -1133,7 +1151,7 @@ et la clé publique est formée des:
 $$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
 Clairement, les éléments intéressant ici sont $g$ et $t$.
 
-\paragraph{Adaptation.} Étant donné que $h \leqslant p$, nous pouvons imbriquer $\gf{p^h}$ dans $\gf{p^{2h}}$, et satisfaire à la toute première étape de l'algorithme. Nous faisons donc une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant $h_1(X)X^p - h_0(X)$, représentant l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme :
+\paragraph{Adaptation.} Étant donné que $h < p$, nous pouvons imbriquer $\gf{p^h}$ dans $\gf{p^{2h}}$, et satisfaire à la toute première étape de l'algorithme. Nous faisons donc une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant le polynôme $h_1(X)X^p - h_0(X)$, permettant de représenter l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme de la figure \ref{fig:diag}.
 \begin{figure}[h]
 \begin{center}
 \begin{tikzpicture}
@@ -1150,23 +1168,25 @@ Clairement, les éléments intéressant ici sont $g$ et $t$.
 \draw[thick, ->, >= latex] (Fp2) -- (Fp2h) ;
 \draw[thick, ->, >= latex] (Fph) -- (Fp2h) ;
 \end{tikzpicture}
+\label{fig:diag}
+\caption{Diagramme de l'extension.}
 \end{center}
 \end{figure}
 
-Comme indiqué dans le prélude, nous aimerions pouvoir prendre $t = X \pmod{I_h(X)}$. Le seul écueil est que $I_h(X)$ est à coefficients dans $\gf{p^2}$. Cependant, la résultat suivant permet d'obtenir satisfaction:
+Comme indiqué dans le prélude, nous aimerions pouvoir prendre $t = X \pmod{I_h(X)}$. Le seul écueil est que $I_h(X)$ est à coefficients dans $\gf{p^2}$. Cependant, le résultat\footnote{C'est une conséquence du corollaire 3.47 de \cite{niederreiter1986}.} suivant permet d'obtenir satisfaction.
 \begin{prop}
 Un polynôme irréductible de degré $h$ sur $\gf{p}$ est irréductible sur $\gf{p^2}$ si, et seulement si, $h$ est impair.
 \end{prop}
-Cela permet dont de choisir $I_h(X)$ comme un facteur irréductible de degré $h$ du polynôme $h_1(X)X^p-h_0(X) \in \gf{p}[X]$. Donc, si on pose $t = X \pmod{I_h(X)}$, la représentation de $\gf{p^{2h}}$ est $$\frac{\gf{p^2}[X]}{(I_h(X))} = \gf{p^2}(t).$$
+Cela permet donc de choisir $I_h(X)$ comme un facteur irréductible de degré $h$ du polynôme $h_1(X)X^p-h_0(X) \in \gf{p}[X]$. Si on pose $t = X \pmod{I_h(X)}$, la représentation de $\gf{p^{2h}}$ est $$\frac{\gf{p^2}[X]}{(I_h(X))} = \gf{p^2}[t].$$
 
-Ainsi, il ne reste plus qu'à choisir l'élément primitif $g$. Comme l'algorithme de Joux permet de trouver les logarithmes dans $\gf{p^{2h}}$, si on choisit aléatoirement $\gamma \in \gf{p^{2h}}$ primitif et que l'on pose $g = \gamma^{(p^{2h}-1) / (p^h-1)} = \gamma^{p^h+1}$, alors $g$ engendre $\gf{p^h}^\times$ et il suffit de prendre les logarithmes en base $\gamma$ est de les réduire modulo $p^h-1$.
+Ainsi, il ne reste plus qu'à choisir l'élément primitif $g$. Comme l'algorithme de Joux permet de trouver les logarithmes dans $\gf{p^{2h}}$, si on choisit aléatoirement $\gamma \in \gf{p^{2h}}$ primitif et que l'on pose $g = \gamma^{(p^{2h}-1) / (p^h-1)} = \gamma^{p^h+1}$, alors $g$ engendre $\gf{p^h}^\times$ et il suffit de prendre les logarithmes en base $\gamma$  réduis modulo $p^h-1$.
 
 \subsection{Implémentation spécifique de l'algorithme}
 
 Pour fixer les idées, nous donnerons en \verb|sage| les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
 \begin{verbatim}
 sage: p = 13 # peu importe les valeurs, il faut juste des nombres premiers
-sage: k = 5 # joue le rôle du h, degré de l'extension
+sage: k = 5 # < p, joue le rôle du h, degré de l'extension
 \end{verbatim}
 
 Commençons par l'imbrication de corps. Dans \verb|sage| cela donne:
@@ -1175,10 +1195,11 @@ sage: Fp2.<alpha> = GF(p ** 2)
 sage: FpY.<Y> = PolynomialRing(GF(p))
 sage: Fp2X.<X> = PolynomialRing(Fp2)
 \end{verbatim}
-On cherche deux polynômes $h_0(X)$ et $h_1(X)$ tels que $h_1(X)X^p - h_0(X)$ ait un facteur irréductible de degré $h$, ici on cherche même $h_1(X)$ affine pour qu'il soit dans la base de friabilité:
+On cherche deux polynômes $h_0(X)$ et $h_1(X)$ tels que $h_1(X)X^p - h_0(X)$ ait un facteur irréductible de degré $h$, ici on cherche même $h_1(X)$ affine pour qu'il soit dans la base de friabilité, comme suggéré par Cécile Pierrot \cite{pierrot2016}:
 \begin{verbatim}
 sage: while true :
 sage:     h0 = FpY.random_element(2)
+sage:     h0 = h0 - h0(0)
 sage:     h1 = FpY.random_element(1)
 sage:     fa = list((h1 * Y ** p - h0).factor())
 sage:     deg = [ poly.degree() for poly, mult in fa ]
@@ -1217,7 +1238,7 @@ sage: nbIter = 0
 sage: hashTable = []
 sage: sieveTable = []
 \end{verbatim}
-Et commençons le crible\footnote{le \textit{print} n'est pas obligatoire, il indique un pourcentage d'exécution.}:
+Et commençons le crible\footnote{le \textit{print} final n'est pas obligatoire, il indique un pourcentage d'exécution.}:
 \begin{verbatim}
 sage: h0 = Fp2X(h0)
 sage: h1 = Fp2X(h1)

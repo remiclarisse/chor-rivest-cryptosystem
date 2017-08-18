@@ -1,15 +1,17 @@
 # p and h primes and h < p
 def embed_field (p, n) :
     Fp2 = GF(p ** 2, 'a')
+    FpY = PolynomialRing(GF(p), 'Y')
     Fp2X = PolynomialRing(Fp2, 'X')
-    Ik, h0, h1 = pick_representation_polynome (p, n, Fp2X.gen())
+    Ik, h0, h1 = pick_representation_polynome (p, n, FpY.gen())
     Fp2n = Fp2X.quotient_ring(Ik)
-    return Fp2n, h0, h1
+    return Fp2n, Fp2X(h0), Fp2X(h1)
 
 def pick_representation_polynome (q, k, X) :
     A = X.parent()
     while true :
         h0 = A.random_element(2)
+        h0 = h0 - h0(0)
         h1 = A.random_element(1)
         fa = list((h1 * X ** q - h0).factor())
         deg = [ poly.degree() for poly, mult in fa ]
@@ -153,6 +155,7 @@ def make_basis (unknownsSide) :
 
 def make_matrix (unknownsSide, basis, modulus) :
     M = Matrix(IntegerModRing(modulus), len(unknownsSide), len(basis), sparse=True)
+    sieveSize = len(unknownsSide)
     i = 0
     for line in unknownsSide :
         for poly, mult in line :
@@ -164,3 +167,26 @@ def make_matrix (unknownsSide, basis, modulus) :
 def solve_logs_basis (M, solutionSide, modulus) :
     B = vector (IntegerModRing(modulus), solutionSide)
     return M.solve_right(B)
+
+def joux_algorithm (p, h) :
+    print "Embedding field..."
+    Fp2h, h0, h1 = embed_field (p, h)
+    print "Sieving linear polynomials..."
+    sieveTable = sieving_linear_poly (p, Fp2h.base().gen(), h0, h1)
+    print "Picking primitive element..."
+    while True :
+        g = Fp2h.random_element()
+        if is_primitive(g) :
+            break
+    print "Computing logarithms of the base field..."
+    baseFieldLogs = get_base_field_logs (g)
+    print "Making equations out of the sieve..."
+    modulus = p ** (2 * h) - 1
+    unknownsSide, solutionSide = make_equations (sieveTable, baseFieldLogs, modulus)
+    print "Making smoothness basis..."
+    basis = make_basis (unknownsSide)
+    print "Making the matrix..."
+    M = make_matrix (unknownsSide, basis, modulus)
+    print "Solving the system to recover the logarithms..."
+    basisLogs = solve_logs_basis (M, solutionSide, modulus)
+    return baseFieldLogs, basis, basisLogs
