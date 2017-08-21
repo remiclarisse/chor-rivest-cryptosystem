@@ -32,7 +32,7 @@ def is_split (P) :
 def sieving_linear_poly (q, X, h0, h1) :
     Fq2X = X.parent()
     Fq2 = Fq2X.base()
-    sieveSize = q ** 2
+    sieveSize = 2 * q ** 2
     nbIter = 0
     hashTable = []
     sieveTable = []
@@ -159,7 +159,7 @@ def make_matrix (unknownsSide, basis, modulus) :
     i = 0
     for line in unknownsSide :
         for poly, mult in line :
-            M[i, basis.index(poly)] = mult
+            M[i, basis.index(poly)] += mult
         i += 1
         print (i * 100 / sieveSize).n(digits=3)
     return M
@@ -189,4 +189,4 @@ def joux_algorithm (p, h) :
     M = make_matrix (unknownsSide, basis, modulus)
     print "Solving the system to recover the logarithms..."
     basisLogs = solve_logs_basis (M, solutionSide, modulus)
-    return baseFieldLogs, basis, basisLogs
+    return baseFieldLogs, basis, basisLogs, g

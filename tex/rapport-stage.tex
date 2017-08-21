@@ -16,7 +16,7 @@
      linkcolor    = cyan,
      linktoc      = page
 }
-\usepackage[top=2.75cm, bottom=2.75cm, left=2.75cm, right=2.75cm]{geometry}
+\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
 
 \newtheorem{theo}{Théorème}[section]
 \newtheorem{lemm}[theo]{Lemme}
@@ -1233,7 +1233,7 @@ sage:         return False
 \end{verbatim}
 Définissons les variables dans \verb|sage|:
 \begin{verbatim}
-sage: sieveSize = p ** 2
+sage: sieveSize = 2 * p ** 2
 sage: nbIter = 0
 sage: hashTable = []
 sage: sieveTable = []
@@ -1335,12 +1335,12 @@ sage:    for poly, mult in line :
 sage:        basis.append(poly)
 sage: basis = list(set(basis))
 
-sage: M = Matrix(IntegerModRing(p ** (2 * k) - 1), 
-sage:            len(unknownsSide), len(basis), sparse=True)
+sage: M = zero_matrix(IntegerModRing(p ** (2 * k) - 1), 
+sage:            len(unknownsSide), len(basis))
 sage: i = 0
 sage: for line in unknownsSide :
 sage:      for poly, mult in line :
-sage:          M[i, basis.index(poly)] = mult
+sage:          M[i, basis.index(poly)] += mult
 sage:      i += 1
 \end{verbatim}
 Et enfin, nous résolvons le système:
