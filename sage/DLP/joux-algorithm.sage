@@ -1,11 +1,11 @@
 # p and h primes and h < p
-def embed_field (p, n) :
+def embed_field (p, h) :
     Fp2 = GF(p ** 2, 'a')
     FpY = PolynomialRing(GF(p), 'Y')
     Fp2X = PolynomialRing(Fp2, 'X')
-    Ik, h0, h1 = pick_representation_polynome (p, n, FpY.gen())
-    Fp2n = Fp2X.quotient_ring(Ik)
-    return Fp2n, Fp2X(h0), Fp2X(h1)
+    Ih, h0, h1 = pick_representation_polynome (p, h, FpY.gen())
+    Fp2h = Fp2X.quotient_ring(Ih)
+    return Fp2h, Fp2X(h0), Fp2X(h1)
 
 def pick_representation_polynome (q, k, X) :
     A = X.parent()
@@ -29,10 +29,11 @@ def is_split (P) :
     else :
         return False
 
-def sieving_linear_poly (q, X, h0, h1) :
+def sieving_linear_poly (q, h0, h1) :
+    X = h0.parent().gen()
     Fq2X = X.parent()
     Fq2 = Fq2X.base()
-    sieveSize = 2 * q ** 2
+    sieveSize = q ** 3
     nbIter = 0
     hashTable = []
     sieveTable = []
@@ -47,12 +48,12 @@ def sieving_linear_poly (q, X, h0, h1) :
                    + (c * b ** q - a * d ** q) * X * h1
                    + (d * b ** q - b * d ** q) * h1)
             if is_split (P) :
-                Q = Fq2X(c * X + d)
+                Q = Fq2X(h1 * (c * X + d))
                 for gamma in range (q) :
                     Q *= ((a - gamma * c) * X + b - gamma * d)
                 if [hash(P), hash(Q)] not in hashTable :
                     hashTable.append([hash(P), hash(Q)])
-                    sieveTable.append([ [(P.lc(), 1)] + list(factor(P)) + [(h1.lc(), 1)] + list(factor(h1))] + [ [(Q.lc(), 1)] + list(factor(Q)) ])
+                    sieveTable.append([ [(P.lc(), 1)] + list(factor(P)) ] + [ [(Q.lc(), 1)] + list(factor(Q)) ])
                     nbIter += 1
                     print (nbIter * 100 / sieveSize).n(digits=3)
     return sieveTable
@@ -133,12 +134,12 @@ def make_equations (sieveTable, baseFieldLogs, modulus) :
         sol = 0
         for poly, mult in left :
             if poly in baseFieldLogs[0] :
-                sol = Integer(mod (sol - mult * baseFieldLogs[1][baseFieldLogs[0].index(poly)], modulus))
+                sol -= baseFieldLogs[1][baseFieldLogs[0].index(poly)]
             else :
                 linear_poly += [ (poly, mult) ]
         for poly, mult in right :
             if poly in baseFieldLogs[0] :
-                sol = Integer(mod (sol + mult * baseFieldLogs[1][baseFieldLogs[0].index(poly)], modulus))
+                sol += baseFieldLogs[1][baseFieldLogs[0].index(poly)]
             else :
                 linear_poly += [ (poly, -mult) ]
         unknownsSide += [linear_poly]
@@ -154,7 +155,7 @@ def make_basis (unknownsSide) :
     return basis
 
 def make_matrix (unknownsSide, basis, modulus) :
-    M = Matrix(IntegerModRing(modulus), len(unknownsSide), len(basis), sparse=True)
+    M = Matrix(ZZ, len(unknownsSide), len(basis), sparse=True)
     sieveSize = len(unknownsSide)
     i = 0
     for line in unknownsSide :
@@ -165,14 +166,13 @@ def make_matrix (unknownsSide, basis, modulus) :
     return M
 
 def solve_logs_basis (M, solutionSide, modulus) :
-    B = vector (IntegerModRing(modulus), solutionSide)
-    return M.solve_right(B)
+    return M.change_ring(IntegerModRing(modulus)).solve_right(vector(solutionSide))
 
 def joux_algorithm (p, h) :
     print "Embedding field..."
     Fp2h, h0, h1 = embed_field (p, h)
     print "Sieving linear polynomials..."
-    sieveTable = sieving_linear_poly (p, Fp2h.base().gen(), h0, h1)
+    sieveTable = sieving_linear_poly (p, h0, h1)
     print "Picking primitive element..."
     while True :
         g = Fp2h.random_element()
