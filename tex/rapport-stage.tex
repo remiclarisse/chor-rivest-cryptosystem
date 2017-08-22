@@ -1123,6 +1123,22 @@ Le choix de $d$ est donné dans la section suivante.
 
 \subsubsection{Analyse de la complexité}
 
+Le changement de représentation et la phase de crible se font en temps polynomial. La phase d'algèbre linéaire s'effectue en $\O(q^7)$ opérations arithmétiques.
+
+Pour étudier la complexité de la phase de descente, écrivons $k = \alpha q$, pour une constante $\alpha \leqslant 1 + \deg(h_1(X)) / q$. Sois cette hypothèse, nous remarquons:
+$$L_{q^{2k}}(\beta, c) \approx \exp\left((c'+\o(1))q^\beta\log(q)\right),\quad\text{où } c' = c(2\alpha)^\beta.$$
+Comme le coût de la descente special-$\mathfrak{q}$ augmente quand le degré du polynôme diminue, on utilise cette méthode jusqu'à atteindre des polynômes de degré $\O(\sqrt{q})$, plus précisément de degré $c_c\sqrt{q/\log q}$, pour une constante $c_c$. Le coût dans ce cas est:
+$$\exp\left(\frac{1}{2\mu}\sqrt{\frac{\alpha}{c_c}}q^{1/4}(\log q)^{5/4}\right),$$
+où $\mu < 1$. Pour ce qui est de la nouvelle descente, Joux fait en sorte de choisir le paramètre $d$ pour que le coût soit dominé par les polynômes de degré $c_c\sqrt{q/\log q}$. Ce qui l'amène à choisir 
+$$d = \ceil{\left(\frac{c_c}{6}\sqrt{q\log q}\right)^{1/2}}.$$
+Cela donne un coût de:
+$$\exp\left(\left( \frac{\sqrt{6c_c}}{4} + \o(1)\right)q^{1/4}(\log q)^{5/4}\right).$$
+Pour que les deux phases de descente se balancent, il prend:
+$$c_c = \frac{1}{\mu}\sqrt{\frac{2\alpha}{3}},$$
+ce qui atteint la complexité:
+$$\exp\left(\left(\frac{1}{2\sqrt{\mu}}{\left(\frac{3\alpha}{2}\right)}^{1/4}+\o(1)\right)q^{1/4}(\log q)^{5/4}\right),$$
+ce qui peut être réécrit comme $L(1/4+\o(1))$.
+
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
 L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incite à prendre $p$ et $h$ deux nombres premiers et tels que $h \leqslant p$ pour ``réparer'' le cryptosystème.
