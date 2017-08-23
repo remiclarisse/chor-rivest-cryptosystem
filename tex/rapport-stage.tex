@@ -147,7 +147,7 @@ Inria (Institut National de Recherche en Informatique et en Automatique) emploie
 Voici la description publique de l'équipe-projet Grace (Geometry, aRithmetic, Algorithms, Codes and Encryption): \og{}La théorie algorithmique des nombres et les problèmes computationnels associés aux courbes algébriques sur les corps, les anneaux, sont centraux dans notre thème de recherche. Ce domaine très riche des mathématiques et de l'informatique a déjà montré son importance dans la cryptographie à clé publique, avec des succès industriels comme le système RSA et la cryptographie à base de courbes elliptiques. Il est moins connu que de bons codes correcteurs d'erreur ou autres peuvent être construits avec les mêmes objets mathématiques, qui sont aussi au c\oe ur de Grace. Nous pensons qu'une interprétation géométrique et unifiée donne une vue profonde sur la nature et les performances des ces problèmes en théorie des codes et cryptographie. Ces deux domaines d'applications interviennent pour la fiabilité et la sécurité des applications. Alors que la cryptologie est traditionnellement au c\oe ur de l'informatique, ce n'est que plus récemment que la théorie des codes y trouve des applications, en sortant du document des télécommunications.\fg{}
 
 L'équipe Grace est en partenariat avec le CNRS et l'École polytechnique, et en collaboration avec le Laboratoire Informatique de l'École polytechnique (LIX).
-L'équipe est composée de 10 membres. Outre Daniel Augot, le responsable, il y a 5 membres permanents: Alain Couvreur, Luca De Feo, Françoise Levy-dit-Vehel, François Morain et Benjamin Smith. Les quatre autres membres sont Nicholas Coxon et William Georges, qui effectuent leur post-doctorat, et Élise Barelli et Julien Lavauzelle, qui sont en dernière année de thèse.
+L'équipe est composée de 10 membres. Outre Daniel Augot, le responsable, il y a 5 membres permanents: Alain Couvreur, Luca De Feo, Françoise Levy-dit-Vehel, François Morain et Benjamin Smith. Les quatre autres membres sont Nicholas Coxon et William George, qui effectuent leur post-doctorat, et Élise Barelli et Julien Lavauzelle, qui sont en dernière année de thèse.
 Et n'oublions pas leur fabuleuse assistante, Jessica Gameiro!
 Aussi, au moment de la rédaction de ces lignes, nous sommes trois stagiaires en master avec Benoît Billaudel et Jean Kieffer.
 
@@ -362,7 +362,7 @@ Comme $g^{E(m) - hd}$ vaut dans la base $\mathcal{A}$ le vecteur $(1, 15, 9, 11,
 $$g^{E(m) - hd} = 10t^5 + 9t^4 + 12t^3 + 4t^2 + 10t + 3.$$
 grâce à la commande:
 \begin{verbatim}
-sage: G = list (Minv * V(g ** (e - h * d))
+sage: G = list (Minv * V(g ** (e - h * d)))
 \end{verbatim}
 Notons $G(X) := 10X^5 + 9X^4 + 12X^3 + 4X^2 + 10X + 3 \in \gf{17}[X]$. Le message est ainsi recouvré en factorisant le polynôme:
 $$G(X) + \mu(X) = X^6 + 2X^5 + 9X^3 + 5X^2 + 4X + 9,$$
@@ -1123,7 +1123,7 @@ Le choix de $d$ est donné dans la section suivante.
 
 \subsubsection{Analyse de la complexité}
 
-Nous présentons succinctement l'analyse de la complexité faite par Antoine Joux pour son algorithme \cite{joux2013}.
+Nous présentons succinctement l'analyse de la complexité faite par Antoine Joux pour son algorithme \cite{joux2013}. Nous nous contentons d'un survol car l'algorithme de Razvan Barbulescu, Pierrick Gaudry, Antoine Joux et Emmanuel Thomé \cite{barbulescu2013}, publié aussi en 2013, atteint une complexité théorique qui est quasi-polynomiale.
 
 Le changement de représentation et la phase de crible se font en temps polynomial. La phase d'algèbre linéaire s'effectue en $\O(q^7)$ opérations arithmétiques.
 
@@ -1143,26 +1143,15 @@ ce qui peut être réécrit comme $L(1/4+\o(1))$.
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
-L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incite à prendre $p$ et $h$ deux nombres premiers et tels que $h \leqslant p$ pour ``réparer'' le cryptosystème.
+L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incite à prendre $p$ et $h$ deux nombres premiers et tels que $2 < h < p$, afin de ``réparer'' le cryptosystème.
 
 %Donner résultats précédents sur les tentatives d'amélioration (Madrid)
 
 \subsection{Idées théoriques}
 
-\paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en ayant recourt à l'algorithme de Joux, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement qu'il y a a priori un problème, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficients dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle porte ses fruits, permettrait de surmonter l'obstacle du calcul des logarithmes. Nous examinerons après si cela rend vulnérable le cryptosystème.
+\paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en ayant recourt à l'algorithme de Joux \cite{joux2013}, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement qu'il y a a priori un problème, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficients dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle est féconde, permettrait de surmonter l'obstacle du calcul des logarithmes. 
 
-\paragraph{Rappels.}La génération de la clé privée consiste à choisir:
-\begin{enumerate}
-\item un générateur $g$ du groupe cyclique $\gf{p^h}^\times$,
-\item un élément $t \in \gf{p^h}$ algébrique de degré $h$ sur $\gf{p}$,
-\item une permutation $\sigma$ de l'ensemble $\{0, \dots, p-1\}$,
-\item un entier $d$ tel que $0 \leqslant d \leqslant p^h-2$.
-\end{enumerate}
-et la clé publique est formée des:
-$$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
-Clairement, les éléments intéressant ici sont $g$ et $t$.
-
-\paragraph{Adaptation.} Étant donné que $h < p$, nous pouvons imbriquer $\gf{p^h}$ dans $\gf{p^{2h}}$, et satisfaire à la toute première étape de l'algorithme. Nous faisons donc une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant le polynôme $h_1(X)X^p - h_0(X)$, permettant de représenter l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme de la figure \ref{fig:diag}.
+\paragraph{Adaptation.} Étant donné que $h < p$, nous pouvons imbriquer $\gf{p^h}$ dans $\gf{p^{2h}}$, et satisfaire à la toute première étape de l'algorithme de Joux \cite{joux2013}. Nous faisons donc une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant le polynôme $h_1(X)X^p - h_0(X)$, permettant de représenter l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme de la figure \ref{fig:diag}.
 \begin{figure}[h]
 \begin{center}
 \begin{tikzpicture}
@@ -1184,15 +1173,65 @@ Clairement, les éléments intéressant ici sont $g$ et $t$.
 \end{center}
 \end{figure}
 
-Comme indiqué dans le prélude, nous aimerions pouvoir prendre $t = X \pmod{I_h(X)}$. Le seul écueil est que $I_h(X)$ est à coefficients dans $\gf{p^2}$. Cependant, le résultat\footnote{C'est une conséquence du corollaire 3.47 de \cite{niederreiter1986}.} suivant permet d'obtenir satisfaction.
+Comme indiqué dans le prélude, nous aimerions pouvoir prendre $t = X \pmod{I_h(X)}$. Le seul écueil est que $I_h(X)$ est à coefficients dans $\gf{p^2}$. Cependant, le résultat suivant, qui est une conséquence du corollaire 3.47 de \cite{niederreiter1986}, permet d'obtenir satisfaction.
 \begin{prop}
 Un polynôme irréductible de degré $h$ sur $\gf{p}$ est irréductible sur $\gf{p^2}$ si, et seulement si, $h$ est impair.
 \end{prop}
-Cela permet donc de choisir $I_h(X)$ comme un facteur irréductible de degré $h$ du polynôme $h_1(X)X^p-h_0(X) \in \gf{p}[X]$. Si on pose $t = X \pmod{I_h(X)}$, la représentation de $\gf{p^{2h}}$ est $$\frac{\gf{p^2}[X]}{(I_h(X))} = \gf{p^2}[t].$$
+Cela permet donc de choisir $I_h(X)$ comme un facteur irréductible unitaire de degré $h$ du polynôme $h_1(X)X^p-h_0(X) \in \gf{p}[X]$. Si on pose $t = X \pmod{I_h(X)}$, la représentation de $\gf{p^{2h}}$ est $$\frac{\gf{p^2}[X]}{(I_h(X))} = \gf{p^2}[t].$$
+Donc $t \in \gf{p^{2h}}$ est algébrique de degré $h$ sur $\gf{p^2}$ et il est dans le sous-corps $\gf{p^h} \subseteq \gf{p^{2h}}$, car le polynôme $I_h(X)$ est irréductible unitaire de degré $h$, donc $I_h(X)$ divise le polynôme $X^{p^h} - X$ et $t$, racine de $I_h(X)$, est d'ordre divisant $p^h-1$.
 
-Ainsi, il ne reste plus qu'à choisir l'élément primitif $g$. Comme l'algorithme de Joux permet de trouver les logarithmes dans $\gf{p^{2h}}$, si on choisit aléatoirement $\gamma \in \gf{p^{2h}}$ primitif et que l'on pose $g = \gamma^{(p^{2h}-1) / (p^h-1)} = \gamma^{p^h+1}$, alors $g$ engendre $\gf{p^h}^\times$ et il suffit de prendre les logarithmes en base $\gamma$  réduis modulo $p^h-1$.
+\subsection{Nouveau procédé de génération des clés}
 
-\subsection{Implémentation spécifique de l'algorithme}
+Pour rappel, la génération de la clé privée consiste à choisir aléatoirement:
+\begin{enumerate}
+\item un générateur $g$ du groupe cyclique $\gf{p^h}^\times$,
+\item un élément $t \in \gf{p^h}$ algébrique de degré $h$ sur $\gf{p}$,
+\item une permutation $\sigma$ de l'ensemble $\{0, \dots, p-1\}$,
+\item un entier $d$ tel que $0 \leqslant d \leqslant p^h-2$.
+\end{enumerate}
+et la clé publique est formée des:
+$$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
+Clairement, la façon de choisir la permutation $\sigma$ et l'entier $d$ restent inchangée. On note toujours $\alpha$ la numérotation du sous-corps premier: $$\gf{p} = \{\alpha_0, \dots, \alpha_{p-1}\}.$$
+
+Pour ce procédé de fabrication, nous allons d'abord calculer les logarithmes qui nous serviront pour la clé publique. Puis nous indiquerons comme on obtient les éléments $g$ et $t$ de la clé privée.
+
+\subsubsection{Calcul des logarithmes $\log_g\left(t + \alpha_{i}\right)$}
+
+Soient $h_0(X)$ et $h_1(X)$ deux polynômes de $\gf{p}[X]$ de bas degré tels que le polynôme $h_1(X)X^p-h_0(X)$ ait un facteur irréductible de degré $h$, que l'on note $I_h(X) \in \gf{p}[X]$. Les indications de d'Antoine Joux \cite{joux2013} et Cécile Pierrot \cite{pierrot2016} incite à prendre $h_0(X)$ quadratique et $h_1(X)$ linéaire, pour qu'il soit dans la base de friabilité. Pour utilisé l'algorithme d'Antoine Joux \cite{joux2013}, on se place dans le corps:
+$$\gf{p^{2h}} \cong \frac{\gf{p^2}[X]}{(I_h(X))}.$$
+Après avoir effectué la phase de crible des polynômes linéaires ainsi que la phase d'algèbre linéaire, nous choisissons aléatoirement une élément primitif $\gamma$ de $\gf{p^{2h}}$ et nous obtenons les logarithmes en base $\gamma$ des éléments de la forme ${t_0} + \beta$, où ${t_0} = X \pmod{I_h(X)}$ et $\beta \in \gf{p^2}$. 
+
+Les logarithmes qui nous intéressent sont seulement ceux de la forme ${t_0} + \alpha$, avec $\alpha \in \gf{p}$. Notons-les alors:
+$$b_i := \log_\gamma\left({t_0} + \alpha_{i}\right) \pmod{p^{2h}-1}, \qquad 0 \leqslant i \leqslant p-1.$$
+Cependant, on souhaite que la base de logarithme soit un élément primitif de $\gf{p^h}$. La façon intuitive de fabriquer un élément $g_0$ primitif de $\gf{p^h}$ à partir de $\gamma$, est de poser 
+$$g_0 := \gamma^{(p^{2h}-1)/(p^h-1)}=\gamma^{p^h+1}.$$
+Nous remarquons que, puisque $\gamma$ a été choisi de façon aléatoire (sous-entendu uniforme), il en est de même pour $g_0$.
+Posons:
+$$a_i := \log_{g_0}\left({t_0} + \alpha_{i}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
+
+Soit $i$ tel que $0 \leqslant i \leqslant p-1$. Il nous reste à déterminer $a_i$ en fonction de $b_i$. Pour cela, rappelons que ${t_0}+\alpha_i \in \gf{p^h}$ et observons:
+$${g_0}^{b_i} = \gamma^{b_i(p^h+1)} = ({t_0}+\alpha_i)^{p^h+1} = ({t_0}+\alpha_i)^{p^h}({t_0}+\alpha_i) = ({t_0}+\alpha_i)^2$$
+Cela signifie donc que ${g_0}^{b_i/2} = {t_0}+\alpha_i$ ou ${g_0}^{b_i/2} = -({t_0}+\alpha_i)$. Dans le second cas, il suffit de multiplier l'égalité par $-1 = {g_0}^{(p^h-1)/2}$. 
+
+Ainsi, quel que soit $i$ tel que $0 \leqslant i \leqslant p-1$:
+$$a_i = \left\{\begin{array}{l}
+b_i / 2 \pmod{p^h-1}, \quad \text{si } {t_0} + {g_0}^{b_i/2} \not\in \gf{p}, \\
+(b_i + p^h - 1) / 2 \pmod{p^h-1}, \quad \text{si } {t_0} + {g_0}^{b_i/2} \in \gf{p}. \\
+\end{array}\right.$$
+
+\subsubsection{Production des clés}
+
+Dans la construction précédente, il n'est pas évident que l'élément algébrique ${t_0}$ est choisi aléatoirement. Et, de plus, il est absurde de prendre le polynôme $I_h(X)$ comme polynôme servant à représenter publiquement notre corps $\gf{p^h}$.
+
+Si on commence comme en section~\ref{sec:cryptosysteme}, disons que le corps $\gf{p^h}$ est représenté publiquement par un polynôme $P(X)\in\gf{p}[X]$ irréductible de degré $h$. Considérons le polynôme $P(X)$ comme étant à coefficients dans $\gf{p}[t_0]$. Ainsi, $P(X) \in \gf{p}[t_0][X]$ est scindé et nous pouvons exprimer ses racines comme des polynômes en $t_0$. Choisissons l'une d'entre elles que nous notons $a$. Il est alors possible d'écrire $a = f(t_0)$, où $f(X) \in \gf{p}[X]$. 
+
+Soient $G(X)$ et $T(X)$ deux polynômes de $\gf{p}[X]$ tel que $g_0 = G(f(t_0))$ et $t_0 = T(f(t_0))$. Alors si on note $g := G(a)$ et $t := T(a)$, on obtient les paramètres que nous souhaitons! Pour cela, il suffit de montrer que, pour tout $0 \leqslant i \leqslant p-1$, nous avons $a_i = \log_g(t+\alpha_i)$. Ce que nous faisons:
+$$\log_g(t+\alpha_i) = \log_{G(a)}(T(a)+\alpha_i) = \log_{G(f(t_0))}(T(f(t_0))+\alpha_i) = \log_{g_0}(t_0+\alpha_i) = a_i.$$
+
+Si $\sigma$ et $d$ sont définis, la clé publique est alors constituée des:
+$$c_i := d + a_{\sigma(i)} \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
+
+\subsection{Implantation}
 
 Pour fixer les idées, nous donnerons en \verb|sage| les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
 \begin{verbatim}
