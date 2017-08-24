@@ -1223,10 +1223,17 @@ b_i / 2 \pmod{p^h-1}, \quad \text{si } {t_0} + {g_0}^{b_i/2} \not\in \gf{p}, \\
 
 Dans la construction précédente, il n'est pas évident que l'élément algébrique ${t_0}$ est choisi aléatoirement. Et, de plus, il est absurde de prendre le polynôme $I_h(X)$ comme polynôme servant à représenter publiquement notre corps $\gf{p^h}$.
 
-Si on commence comme en section~\ref{sec:cryptosysteme}, disons que le corps $\gf{p^h}$ est représenté publiquement par un polynôme $P(X)\in\gf{p}[X]$ irréductible de degré $h$. Considérons le polynôme $P(X)$ comme étant à coefficients dans $\gf{p}[t_0]$. Ainsi, $P(X) \in \gf{p}[t_0][X]$ est scindé et nous pouvons exprimer ses racines comme des polynômes en $t_0$. Choisissons l'une d'entre elles que nous notons $a$. Il est alors possible d'écrire $a = f(t_0)$, où $f(X) \in \gf{p}[X]$. 
+Si on commence comme en section~\ref{sec:cryptosysteme}, disons que le corps $\gf{p^h}$ est représenté publiquement par un polynôme $P(X)\in\gf{p}[X]$ irréductible de degré $h$, et qu'on dénote la classe de $X$ modulo $P(X)$ par $a$, i.e. la représentation publique est $\gf{p}[a]$. Ensuite, nous faisons un raisonnement similaire à celui se trouvant au début de la section~\ref{sec:DLPJoux}: considérons le polynôme $I_h(X)$ comme étant à coefficients dans $\gf{p}[a]$. Ainsi, $I_h(X) \in \gf{p}[a][X]$ est scindé et nous pouvons exprimer ses racines comme des polynômes en $a$. Choisissons l'une d'entre elles que nous notons $t \in \gf{p}[a]$. Il est alors possible d'écrire $t = f(a)$, où $f(X) \in \gf{p}[X]$. Les éléments $t_0$ et $t$ sont intimement liés: la matrice de passage du $\gf{p}$-espace vectoriel $\gf{p}[t_0]$ muni de la base $(1,t_0,\dots,{t_0}^{h-1})$ vers $\gf{p}$-espace vectoriel $\gf{p}[a]$ muni de la base $(1,t,\dots,{t}^{h-1})$ est la matrice identité.
 
-Soient $G(X)$ et $T(X)$ deux polynômes de $\gf{p}[X]$ tel que $g_0 = G(f(t_0))$ et $t_0 = T(f(t_0))$. Alors si on note $g := G(a)$ et $t := T(a)$, on obtient les paramètres que nous souhaitons! Pour cela, il suffit de montrer que, pour tout $0 \leqslant i \leqslant p-1$, nous avons $a_i = \log_g(t+\alpha_i)$. Ce que nous faisons:
-$$\log_g(t+\alpha_i) = \log_{G(a)}(T(a)+\alpha_i) = \log_{G(f(t_0))}(T(f(t_0))+\alpha_i) = \log_{g_0}(t_0+\alpha_i) = a_i.$$
+Soit $G(X)$ un polynôme de $\gf{p}[X]$ tel que $g_0 = G(t_0) \in \gf{p}[t_0]$. Soient $g := G(f(a))$ et $\varphi: \gf{p}[t_0] \rightarrow \gf{p}[a], t_0 \mapsto t$, nous avons pour tout $0 \leqslant i \leqslant p-1$:
+\begin{align*}
+\log_{g}({t}+\alpha_i) &= \log_{G(f(a))}(t+\alpha_i)\\
+&= \log_{G(t)}(t+\alpha_i) \\
+&= \log_{G(\varphi(t_0))}(\varphi(t_0)+\alpha_i) \\
+&= \log_{\varphi(G(t_0))}(\varphi(t_0+\alpha_i)) \\
+&= \log_{\varphi(g_0)}(\varphi(t_0+\alpha_i)) \\
+&= a_i.
+\end{align*}
 
 Si $\sigma$ et $d$ sont définis, la clé publique est alors constituée des:
 $$c_i := d + a_{\sigma(i)} \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$

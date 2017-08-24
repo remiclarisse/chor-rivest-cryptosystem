@@ -6,36 +6,37 @@
 # base_field = GF(p ** 2)
 # prime_field_poly = PolynomialRing(prime_field, 'x')
 # base_field_poly = PolynomialRing(base_field, 'x')
-# Ih, h0, h1 = pick_representation_polynome (p, h, prime_field_poly.gen())
+# # Ih, h0, h1 = pick_representation_polynome (p, h, prime_field_poly.gen())
+# h0 = 5*prime_field_poly.gen()**2 + 2*prime_field_poly.gen()
+# h1 = 6*prime_field_poly.gen() + 1
+# Ih = prime_field_poly.gen()**3 + 3
 # F = base_field_poly.quotient_ring(Ih)
 # # Logarithme des polynômes linéaires F_(p^2)
 # linear_poly = [ F.gen() + alp for alp in prime_field ]
-# while True :
-#     g0 = F.random_element()
-#     if is_primitive(g0) :
-#         break
+# # while True :
+# #     gamma = F.random_element()
+# #     if is_primitive(g0) :
+# #         break
+# gamma = (base_field.gen() + 6)*F.gen()**2 + (5*base_field.gen() + 5)*F.gen() + 4*base_field.gen() + 1
 # fa = list(factor(p ** (2 * h) - 1))
-# loga = [ pohlig_hellman (g0, linear_poly[i], fa) for i in range (p) ]
+# loga = [ pohlig_hellman (gamma, linear_poly[i], fa) for i in range (p) ]
 # # Logarithme des polynômes linéaires F_p
-# g = g0 ** (p ** h + 1)
+# g0 = gamma ** (p ** h + 1)
 # for i in range (p) :
-#     if lift(g ** (loga[i] / 2)).lc() != 1 :
+#     if lift(g0 ** (loga[i] / 2)).lc() != 1 :
 #         loga[i] = ((loga[i] + p ** h - 1) / 2) % (p ** h - 1)
 #     else :
 #         loga[i] = (loga[i] / 2) % (p ** h - 1)
 # # Changement de représentation
 # K = GF(p ** h)
-# t0 = K(0)
-# while True :
-#     if prime_field_poly(t0.minpoly()) == Ih :
-#         break
-#     else :
-#         t0 = K.next(t0)
-# # Choix de t
-# while True :
-#     t = K.random_element()
-#     if t.minimal_polynomial().degree() == h :
-#         break
+# t = 6*K.gen()**2 + 2*K.gen() + 2
+# # t = K(0)
+# # while True :
+# #     if prime_field_poly(t.minpoly()) == Ih :
+# #         break
+# #     else :
+# #         t = K.next(t)
+# g = K(lift(g0)(t))
 
 
 def pick_representation_polynome (p, h, X) :
