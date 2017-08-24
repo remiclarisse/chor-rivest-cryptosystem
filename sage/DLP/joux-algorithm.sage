@@ -39,6 +39,7 @@ def sieving_linear_poly (q, h0, h1) :
     sieveTable = []
     a, b, c, d = Fq2(0), Fq2(0), Fq2(0), Fq2(0)
     end = Fq2.list()[-1]
+    linear_poly = [ X + const for const in Fq2 ]
     while nbIter < sieveSize :
         while True :
             [a, b, c, d] = next_tuple ([a, b, c, d], end)
