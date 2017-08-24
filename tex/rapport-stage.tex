@@ -116,13 +116,13 @@
 
 Du 15 mai au 31 août 2017, j'ai intégré en tant que stagiaire l'équipe Grace de Inria Saclay - Île-de-France. Sous la supervision de Daniel Augot, responsable de l'équipe, et Luca De Feo, j'ai étudié le cryptosystème \cite{chorRivest1988} présenté par Benny Chor et Ronald Rivest en 1984, ainsi que l'algorithme \cite{joux2013} qu'Antoine Joux à conçu en 2013 pour le calcul de logarithme discret dans un corps fini de petite caractéristique.
 
-Le cryptosystème de Chor-Rivest est un cryptosytème asymétrique qui base sa sécurité sur un problème de sac à dos. Cependant, pour produire la clé publique, il faut avoir recours à des calculs de logarithmes discrets dans un corps fini $\gf{p^h}$. C'est pour cela que Chor et Rivest incitent l'utilisateur à prendre des paramètres facilitant la résolution du problème du logarithme discret, en sélectionnant par exemple un exposant $h$ friable. C'est justement ce pré-requis qui a permis à Serge Vaudenay en 2000 de confectionner une cryptanalyse \cite{vaudenay2000}, qui lui fait arriver à la conclusion qu'il faut choisir un exposant $h$ premier.
+Le cryptosystème de Chor-Rivest est un cryptosytème asymétrique qui base sa sécurité sur un problème de sac à dos. Cependant, pour produire la clé publique, il faut avoir recours à des calculs de logarithmes discrets dans un corps fini $\gf{p^h}$. C'est pour cela que Chor et Rivest incitent l'utilisateur à prendre des paramètres facilitant la résolution du problème du logarithme discret, en sélectionnant par exemple un exposant $h$ composé. C'est justement ce pré-requis qui a permis à Serge Vaudenay en 2000 de confectionner une cryptanalyse \cite{vaudenay2000}, qui le fait arriver à la conclusion qu'il faut choisir un exposant $h$ premier.
 
 Nous sommes donc au croisement de deux recommandations: l'une facilitant le calcul de logarithme pour fabriquer les clés et l'autre rendant le cryptosystème résistant à la meilleure cryptanalyse existante à ce jour. Il est clair qu'avoir un cryptosystème cassé est inutile. C'est pour cela que nous nous intéressons à l'algorithme de Joux, afin que le calcul des logarithmes ne soit plus un obstacle.
 
-Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet Grace, suivi par un bref descriptif des attentes du stage. Les section~\ref{sec:cryptosysteme} et section~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers resultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
+Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet Grace, et faisons un bref descriptif des attentes du stage. Les sections~\ref{sec:cryptosysteme} et~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers resultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous déduisons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
 
-\paragraph{GitHub.} Des fichiers comportant les divers algorithmes sont présents sur GitHub pour agrémenter la lecture du rapport. Il y a une implémentation élémentaire en \verb|C| de l'algorithme rho de Pollard \cite{pollard1978} dans un corps $\gf{p}$, où $p$ est un nombre premier inférieur à $2^{32}$, ainsi que d'autres fichiers en \verb|sage| implémentant le cryptosystème de Chor-Rivest \cite{chorRivest1988}, l'attaque de Serge Vaudenay \cite{vaudenay2000} et une variante de l'algorithme d'Antoine Joux \cite{joux2013}, exposés en section \ref{sec:cryptosysteme}, \ref{sec:cryptanalyse} et \ref{sec:DLPJoux} respectivement. Il est laissé au lecteur l'initiative d'explorer le dépôt documenté.
+\paragraph{GitHub.} Des fichiers comportant les divers algorithmes sont présents sur GitHub pour agrémenter la lecture du rapport. Il y a une implémentation élémentaire en \verb|C| de l'algorithme rho de Pollard \cite{pollard1978} dans un corps $\gf{p}$, où $p$ est un nombre premier inférieur à $2^{32}$, ainsi que d'autres fichiers en SageMath implémentant le cryptosystème de Chor-Rivest \cite{chorRivest1988}, l'attaque de Serge Vaudenay \cite{vaudenay2000} et une variante de l'algorithme d'Antoine Joux \cite{joux2013}, exposés en section \ref{sec:cryptosysteme}, \ref{sec:cryptanalyse} et \ref{sec:DLPJoux} respectivement. Il est laissé au lecteur l'initiative d'explorer le dépôt documenté.
 \paragraph{web URL.}\url{https://github.com/Remi-Clarisse/chor-rivest-cryptosystem.git}
 
 \setcounter{tocdepth}{1}
@@ -147,7 +147,7 @@ Inria (Institut National de Recherche en Informatique et en Automatique) emploie
 Voici la description publique de l'équipe-projet Grace (Geometry, aRithmetic, Algorithms, Codes and Encryption): \og{}La théorie algorithmique des nombres et les problèmes computationnels associés aux courbes algébriques sur les corps, les anneaux, sont centraux dans notre thème de recherche. Ce domaine très riche des mathématiques et de l'informatique a déjà montré son importance dans la cryptographie à clé publique, avec des succès industriels comme le système RSA et la cryptographie à base de courbes elliptiques. Il est moins connu que de bons codes correcteurs d'erreur ou autres peuvent être construits avec les mêmes objets mathématiques, qui sont aussi au c\oe ur de Grace. Nous pensons qu'une interprétation géométrique et unifiée donne une vue profonde sur la nature et les performances des ces problèmes en théorie des codes et cryptographie. Ces deux domaines d'applications interviennent pour la fiabilité et la sécurité des applications. Alors que la cryptologie est traditionnellement au c\oe ur de l'informatique, ce n'est que plus récemment que la théorie des codes y trouve des applications, en sortant du document des télécommunications.\fg{}
 
 L'équipe Grace est en partenariat avec le CNRS et l'École polytechnique, et en collaboration avec le Laboratoire Informatique de l'École polytechnique (LIX).
-L'équipe est composée de 10 membres. Outre Daniel Augot, le responsable, il y a 5 membres permanents: Alain Couvreur, Luca De Feo, Françoise Levy-dit-Vehel, François Morain et Benjamin Smith. Les quatre autres membres sont Nicholas Coxon et William George, qui effectuent leur post-doctorat, et Élise Barelli et Julien Lavauzelle, qui sont en dernière année de thèse.
+L'équipe est composée de 10 membres. Outre Daniel Augot, le responsable, il y a quatre membres permanents: Alain Couvreur, Françoise Levy-dit-Vehel, François Morain et Benjamin Smith. Les cinq autres membres sont Luca De Feo, qui est chercheur délégué, Nicholas Coxon et William George, qui effectuent leur post-doctorat, et Élise Barelli et Julien Lavauzelle, qui sont en dernière année de thèse.
 Et n'oublions pas leur fabuleuse assistante, Jessica Gameiro!
 Aussi, au moment de la rédaction de ces lignes, nous sommes trois stagiaires en master avec Benoît Billaudel et Jean Kieffer.
 
@@ -157,10 +157,13 @@ Aussi, au moment de la rédaction de ces lignes, nous sommes trois stagiaires en
 
 Les objectifs du stage donnés par Daniel et Luca sont:\begin{enumerate}
 \item comprendre le cryptosystème de Chor-Rivest,
-\item l’implémenter en \verb|sage| selon la proposition d'origine,
+\item l’implémenter en SageMath selon la proposition d'origine,
 \item et si le temps le permet, implanter une version modifiée, qui utilise des extensions d'extensions de corps.
 \end{enumerate}
-Les deux premiers points sont traités dans la section suivante (\ref{sec:cryptosysteme}), les codes \verb|sage| sont sur le GitHub. Quant au troisième point, il convient d'expliquer pourquoi nous souhaitons implanter une version modifiée. Le cryptosytème de Chor-Rivest \cite{chorRivest1988} est réputé \og{}cassé \fg{} par Serge Vaudenay \cite{vaudenay2000}, ce que nous détaillons en section \ref{sec:cryptanalyse}. Cependant, la cryptanalyse s’appuie sur ce que l'on pourrait appeler une avarie du système: la fabrication de la clé publique requiert que l'on se place dans un corps fini dans lequel le calcul de logarithme discret n'est pas rédhibitoire. Cette exigence est satisfaite en particulier lorsque le corps fini considéré a de nombreux sous-corps, ce qui est d'ailleurs le choix fait par Benny Chor et Ronald Rivest. Donc, une façon efficace de rendre impraticable l'attaque de Vaudenay est de choisir un corps fini sans sous-corps, dans le meilleur des cas bien sûr. Cela rend par conséquence le calcul \og{}naïf \fg{} de logarithmes discrets difficile. Pour ne pas déshabiller Pierre pour habiller Paul, il nous faut donc nous pencher plus sérieusement sur le problème du calcul de logarithme discret dans les corps finis, ce que nous faisons dans la section \ref{sec:DLPJoux}, en étudiant notamment l'algorithme d'Antoine Joux \cite{joux2013}. Ceci nous permet de traiter le dernier point de la liste, en section \ref{sec:consequences}.
+Les deux premiers points sont traités dans la section suivante (\ref{sec:cryptosysteme}), les codes SageMath sont sur le GitHub. Quant au troisième point, il convient d'expliquer pourquoi nous souhaitons implanter une version modifiée. Le cryptosytème de Chor-Rivest \cite{chorRivest1988} est réputé \og{}cassé \fg{} par Serge Vaudenay \cite{vaudenay2000}, ce que nous détaillons en section \ref{sec:cryptanalyse}. Cependant, la cryptanalyse s’appuie sur ce que l'on pourrait appeler une avarie du système: la fabrication de la clé publique requiert que l'on se place dans un corps fini dans lequel le calcul de logarithme discret n'est pas rédhibitoire. Cette exigence est satisfaite en particulier lorsque le corps fini considéré a de nombreux sous-corps, ce qui est d'ailleurs le choix fait par Benny Chor et Ronald Rivest. Donc, une façon efficace de rendre impraticable l'attaque de Vaudenay est de choisir un corps fini sans sous-corps,
+% Ceci est techniquement impossible: F_p sera toujours un sous-corps propre. Au mieux on peut espérer
+% qu'il soit le seul.
+dans le meilleur des cas bien sûr. Cela rend par conséquence le calcul \og{}naïf \fg{} de logarithmes discrets difficile. Pour ne pas déshabiller Pierre pour habiller Paul, il nous faut donc nous pencher plus sérieusement sur le problème du calcul de logarithme discret dans les corps finis, ce que nous faisons dans la section \ref{sec:DLPJoux}, en étudiant notamment l'algorithme d'Antoine Joux \cite{joux2013}. Ceci nous permet de traiter le dernier point de la liste, en section \ref{sec:consequences}.
 
 %(Luca) Avant de présenter le système, tu devrais présenter ton stage: objectifs, outils, résultats.
 
@@ -195,6 +198,8 @@ où $\{\beta_1, \dots, \beta_l \}$ et $\{ \gamma_1, \dots, \gamma_m\}$ sont deux
 \subsection{Description}
 
 Soient $p$ une puissance non-nulle de nombre premier et $h \geqslant 2$ un entier naturel. Considérons le corps fini à $p^h$ élément, noté $\gf{p^h}$. La représentation de $\gf{p^h}$ est supposée publique, i.e. il existe un polynôme $P(X)$ public de degré $h$ irréductible sur $\gf{p}$ et les éléments de $\gf{p^h}$ sont vus comme des polynômes modulo $P(X)$ :
+%% Ce polynôme P ne joue aucun rôle dans le système, ni dans les attaques.
+%% Je me demande si c'est la peine de lui donner un nom, voire d'en parler tout court.
 $$\gf{p^h} \cong \frac{\gf{p}[X]}{(P(X))}.$$
 Considérons aussi une numérotation publique $\alpha$ du sous-corps de base $\gf{p}$, i.e. $$\{\alpha_0,\dots, \alpha_{p-1}\} = \gf{p} \subset \gf{p^h}.$$
 
@@ -208,7 +213,7 @@ Considérons aussi une numérotation publique $\alpha$ du sous-corps de base $\g
 La clé publique est alors composée des :
 $$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
 
-\'Etant donné qu'il faut calculer des logarithmes discrets pour fabriquer la clé publique, les paramètres choisis doivent faciliter le calcul de ces logarithmes dans $\gf{p^h}$. Ainsi, Chor et Rivest suggèrent de prendre pour $p$ un entier premier petit, ou une puissance de nombre premier petite, et pour $h$ un entier friable, permettant l'utilisation de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}. En l’occurrence, ils ont proposé de se placer dans des corps tels que $\gf{197^{24}}$, $\gf{211^{24}}$, $\gf{243^{24}}$ et $\gf{256^{25}}$.
+\'Etant donné qu'il faut calculer des logarithmes discrets pour fabriquer la clé publique, les paramètres choisis doivent faciliter le calcul de ces logarithmes dans $\gf{p^h}$. Ainsi, Chor et Rivest suggèrent de prendre pour $p$ un entier premier petit, ou une puissance de nombre premier petite, et pour $h$ un entier composé, permettant l'utilisation de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}. En l’occurrence, ils ont proposé de se placer dans des corps tels que $\gf{197^{24}}$, $\gf{211^{24}}$, $\gf{243^{24}}$ et $\gf{256^{25}}$.
 
 \paragraph{Espace des messages.}L'espace des messages est l'ensemble des chaînes de $p$ bits et de poids de Hamming égal à $h$. C'est-à-dire que le message à chiffrer doit être une chaîne de bits $m = [m_0\cdots m_{p-1}]$ telle que $m_0+\dots + m_{p-1} = h$. N'importe quel message peut être découpé en plusieurs messages de $p$ bits et de poids $h$ en suivant un algorithme d'encodage donné dans \cite[IV.B.]{chorRivest1988}.
 
@@ -234,7 +239,7 @@ $$G(X) + \mu(X) = \prod_{m_i = 1} \left(X+\alpha_{\sigma(i)}\right).$$
 Ainsi, la factorisation de $G(X)+\mu(X)$ permet de recouvrer le message $m$.
 
 \subsection{Exemple}
-Nous nous servons de \verb|sage| pour construire un exemple\footnote{Les lignes de commandes peuvent être copiées telles quelles, elles fonctionnent, mais il est fort probable que les clés ne soient pas les mêmes que dans cet exemple. Les valeurs de $p$ et $h$ peuvent d'ailleurs être changées !
+Nous nous servons de SageMath pour construire un exemple\footnote{Les lignes de commandes peuvent être copiées telles quelles, elles fonctionnent, mais il est fort probable que les clés ne soient pas les mêmes que dans cet exemple. Les valeurs de $p$ et $h$ peuvent d'ailleurs être changées !
 
 Cet exemple est essentiellement ce qu'il y a dans le fichier \textit{chor-rivest-prime-number.sage}.} d'une instance du cryptosystème de Chor-Rivest. Prenons $p := 17$ et $h := 6$, ainsi $p^h = 24\;137\;569$.
 \begin{verbatim}
@@ -242,7 +247,7 @@ sage: p = 17
 sage: h = 6
 sage: q = p ** h
 \end{verbatim}
-Demandons à \verb|sage| de construire $\gf{17^6}$ :
+Demandons à SageMath de construire $\gf{17^6}$ :
 \begin{verbatim}
 sage: K.<a> = FiniteField(q)
 sage: P = a.minimal_polynomial()
@@ -254,7 +259,7 @@ Les commandes suivantes permettent d'obtenir une numérotation du sous-corps pre
 sage: alpha = [K(i) for i in range (p)]
 sage: shuffle (alpha)
 \end{verbatim}
-La numérotation $\alpha$ donnée par \verb|sage| est ici :
+La numérotation $\alpha$ donnée par SageMath est ici :
 $$(\alpha_0, \dots, \alpha_{16}) = (2, 12, 4, 1, 0, 10, 7, 8, 15, 16, 3, 5, 13, 9, 11, 6, 14)$$
 \subsubsection{Génération des clés}
 Nous souhaitons déterminer un élément primitif $g$ de $\gf{17^6}$ :
@@ -274,7 +279,7 @@ sage:     if t.minimal_polynomial().degree() == h :
 sage:         break
 sage: mu = t.minimal_polynomial()
 \end{verbatim}
-Ce code \verb|sage| donne ici :
+Ce code SageMath donne ici :
 $$t := 9a^5 + 16a^4 + 10a^3 + 3a^2 + 12a + 12,$$
 de polynôme minimal :
 $$\mu(X) := X^6 + 9X^5 + 8X^4 + 14X^3 + X^2 + 11X + 6\in\gf{17}[X].$$
@@ -290,7 +295,9 @@ sage: d = randint (0, q - 2)
 \end{verbatim}
 assigne la valeur $1\;530\;545$ à l'entier $d$.
 
-Nous avons fini de fabriquer la clé privée ! Reste à construire la clé publique\footnote{À toutes fins utiles, la méthode utilisée pour le calcul des logarithmes discret est Pohlig-Hellman \cite{pohligHellman1978} avec du pas-de-bébé--pas-de-géant.} :
+Nous avons fini de fabriquer la clé privée ! Reste à construire la clé publique\footnote{À toutes fins utiles, la méthode utilisée pour le calcul des logarithmes discret
+%% Par Sage? Quelle version?
+est Pohlig-Hellman \cite{pohligHellman1978} avec du pas-de-bébé--pas-de-géant.} :
 \begin{verbatim}
 sage: c = [mod (d + log (t + alpha[sig[i]], g), q - 1) for i in range (p)]
 \end{verbatim}
@@ -330,9 +337,9 @@ sage: e = mod (sum ([m[i]*c[i] for i in range (p)]), q-1)
 $$E(m) := 23\;410\;132.$$
 
 \subsubsection{Déchiffrement du message}
-Nous souhaitons écrire $g^{E(m) - hd}$ comme un polynôme en $t$. Or \verb|sage| nous donne l'élément $g^{E(m) - hd}$ comme polynôme en $a$ : $$g^{E(m) - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
+Nous souhaitons écrire $g^{E(m) - hd}$ comme un polynôme en $t$. Or SageMath nous donne l'élément $g^{E(m) - hd}$ comme polynôme en $a$ : $$g^{E(m) - hd} = a^5 + 11a^3 + 9a^2 + 15a + 1.$$
 Pour parvenir à exprimer $g$ comme nous le souhaitons, il faut effectuer un changement de base du $\gf{17}$-espace vectoriel $\gf{17^6}$ : passer de la base $\mathcal{A} := (1, a, a^2, \dots, a^{h-1})$ à la base $\mathcal{T} := (1, t, t^2, \dots, t^{h-1})$.
-La matrice de passage facile à calculer est celle qui passe de la base $\mathcal{T}$ à la base $\mathcal{A}$ : il suffit d'écrire dans \verb|sage| les différentes puissances de $t$, et \verb|sage| les exprime en fonction des puissances de $a$ :
+La matrice de passage facile à calculer est celle qui passe de la base $\mathcal{T}$ à la base $\mathcal{A}$ : il suffit d'écrire dans SageMath les différentes puissances de $t$, et SageMath les exprime en fonction des puissances de $a$ :
 \begin{verbatim}
 sage: V = K.vector_space()
 sage: M = Matrix (GF(p), [V(t ** i) for i in range (h)]).transpose()
@@ -385,13 +392,18 @@ Par exemple, pour le cas $\alpha_{\sigma(i)} = 1$: nous cherchons d'abord l'indi
 
 \section{La cryptanalyse de Serge Vaudenay}\label{sec:cryptanalyse}
 
-Nous présentons ici la cryptanalyse de Serge Vaudenay \cite{vaudenay2000}, publiée en 2000. Elle s'appuie sur la forte friabilité de $h$, i.e. sur l'existence de nombreux sous-corps de $\gf{p^h}$. Cette attaque ne requiert pas d'émission de chiffrés, elle se base seulement sur la connaissance de la clé publique. Elle exploite une faiblesse du cryptosystème, à savoir que par conception du cryptosystème, il existe plusieurs clés privées qui produisent la même clé publique.
+Nous présentons ici la cryptanalyse de Serge Vaudenay \cite{vaudenay2000}, publiée en 2000. Elle s'appuie sur la friabilité de $h$, i.e. sur l'existence de nombreux sous-corps de $\gf{p^h}$. Cette attaque ne requiert pas d'émission de chiffrés, elle se base seulement sur la connaissance de la clé publique. Elle exploite une faiblesse du cryptosystème, à savoir que par conception du cryptosystème, il existe plusieurs clés privées qui produisent la même clé publique.
+%% Je ne suis pas convaincu que ceci soit une faiblesse. Il faut bien sûr tenir cela
+%% en compte pour mener l'attaque, mais techniquement c'est juste une caractéristique
+%% du système.
 
 Ici, nous donnons l'attaque pour $p$ un nombre premier, bien qu'elle soit adaptable pour le cas où $p$ est une puissance d'un nombre premier. En outre, nous exposons l'attaque à rebours, à savoir que nous partons du cas où quelques éléments de la clé privée sont connus et, au fur et à mesure, nous les retirons en regardant comment les construire.
 
 \subsection{Notion de clés privées équivalentes}
 
-Dans le cryptosystème de Chor-Rivest, nous choisissons la clé privée de façon aléatoire puis, à partir de celle-ci, nous calculons la clé publique. Le système repose sur la difficulté de trouver une clé secrète à partir de la clé publique. Cependant, nous remarquons qu'il y a plusieurs clés privées \textit{équivalentes}, à savoir qu'il existe plusieurs jeux de clés privées qui donnent la même clé publique.
+Dans le cryptosystème de Chor-Rivest, nous choisissons la clé privée de façon aléatoire puis, à partir de celle-ci, nous calculons la clé publique. Le système repose sur la difficulté de trouver une clé secrète à partir de la clé publique.
+%% Tout système repose sur cette difficulté
+Cependant, nous remarquons qu'il y a plusieurs clés privées \textit{équivalentes}, à savoir qu'il existe plusieurs jeux de clés privées qui donnent la même clé publique.
 
 Affinons. Nous pouvons remplacer $t$ et $g$ par leur puissance $p$-ième, la clé publique reste inchangée car :
 $$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g}\left(\left(t + \alpha_{\sigma(i)}\right)^p\right) = \log_{g}\left(t + \alpha_{\sigma(i)}\right).$$
@@ -530,6 +542,7 @@ Maintenant que nous avons obtenu la permutation $\pi$, nous souhaitons résoudre
 Par la proposition~\ref{prop:permutation}, la permutation $\pi$ donnée par l'algorithme~\ref{algo:naifgpr} est telle qu'il existe $u \in \gf{p}^\times$ et $v \in \gf{p}$ vérifiant :
 $$\alpha_{\pi(i)} = u \alpha_{\sigma(i)} + v, \qquad \forall i : 0 \leqslant i \leqslant p-1.$$
 En exprimant le polynôme $Q(X)$ faisant intervenir la permutation $\pi$, noté $Q_\pi(X)$, par rapport au polynôme $Q(X)$ faisant intervenir la permutation $\sigma$, noté $Q_\sigma(X)$, nous obtenons :
+%% Notation dangereuse: on peut comprendre Q_π = Q = Q_σ
 \begin{align*}
 Q_\pi(X) &= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{X-\alpha_{\pi(k)}}{\alpha_{\pi(j)}-\alpha_{\pi(k)}}, \\
 &= \sum_{j=0}^{h/r} (\mbf g_{p^r})^{c_{j}} \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{X-u\alpha_{\sigma(k)} - v}{u\alpha_{\sigma(j)}-u\alpha_{\sigma(k)}}, \\
@@ -817,7 +830,7 @@ L'algorithme~\ref{algo:attaqueGeneral} illustre l'attaque complète de Serge Vau
 
 Serge Vaudenay a décrit une attaque du cryptosystème, lorsque $h$ admet un facteur $r$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, ayant pour complexité $\O(h^3p^r/r^2)$.
 
-L'attaque a été implémentée\footnote{Consulter le fichier \textit{vaudenay-attack.sage}} en \verb|sage|, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 1 heure et demie en moyenne contre 15 minutes, pour les corps $\gf{197^{24}}$ et $\gf{211^{24}}$.
+L'attaque a été implémentée\footnote{Consulter le fichier \textit{vaudenay-attack.sage}} en SageMath, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 1 heure et demie en moyenne contre 15 minutes, pour les corps $\gf{197^{24}}$ et $\gf{211^{24}}$.
 
 Les préconisations de Serge Vaudenay pour réparer le cryptosystème de Chor-Rivest sont les suivantes : \begin{itemize}
 \item choisir un corps fini $\gf{p^h}$ avec $p$ et $h$ tous les deux premiers,
@@ -1079,7 +1092,7 @@ $$\frac{(a^qc - ac^q)Xh_0(X) + (a^qd - bc^q)h_0(X) + (b^qc - ad^q)Xh_1(X) + (b^q
 $$= (cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d)).$$
 Par conséquence, nous obtenons une égalité dans $\gf{q^2}[X]/(I_k(X)) \cong \gf{q^{2k}}$ entre un produit de polynômes linéaires et une fraction avec un numérateur de bas degré et un dénominateur constant. En ajoutant $h_1(X)$ à la base de friabilité, nous obtenons une relation satisfaisante dès que le membre de gauche se factorise en polynômes linéaires.
 
-\paragraph{Comptage des relations.}La description ci-dessus génère une relation candidate pour chaque quadruplet $(a,b,c,d) \in \gf{q^2}^4$. Cependant, certaines de ses relations sont générées plusieurs fois, avec des $(a,b,c,d)\in\gf{q^2}^4$ distincts. Par exemple, si $(a,b,c,d)\in\gf{q}^4$, nous obtenons une équation triviale.
+\paragraph{Comptage des relations.}La description ci-dessus génère une relation candidate pour chaque quadruplet $(a,b,c,d) \in \gf{q^2}^4$. Cependant, certaines de ces relations sont générées plusieurs fois, avec des $(a,b,c,d)\in\gf{q^2}^4$ distincts. Par exemple, si $(a,b,c,d)\in\gf{q}^4$, nous obtenons une équation triviale.
 
 Pour cette raison, Joux \cite{joux2013} préconise de prendre les coefficients $a,b,c,d$ dans $\gf{q^2}$. En étudiant l'action de $\operatorname{PGL}_2(\gf{q^2})$ sur la droite projective $\mathbb{P}_1(\gf{q})$ et du fait que $\operatorname{PGL}_2(\gf{q})$ laisse $\mathbb{P}_1(\gf{q})$ globalement invariant, Joux déduit le nombre d'équations candidates : 
 $$\frac{q^6 - q^2}{q^3 - q} = q^3 + q.$$
@@ -1111,11 +1124,11 @@ Reste à construire de tels polynômes $k_1(X)$ et $k_2(X)$. Antoine Joux \cite{
 Ce système est même bilinéaire en $k_1(X)$ et $k_2(X)$ puisque chaque monôme qui apparaît dans le système contient au plus une inconnue provenant de $k_1(X)$ et une de $k_2(X)$.
 
 Plus précisément, considérons chaque coefficient de $k_1(X)$ et $k_2(X)$ comme une indéterminée appartenant au corps des coefficients $\gf{q^2}$. Si $x$ est une telle inconnue, nous l'écrivons $x_0 + zx_1$, où $(1,z)$ est une base de $\gf{q^2}$ sur $\gf{q}$, et $x_0$ et $x_1$ sont des inconnues appartenant à $\gf{q}$. Avec une telle convention: $$x^q = x_0 + z^qx_1.$$
-Le système a $\deg H(X)$ équations sur $\gf{q^2}$ et peut s'écrire comme un système à $2\deg H(X)$ équations sur $\gf{q}$. En supposant que $k_1(X)$ est unitaire, le nombre maximum d'inconnues est $2(\deg k_1(X) + \deg k_2(X) + 1)$. Cependant, à cause de l'action de $\operatorname{PGL}_2(\gf{q})$, plusieurs couples $(k_1(X),k_2(X))$ distincts donnent le même polynôme $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q)$. Pour éviter cela, il faut fixer au moins une inconnue dans $\gf{q^2} - \gf{q}$, laissant ainsi $2(\deg k_1(X) + \deg k_2(X))$ inconnues dans $\gf{q}$. 
+Le système a $\deg H(X)$ équations sur $\gf{q^2}$ et peut s'écrire comme un système à $2\deg H(X)$ équations sur $\gf{q}$. En supposant que $k_1(X)$ est unitaire, le nombre maximum d'inconnues est $2(\deg k_1(X) + \deg k_2(X) + 1)$. Cependant, à cause de l'action de $\operatorname{PGL}_2(\gf{q})$, plusieurs couples $(k_1(X),k_2(X))$ distincts donnent le même polynôme $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q)$. Pour éviter cela, il faut fixer au moins une inconnue dans $\gf{q^2} \setminus \gf{q}$, laissant ainsi $2(\deg k_1(X) + \deg k_2(X))$ inconnues dans $\gf{q}$. 
 
 Antoine Joux \cite{joux2013} fait ensuite un raisonnement heuristique pour avoir une bonne probabilité que le système précédent admette une solution, à savoir: nous avons besoin que 
 $$\deg k_1(X) + \deg k_2(X) \geqslant \deg H(X) + 1.$$
-Enfin, il étudie la complexité de la descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donnent que la complexité est exponentielle en $\min(\deg k_1(X), \deg k_2 (X))$.
+Enfin, il étudie la complexité de la descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donne que la complexité est exponentielle en $\min(\deg k_1(X), \deg k_2 (X))$.
 Plus précisément, en posant $d = \deg k_2(X)$ et donc $\deg k_1(X) = \deg H(X) +1 - d$, la complexité est :
 $$\binom{2 (\deg H(X)) + 3}{2d+1}^\omega,$$
 où $2 \leqslant \omega \leqslant 3$ est une constante. 
@@ -1143,7 +1156,7 @@ ce qui peut être réécrit comme $L(1/4+\o(1))$.
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
-L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incite à prendre $p$ et $h$ deux nombres premiers et tels que $2 < h < p$, afin de ``réparer'' le cryptosystème.
+L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incitent à prendre $p$ et $h$ deux nombres premiers et tels que $2 < h < p$, afin de ``réparer'' le cryptosystème.
 
 %Donner résultats précédents sur les tentatives d'amélioration (Madrid)
 
@@ -1197,7 +1210,7 @@ Pour ce procédé de fabrication, nous allons d'abord calculer les logarithmes q
 
 \subsubsection{Calcul des logarithmes $\log_g\left(t + \alpha_{i}\right)$}
 
-Soient $h_0(X)$ et $h_1(X)$ deux polynômes de $\gf{p}[X]$ de bas degré tels que le polynôme $h_1(X)X^p-h_0(X)$ ait un facteur irréductible de degré $h$, que l'on note $I_h(X) \in \gf{p}[X]$. Les indications de d'Antoine Joux \cite{joux2013} et Cécile Pierrot \cite{pierrot2016} incite à prendre $h_0(X)$ quadratique et $h_1(X)$ linéaire, pour qu'il soit dans la base de friabilité. Pour utilisé l'algorithme d'Antoine Joux \cite{joux2013}, on se place dans le corps:
+Soient $h_0(X)$ et $h_1(X)$ deux polynômes de $\gf{p}[X]$ de bas degré tels que le polynôme $h_1(X)X^p-h_0(X)$ ait un facteur irréductible de degré $h$, que l'on note $I_h(X) \in \gf{p}[X]$. Les indications de d'Antoine Joux \cite{joux2013} et Cécile Pierrot \cite{pierrot2016} incitent à prendre $h_0(X)$ quadratique et $h_1(X)$ linéaire, pour qu'il soit dans la base de friabilité. Pour utiliser l'algorithme d'Antoine Joux \cite{joux2013}, on se place dans le corps:
 $$\gf{p^{2h}} \cong \frac{\gf{p^2}[X]}{(I_h(X))}.$$
 Après avoir effectué la phase de crible des polynômes linéaires ainsi que la phase d'algèbre linéaire, nous choisissons aléatoirement une élément primitif $\gamma$ de $\gf{p^{2h}}$ et nous obtenons les logarithmes en base $\gamma$ des éléments de la forme ${t_0} + \beta$, où ${t_0} = X \pmod{I_h(X)}$ et $\beta \in \gf{p^2}$. 
 
@@ -1233,13 +1246,13 @@ $$c_i := d + a_{\sigma(i)} \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
 
 \subsection{Implantation}
 
-Pour fixer les idées, nous donnerons en \verb|sage| les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
+Pour fixer les idées, nous donnerons en SageMath les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
 \begin{verbatim}
 sage: p = 13 # peu importe les valeurs, il faut juste des nombres premiers
 sage: k = 5 # < p, joue le rôle du h, degré de l'extension
 \end{verbatim}
 
-Commençons par l'imbrication de corps. Dans \verb|sage| cela donne:
+Commençons par l'imbrication de corps. Dans SageMath cela donne:
 \begin{verbatim}
 sage: Fp2.<alpha> = GF(p ** 2)
 sage: FpY.<Y> = PolynomialRing(GF(p))
@@ -1257,7 +1270,7 @@ sage:     if k in deg :
 sage:         break
 sage: Ik = fa[deg.index(k)][0]
 \end{verbatim}
-La représentation en \verb|sage| donne:
+La représentation en SageMath donne:
 \begin{verbatim}
 sage: Fp2k.<beta> = Fp2X.quotient_ring(Fp2X(Ik))
 \end{verbatim}
@@ -1270,7 +1283,7 @@ et d'autre part:
 $$h_1(X)(cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d))$$
 et nous ne gardons que les relations où le polynôme \ref{eqn:exemAlgoJoux} se factorise en polynômes linéaires. Et il nous faut approximativement $p^2$ telles relations.
 
-Voici d'abord un petit bout de code \verb|sage| permettant de déterminer si un polynôme est scindé:
+Voici d'abord un petit bout de code SageMath permettant de déterminer si un polynôme est scindé:
 \begin{verbatim}
 sage: def is_split (P) :
 sage:     fa = list(P.factor())
@@ -1281,7 +1294,7 @@ sage:         return True
 sage:     else :
 sage:         return False
 \end{verbatim}
-Définissons les variables dans \verb|sage|:
+Définissons les variables dans SageMath:
 \begin{verbatim}
 sage: sieveSize = 2 * p ** 2
 sage: nbIter = 0
@@ -1350,7 +1363,7 @@ sage:     g = Fp2k.random_element()
 sage:     if is_primitive(g) :
 sage:         break
 \end{verbatim}
-Pour nous débarrasser des facteurs de $\gf{p^2}$ dans notre système, nous déterminons les logarithmes en base $g$ de ceux-ci. Cela se fait à l'aide, par exemple, de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}, que nous n'écrivons pas ici. Après avoir attaché le fichier \textit{joux-algorithm.sage} à \verb|sage|, écrire la commande:
+Pour nous débarrasser des facteurs de $\gf{p^2}$ dans notre système, nous déterminons les logarithmes en base $g$ de ceux-ci. Cela se fait à l'aide, par exemple, de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}, que nous n'écrivons pas ici. Après avoir attaché le fichier \textit{joux-algorithm.sage} à SageMath, écrire la commande:
 \begin{verbatim}
 sage: baseFieldLogs = get_base_field_logs (g)
 \end{verbatim}
