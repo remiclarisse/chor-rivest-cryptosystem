@@ -91,7 +91,7 @@
 \vspace{2cm}
 
 \centerline{\large\bfseries Master 1 de Cryptologie et Sécurité Informatique}
-\centerline{\large\bfseries \'Equipe-projet GRACE}
+\centerline{\large\bfseries \'Equipe-projet Grace}
 \centerline{\rule{5cm}{2pt}}
 \centerline{\bfseries Stage estival 2017}
 
@@ -114,11 +114,11 @@
 \thispagestyle{empty}
 \section*{Introduction}
 
-Du 15 mai au 31 août 2017, j'ai intégré en tant que stagiaire l'équipe Grace de Inria Saclay - Île-de-France. Sous la supervision de Daniel Augot, responsable de l'équipe, et Luca De Feo, j'ai étudié le cryptosystème \cite{chorRivest1988} présenté par Benny Chor et Ronald Rivest en 1984, ainsi que l'algorithme \cite{joux2013} qu'Antoine Joux à conçu en 2013 pour le calcul de logarithme discret dans un corps fini de petite caractéristique.
+Du 15 mai au 31 août 2017, j'ai intégré en tant que stagiaire l'équipe Grace de Inria Saclay--Île-de-France. Sous la supervision de Daniel Augot, responsable de l'équipe, et Luca De Feo, chercheur délégué, j'ai étudié le cryptosystème présenté par Benny Chor et Ronald Rivest~\cite{chorRivest1988} en 1984, ainsi que l'algorithme qu'Antoine Joux~\cite{joux2013} a conçu en 2013 pour le calcul de logarithme discret dans un corps fini de petite caractéristique.
 
 Le cryptosystème de Chor-Rivest est un cryptosytème asymétrique qui base sa sécurité sur un problème de sac à dos. Cependant, pour produire la clé publique, il faut avoir recours à des calculs de logarithmes discrets dans un corps fini $\gf{p^h}$. C'est pour cela que Chor et Rivest incitent l'utilisateur à prendre des paramètres facilitant la résolution du problème du logarithme discret, en sélectionnant par exemple un exposant $h$ composé. C'est justement ce pré-requis qui a permis à Serge Vaudenay en 2000 de confectionner une cryptanalyse \cite{vaudenay2000}, qui le fait arriver à la conclusion qu'il faut choisir un exposant $h$ premier.
 
-Nous sommes donc au croisement de deux recommandations: l'une facilitant le calcul de logarithme pour fabriquer les clés et l'autre rendant le cryptosystème résistant à la meilleure cryptanalyse existante à ce jour. Il est clair qu'avoir un cryptosystème cassé est inutile. C'est pour cela que nous nous intéressons à l'algorithme de Joux, afin que le calcul des logarithmes ne soit plus un obstacle.
+Nous sommes donc au croisement de deux recommandations: l'une facilitant le calcul de logarithmes pour fabriquer les clés et l'autre rendant le cryptosystème résistant à la meilleure cryptanalyse existante à ce jour. Il est clair qu'avoir un cryptosystème cassé est inutile. C'est pour cela que nous nous intéressons à l'algorithme de Joux, en espérant qu'il nous permette de franchir l’obstacle du calcul de logarithmes.
 
 Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet Grace, et faisons un bref descriptif des attentes du stage. Les sections~\ref{sec:cryptosysteme} et~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers résultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
 
@@ -134,11 +134,11 @@ Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous prése
 
 Inria (Institut National de Recherche en Informatique et en Automatique) emploie 2\;600 collaborateurs issus des meilleures universités mondiales, qui relèvent les défis des sciences informatiques et mathématiques. Inria est organisé en \og{}équipes-projets\fg{} qui rassemblent des chercheurs aux compétences complémentaires autour d’un projet scientifique focalisé. Ce modèle ouvert et agile lui permet d’explorer des voies originales avec ses partenaires industriels et académiques. Inria répond ainsi aux enjeux pluridisciplinaires et applicatifs de la transition numérique. À l'origine de nombreuses innovations créatrices de valeur et d'emploi, Inria transfère vers les entreprises (start-up, PME et grands groupes) ses résultats et ses compétences, dans des domaines tels que la santé, les transports, l'énergie, la communication, la sécurité et la protection de la vie privée, la ville intelligente, l’usine du futur\dots
 
-\subsection{Centre Inria Saclay - Île-de-France}
+\subsection{Centre Inria Saclay--Île-de-France}
 
 À Paris-Saclay, Inria développe des recherches à fort impact sociétal pour inventer le monde de demain. Créé en 2008, le centre de recherche Inria Saclay - Île-de-France accueille 450 scientifiques et 100 membres des services d’appui à la recherche. Les scientifiques sont organisés en 31 équipes de recherche dont 26 sont communes avec des partenaires du plateau de Saclay. Le centre accueille également le Joint Lab Inria / Microsoft Research.
 
-\textit{\og{}Le centre Inria Saclay - Île-de-France est un acteur essentiel de la recherche en sciences du numérique sur le plateau de Saclay. Il porte les valeurs et les projets qui font l’originalité d’Inria dans le paysage de la recherche: l’excellence scientifique, le transfert technologique, les partenariats pluridisciplinaires avec des établissements aux compétences complémentaires aux nôtres, afin de maximiser l’impact scientifique, économique et sociétal d’Inria.\fg{}} \\
+\textit{\og{}Le centre Inria Saclay--Île-de-France est un acteur essentiel de la recherche en sciences du numérique sur le plateau de Saclay. Il porte les valeurs et les projets qui font l’originalité d’Inria dans le paysage de la recherche: l’excellence scientifique, le transfert technologique, les partenariats pluridisciplinaires avec des établissements aux compétences complémentaires aux nôtres, afin de maximiser l’impact scientifique, économique et sociétal d’Inria.\fg{}} \\
 --- Bertrand Braunschweig, directeur du centre Inria Saclay - Île-de-France.
 
 \paragraph{Source.} \url{https://www.inria.fr/}
@@ -163,6 +163,14 @@ Les objectifs du stage donnés par Daniel et Luca sont:\begin{enumerate}
 Les deux premiers points sont traités dans la section suivante (\ref{sec:cryptosysteme}), les codes SageMath sont sur le GitHub. Quant au troisième point, il convient d'expliquer pourquoi nous souhaitons implanter une version modifiée. Le cryptosytème de Chor-Rivest \cite{chorRivest1988} est réputé \og{}cassé \fg{} par Serge Vaudenay \cite{vaudenay2000}, ce que nous détaillons en section \ref{sec:cryptanalyse}. Cependant, la cryptanalyse s’appuie sur ce que l'on pourrait appeler une avarie du système: la fabrication de la clé publique requiert que l'on se place dans un corps fini dans lequel le calcul de logarithme discret n'est pas rédhibitoire. Cette exigence est satisfaite en particulier lorsque le corps fini considéré a de nombreux sous-corps, ce qui est d'ailleurs le choix fait par Benny Chor et Ronald Rivest. Donc, une façon efficace de rendre impraticable l'attaque de Vaudenay est de choisir un corps fini ayant pour seuls sous-corps lui-même et son sous-corps premier, dans le meilleur des cas bien sûr. Cela rend par conséquence le calcul \og{}naïf \fg{} de logarithmes discrets difficile. Il nous faut donc nous pencher plus sérieusement sur le problème du calcul de logarithme discret dans les corps finis, ce que nous faisons dans la section~\ref{sec:DLPJoux}, en étudiant notamment l'algorithme d'Antoine Joux~\cite{joux2013}. Ceci nous permet de traiter le dernier point de la liste, dont les résultats en section~\ref{sec:consequences}.
 
 %(Luca) Avant de présenter le système, tu devrais présenter ton stage: objectifs, outils, résultats.
+
+\section{Le problème du calcul de logarithme discret}
+
+\subsection{Algorithme de Pohlig-Hellman}
+
+\subsection{Algorithme pas de bébé et pas de géant}
+
+\subsection{Algorithme rho de Polard}
 
 \section{Le cryptosystème de Chor-Rivest}\label{sec:cryptosysteme}
 
