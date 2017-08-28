@@ -38,13 +38,13 @@ def sieving_linear_poly (q, h0, h1) :
     hashTable = []
     sieveTable = []
     a, b, c, d = Fq2(0), Fq2(0), Fq2(0), Fq2(0)
-    end = Fq2.list()[-1]
     linear_poly = [ X + const for const in Fq2 ]
     while nbIter < sieveSize :
         while True :
-            [a, b, c, d] = next_tuple ([a, b, c, d], end)
+            [a, b, c, d] = next_tuple ([a, b, c, d])
             if is_valid_quadruplet (a, b, c, d, q) :
                 break
+        print a, b, c, d
         P = Fq2X((c * a ** q - a * c ** q) * X * h0
                + (d * a ** q - b * c ** q) * h0
                + (c * b ** q - a * d ** q) * X * h1
@@ -53,6 +53,10 @@ def sieving_linear_poly (q, h0, h1) :
             Q = Fq2X(h1 * (c * X + d))
             for gamma in range (q) :
                 Q *= ((a - gamma * c) * X + b - gamma * d)
+            indEqn = [ [linear_poly.index(poly), mult] for poly, mult in list(factor(P)) ] + [ [linear_poly.index(poly), -mult] for poly, mult in list(factor(Q)) ]
+            indEqn.sort()
+            print indEqn
+            print list(factor(P)), list(factor(Q))
             if [hash(P), hash(Q)] not in hashTable :
                 hashTable.append([hash(P), hash(Q)])
                 sieveTable.append([ [(P.lc(), 1)] + list(factor(P)) ] + [ [(Q.lc(), 1)] + list(factor(Q)) ])
@@ -60,19 +64,19 @@ def sieving_linear_poly (q, h0, h1) :
                 print (nbIter * 100 / sieveSize).n(digits=3)
     return sieveTable
 
-def next_tuple (T, end) :
+def next_tuple (T) :
     K = T[0].parent()
-    if len (T) == 1 and T[-1] == end :
-        raise StopIteration
-    if T[0] == end :
-        return [K(0)] + next_tuple (T[1:], end)
-    else :
+    try :
         T[0] = K.next(T[0])
+    except StopIteration :
+        if len (T) == 1 :
+            raise StopIteration
+        return [K(0)] + next_tuple (T[1:])
     return T
 
 def is_valid_quadruplet (a, b, c, d, p) :
     K = a.parent()
-    if a * d != b * c :
+    if a * d == b * c :
         return False
     if a ** p == a and b ** p == b and c ** p == c and d ** p == d :
         return False
