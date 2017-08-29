@@ -33,7 +33,7 @@ def sieving_linear_poly (q, h0, h1) :
     X = h0.parent().gen()
     Fq2X = X.parent()
     Fq2 = Fq2X.base()
-    sieveSize = q ** 3
+    sieveSize = 2 * q ** 2
     nbIter = 0
     hashTable = []
     sieveTable = []

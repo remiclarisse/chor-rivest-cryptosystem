@@ -227,10 +227,8 @@ Une fois que $a$ est connu pour tout $p^\alpha$ divisant $n$, nous pouvons recon
 	\STATE{$g_0 \gets g^{n/p_i}$}
 	\FOR{$j$ allant de $1$ à $\alpha_i$}
 		\STATE{$h_0 \gets g^{-a_in/p_i^j}h^{n/p_i^j}$}
-		\IF{$h_0 \neq 1$}
-			\STATE{$b \gets \verb|log_in_sub_grp|(h_0,g_0)$}
-			\STATE{$a_i \gets a_i + b p_i^{j-1}$}
-		\ENDIF
+		\STATE{$b \gets \verb|log_in_sub_grp|(h_0,g_0)$}
+		\STATE{$a_i \gets a_i + b p_i^{j-1}$}
 	\ENDFOR
 \ENDFOR
 \STATE{calculer $a \equiv a_i \pmod{p_i^{\alpha_i}}$, pour $1\leqslant i \leqslant r$, grâce au théorème des restes chinois}
@@ -1129,7 +1127,7 @@ Les préconisations de Serge Vaudenay pour réparer le cryptosystème de Chor-Ri
   \midrule
   \ref{algo:testgpr} (p.\pageref{algo:testgpr})& $r \geqslant \sqrt{h+1/4}+1/2$ &  & $g_{p^r}$ & $\O\left({h^3p^r}/{r^2}\right)$ \\
   \midrule
-  \ref{algo:gprFromgpri} (p.\pageref{algo:gprFromgpri})& ${\{r_i\}}_{1\leqslant i \leqslant k}$ diviseurs de $r$& ${\left(g_{p^{r_i}}\right)}_{1\leqslant i \leqslant k}$ & $g_{p^r}$ & $\O(p^2r)$ \\
+  \ref{algo:gprFromgpri} (p.\pageref{algo:gprFromgpri})& ${\{r_i\}}_{1\leqslant i \leqslant k}$ diviseurs de $r$& ${\left\{g_{p^{r_i}}\right\}}_{1\leqslant i \leqslant k}$ & $g_{p^r}$ & $\O(p^2r)$ \\
   \midrule
   \ref{algo:attaqueGenerale} (p.\pageref{algo:attaqueGenerale})& $r \geqslant \sqrt{h+1/4}+1/2$ & & $g, t, \sigma, d$ & $\O\left({h^3p^r}/{r^2}\right)$\\
   \bottomrule
@@ -1274,17 +1272,17 @@ Par conséquent, le calcul d'un logarithme discret est maintenant représenté p
 
 Le crible par corps de fonctions (FFS pour \textit{function field sieve}) est proposé en 1999 par Leonard Adleman et Ming-Deh Huang \cite{adleman1999}. Sans dénaturer l'idée des auteurs, nous présentons l'algorithme en utilisant des anneaux de polynômes et non des corps de fonctions, comme dans \cite{joux2013, joux2006, joux2002, pierrot2016}.
 
-Le point de départ de l'algorithme réside une nouvelle fois dans la manière de définir le corps cible. L'idée consiste à construire l'extension à l'aide de deux relations polynômiales bivariées sur $\gf{q}$ : $$Y = f(X) \quad \text{et}\quad X = g(Y).$$
+Le point de départ de l'algorithme réside une nouvelle fois dans la manière de définir le corps cible. L'idée consiste à construire l'extension à l'aide de deux relations polynomiales bivariées sur $\gf{q}$ : $$Y = f(X) \quad \text{et}\quad X = g(Y).$$
 En assemblant ces deux relations, nous obtenons $X = g(f(X))$. Donc, si le polynôme $g(f(X)) - X$ possède un facteur irréductible $I_k(X)$ de degré $k$, nous pouvons représenter $\gf{q^k}$ à l'aide de celui-ci. Cela constitue notre heuristique :
 \begin{heur}
 Il existe deux polynômes $f(X)$ et $g(Y)$ dans $\gf{q}[X, Y]$ tels que le polynôme $g(f(X)) - X$ possède un facteur irréductible $I_k(X)$ de degré $k$.
 \end{heur}
 La représentation étant fixée, nous désignons par $\alpha$ l'une des racines dans $\gf{q^k}$ du polynôme $I_k(X)$ et nous posons $\beta = f(\alpha)$. Par construction nous avons $\alpha = g(\beta)$ dans $\gf{q^k}$. À partir de n'importe quelle paire de polynômes $A(X)$ et $B(X)$ univariés, nous pouvons écrire :
 $$A(\alpha) + f(\alpha)B(\alpha) = A(g(\beta)) + \beta B(g(\beta)).$$
-Nous obtenons ainsi une égalité dans $\gf{q^k}$ entre un polynôme en $\alpha$ et un second en $\beta$. De plus, chacun de ces deux polynômes est de degré relativement petit, si les paramètres sont bien choisis. Par conséquent, si chacun d'entre eux se factorise en produits de polynômes irréductibles de degrés au plus $d$, nous pouvons exploiter cette relation multiplicative. Soulignons que nous avons ici doublé la taille de la base de friabilité, puisqu'elle contient maintenant l'évaluation de chaque polynôme irréductible de petit degré en $\alpha$ et en $\beta$.
+Nous obtenons ainsi une égalité dans $\gf{q^k}$ entre un polynôme en $\alpha$ et un second en $\beta$. De plus, chacun de ces deux polynômes est de degré relativement petit, si les paramètres sont bien choisis. Par conséquent, si chacun d'entre eux se factorise en produits de polynômes irréductibles de degré au plus $d$, nous pouvons exploiter cette relation multiplicative. Soulignons que nous avons ici doublé la taille de la base de friabilité, puisqu'elle contient maintenant l'évaluation de chaque polynôme de la base de friabilité en $\alpha$ et en $\beta$.
 
 Les polynômes $A(X)$ et $B(X)$ sont à choisir de sorte que leur degré soit au plus $d$, tandis le degré de $f(X)$ et $g(Y)$ est choisi pour vérifier: $$\deg(f(X)) \deg(g(Y)) \approx k \quad\text{et}\quad \frac{\deg(f(X))}{\deg(g(Y))} \approx d.$$
-L'optimisation non détaillée ici, donne une complexité asymptotique heuristique de :
+L'optimisation, non détaillée ici, donne une complexité asymptotique heuristique de :
 $$L_{q^k}(1/3, (32/9)^{1/3}).$$
 
 \subsection{Descente special-$\mathfrak{q}$}\label{s-sec:special-q}
@@ -1296,7 +1294,7 @@ Soient $H(X)\in\gf{q}[X]$ le polynôme tel que $H(\alpha) = h$. Considérons l'e
 $$\mathcal S_H = \{X^iY^j : 0 \leqslant i \leqslant D_\alpha(H), 0 \leqslant j \leqslant D_\beta(H)\},$$
 où $D_\alpha(H)$ et $D_\beta(H)$ sont des paramètres que nous déterminerons plus tard. Chaque monôme dans $\mathcal S_H$ peut être exprimé comme un polynôme univarié en $X$ en substituant $Y$ par $f(X)$. Pour $m(X,Y)$ un monôme de $\mathcal S_H$, notons $V_H(m)(X)$ la valeur modulo $H(X)$ du polynôme univarié correspondant à $m(X,Y)$, i.e. 
 $$V_H(m)(X) := m(X,f(X)) \pmod{H(X)}.$$
-Clairement, $V_H(m)(X)$ peut être représenté par un vecteur $V_H(m)$ à $\deg(H(X))$ coefficients dans le corps fini $\gf{q}$. Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)$ pour $m(X,Y) \in \mathcal S_H$. Concrètement, la matrice $M_H$ contient en colonnes des restes de divisions euclidiennes par le polynôme $H(X)$. N'importe quel vecteur du noyau de $M_H$ peut être alors interprété comme combinaison linéaire de ces restes modulo $H(X)$. Ainsi, à chaque vecteur du noyau de $M_H$, on peut associer une combinaison linéaire d'éléments de $\mathcal S_H$ qui est un polynôme $U(X,Y)$, tel que $U(X,f(X))$ est divisible par $H(X)$. Si, à la fois, les polynômes $U(X,f(X))/H(X)$ et $U(g(Y),Y)$ se factorisent en polynômes de degré suffisamment petit, on peut itérer le procédé sur les polynômes de la relation dont le degré est supérieur à $d$.
+Clairement, $V_H(m)(X)$ peut être représenté par un vecteur $V_H(m)$ à $\deg H(X)$ coefficients dans le corps fini $\gf{q}$. Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)$ pour $m(X,Y) \in \mathcal S_H$. Concrètement, la matrice $M_H$ contient en colonnes des restes de divisions euclidiennes par le polynôme $H(X)$. N'importe quel vecteur du noyau de $M_H$ peut être alors interprété comme combinaison linéaire de ces restes modulo $H(X)$. Ainsi, à chaque vecteur du noyau de $M_H$, on peut associer une combinaison linéaire d'éléments de $\mathcal S_H$, qui est un polynôme $U(X,Y)$, tel que $U(X,f(X))$ est divisible par $H(X)$. Si, à la fois, les polynômes $U(X,f(X))/H(X)$ et $U(g(Y),Y)$ se factorisent en polynômes de degré suffisamment petit, on peut itérer le procédé sur les polynômes de la relation dont le degré est supérieur à $d$.
 
 L'étude faite dans \cite{joux2006, joux2002} et rappelée dans \cite{joux2013}, donne :
 $$D_\alpha(H) D_\beta(H) \geqslant \deg H(X) \quad\text{et}\quad \frac{D_\beta(H)}{D_\alpha(H)} \approx d.$$
@@ -1316,9 +1314,8 @@ L'un des changements de paradigme majeurs par rapport aux autres algorithmes pr�
 
 \subsubsection{Présentation des idées de Joux}\label{ss-sec:idees}
 
-Nous présentons ici les idées sur lesquelles repose l'algorithme.
 
-\paragraph{Idée 1: les homographies.} Si on a un polynôme qui se factorise, on souhaite le transformer en d'autres polynômes qui se factorisent eux aussi. Pour cela, on considère la transformation induite par les homographies, à savoir :
+\paragraph{Idée 1: les homographies.} Si on a un polynôme qui se factorise, on souhaite lui appliquer une transformation afin d'obtenir d'autres polynômes qui se factorisent eux aussi. Pour cela, on considère la transformation induite par les homographies, à savoir :
 $$X \mapsto \frac{aX+b}{cX+d}.$$
 Cependant, faire ce changement de variable ne donne pas un polynôme : si $f(X) \in\gf{q}[X]$ est un polynôme, ce n'est pas forcement le cas de $f((aX+b)/(cX+d))$. Ainsi, nous considérons plutôt l'évaluation homogène d'un polynôme, i.e. pour un polynôme $f(X)$ de $\gf{q}[X]$, dont on note $\deg f$ le degré, on considère le polynôme :
 $$F_{a,b,c,d}(X) := (cX+d)^{\deg f} f \left(\frac{aX+b}{cX+d}\right).$$
@@ -1337,7 +1334,7 @@ $$(cX+d)^{\deg F_i} F_i\left(\frac{aX+b}{cX+d}\right)$$
 sont en effet des polynômes. Visiblement, il n'y a aucune raison pour que les facteurs ainsi transformés soient irréductibles dans $\gf{q^k}[X]$. Remarquons que lorsque $c \neq 0$, le coefficient de $X^{\deg{F_i}}$ venant de $F_i$ est $c^{\deg F_i}F_i(a/c)$. Comme il n'est pas nécessairement égal à $1$ et peut même être nul, on observe que les facteurs transformés ne sont pas nécessairement unitaires et peuvent être de degré strictement inférieur à celui du $F_i(X)$ correspondant.
 \end{proof}
 
-\paragraph{Idée 2: un polynôme toujours scindé.} La seconde idée découle directement de la première. Comme on sait faire plusieurs ``copies'' d'un polynôme, on souhaite considérer un polynôme qui se factorise agréablement. Sur $\gf{q}$, un candidat naturel est : $$X^q -X = \prod_{\gamma\in\gf{q}} X-\gamma.$$
+\paragraph{Idée 2: un polynôme toujours scindé.} La seconde idée découle directement de la première. Comme on sait faire plusieurs \og{}copies\fg{} d'un polynôme, on souhaite considérer un polynôme qui se factorise agréablement. Sur $\gf{q}$, un candidat naturel est : $$X^q -X = \prod_{\gamma\in\gf{q}} X-\gamma.$$
 
 \paragraph{Idée 3: une bonne représentation du corps.} L'image de $X^q-X$ par une homographie est un polynôme combinaison linéaire des monômes $X^{q+1}$, $X^q$, $X$ et $1$. Pour obtenir une relation multiplicative, on désire donc trouver une représentation du corps fini qui transforme le polynôme $X^q - X$ en un polynôme de bas degré. Une façon de faire est de demander la satisfaction dans $\gf{q^k}$ de la relation :
 $$x^q = \frac{h_0(x)}{h_1(x)}.$$
@@ -1377,9 +1374,9 @@ $$a^qcX^{q+1} + a^qdX^q + b^qcX + b^qd - ac^qX^{q+1} - ad^qX - bc^qX^q - bd^q$$
 $$= (a^qc - ac^q)X^{q+1} + (a^qd - bc^q)X^q + (b^qc - ad^q)X + b^qd - bd^q,$$
 $$\equiv (a^qc - ac^q)X\frac{h_0(X)}{h_1(X)} + (a^qd - bc^q)\frac{h_0(X)}{h_1(X)} + (b^qc - ad^q)X + b^qd - bd^q \pmod{I_k(X)}.$$
 Cela nous donne l'égalité, modulo $I_k(X)$, suivante:
-$$\frac{(a^qc - ac^q)Xh_0(X) + (a^qd - bc^q)h_0(X) + (b^qc - ad^q)Xh_1(X) + (b^qd - bd^q)h_1(X)}{h_1(X)}$$
-$$= (cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d)).$$
-Par conséquence, nous obtenons une égalité dans $\gf{q^2}[X]/(I_k(X)) \cong \gf{q^{2k}}$ entre un produit de polynômes linéaires et une fraction avec un numérateur de bas degré et un dénominateur constant. En ajoutant $h_1(X)$ à la base de friabilité, nous obtenons une relation satisfaisante dès que le membre de gauche se factorise en polynômes linéaires.
+$$(a^qc - ac^q)Xh_0(X) + (a^qd - bc^q)h_0(X) + (b^qc - ad^q)Xh_1(X) + (b^qd - bd^q)h_1(X)$$
+$$= h_1(X)(cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d)).$$
+Par conséquence, nous obtenons une égalité dans $\gf{q^2}[X]/(I_k(X)) \cong \gf{q^{2k}}$ entre un produit de polynômes linéaires et $h_1(X)$ d'une part et un polynôme de bas degré d'autre part. En ajoutant $h_1(X)$ à la base de friabilité, nous obtenons une relation satisfaisante dès que le membre de gauche se factorise en polynômes linéaires.
 
 \paragraph{Comptage des relations.}Le procédé ci-dessus génère une relation candidate pour chaque quadruplet $(a,b,c,d) \in \gf{q^2}^4$. Cependant, certaines de ces relations sont générées plusieurs fois, avec des $(a,b,c,d)\in\gf{q^2}^4$ distincts. Par exemple, si $(a,b,c,d)\in\gf{q}^4$, nous obtenons une équation triviale.
 
@@ -1387,15 +1384,15 @@ Pour cette raison, Joux \cite{joux2013} préconise de prendre les coefficients $
 $$\frac{q^6 - q^2}{q^3 - q} = q^3 + q.$$
 Après un argument heuristique, Joux \cite{joux2013} explique qu'il suffit de considérer $\O(q^2)$ quadruplets, en évitant ceux donnant des duplicatas, pour pouvoir passer à la phase d'algèbre linéaire sur les logarithmes des polynômes linéaires.
 
-\paragraph{Étendre la base aux polynômes de degré $2$.} Si nous appliquons la même stratégie que précédemment, nous tombons sur un os. En effet, on pourrait garder les relations comprenant à la fois des polynômes de degré $1$ et de degré $2$. Mais, étant donné qu'il y a $\O(q^4)$ polynômes irréductibles de degré $2$ à coefficients dans $\gf{q^2}$ et qu'on ne peut fabriquer que $\O(q^3)$ relations par la méthode précédente, il serait impossible de recouvrer le logarithme de tous les polynômes irréductibles de degré $2$.
+\paragraph{Étendre la base aux polynômes de degré $2$.} Si nous appliquons la même stratégie que précédemment, nous ne pourrions pas compléter la base de friabilité avec tous les polynômes irréductibles de degré $2$. En effet, on pourrait garder les relations comprenant à la fois des polynômes de degré $1$ et de degré $2$. Mais, étant donné qu'il y a $\O(q^4)$ polynômes irréductibles de degré $2$ à coefficients dans $\gf{q^2}$ et qu'on ne peut fabriquer que $\O(q^3)$ relations par la méthode précédente, il serait impossible de recouvrer le logarithme de tous les polynômes irréductibles de degré $2$.
 
 Une stratégie qui fonctionne est d'accomplir la transformation suivante :
 $$X \mapsto \frac{a(X^2+\theta X) + b}{c(X^2 + \theta X) +d},$$
 pour $\theta \in \gf{q^2}$ et $(a,b,c,d) \in \gf{q^2}^4$. Ce que Joux \cite{joux2013} fait ici est qu'il partitionne l'ensemble des polynômes de degré $2$ en plusieurs sous-ensembles, indexés par $\theta$. Après ce changement dans l'équation~\ref{eqn:identitySplit}, on multiplie l'égalité par $\left(c(X^2+\theta X) +d\right)^{q+1}$ et le membre de gauche se factorise en  produit d'une constante de $\gf{q^2}$ et de polynômes irréductibles de degré $2$ ayant la forme $X^2 + \theta X + \kappa \in \gf{q^2}[X]$. Si nous gardons seulement les relations où le membre de droite se factorise en polynômes linéaires, nous pouvons déterminer les logarithmes des polynômes $X^2 +\theta X + \kappa$ irréductibles, où $\theta$ est fixé. Cela nous fait résoudre $q^2$ systèmes (un pour chaque $\theta$) de taille $\O(q^2)$ chacun.
 
-\paragraph{Phase 0: étape facultative préliminaire à la descente.}Avant de commencer la descente proprement dite, il peut être utile de trouver un bon représentant de l'élément $h$ dont nous souhaitons déterminer le logarithme. Tout d'abord, $h = H(\alpha)$ est écrit comme un polynôme de degré au plus $k-1$ sur $\gf{q^2}$, où $\alpha$ est une racine fixée de $I_k(X)$ et $H(X) \in \gf{q^2}[X]$. S'il n'est pas satisfaisant, supposons que la base de logarithme que nous choisissons est l'élément primitif $g$, on peut considérer plutôt la représentation polynomiale de $hg^r$, en faisant varier $r$ jusqu'à ce que l'on ait une décomposition en polynômes convenable.
+\paragraph{Phase 0: étape facultative préliminaire à la descente.}Avant de commencer la descente proprement dite, il peut être utile de trouver un bon représentant de l'élément $h$ dont nous souhaitons déterminer le logarithme. Tout d'abord, $h = H(\alpha)$ est écrit comme un polynôme de degré au plus $k-1$ sur $\gf{q^2}$, où $\alpha$ est une racine fixée de $I_k(X)$ et $H(X)$ est un polynôme de $\gf{q^2}[X]$. S'il n'est pas satisfaisant, supposons que la base de logarithme que nous choisissons est l'élément primitif $g$, on peut considérer plutôt la représentation polynomiale de $hg^r$, en faisant varier $r$ jusqu'à ce que l'on ait une décomposition en polynômes convenable.
 
-\paragraph{Phase 1: descente special-$\mathfrak{q}$.}La première phase de descente fait appel à la descente special-$\mathfrak{q}$, déjà exposée au paragraphe~\ref{s-sec:special-q}. Cependant, nous ne possédons pas de seconde indéterminée $Y$. Il faut donc créer $Y$ en fonction de $X$. Joux \cite{joux2013} précise que la méthode que nous nous apprêtons à exposer, ne marche que dans le cas d'un corps de petite caractéristique.
+\paragraph{Phase 1: descente special-$\mathfrak{q}$.}La première phase de descente fait appel à la descente special-$\mathfrak{q}$, déjà exposée au paragraphe~\ref{s-sec:special-q}. Cependant, nous ne possédons pas de seconde indéterminée $Y$. Il faut donc créer $Y$ en fonction de $X$. Joux \cite{joux2013} précise que la méthode que nous nous apprêtons à exposer ne marche que dans le cas d'un corps de petite caractéristique.
 
 Notons $p$ la caractéristique du corps fini, soit $\ell$ tel que $q = p^\ell$ et posons $r := \floor{\ell/2}$. Si $Y = X^{p^{r}}$ alors, par définition de notre corps:
 $$Y^{qp^{-r}} = X^q = \frac{h_0(X)}{h_1(X)}.$$
@@ -1413,11 +1410,11 @@ Reste à construire de tels polynômes $k_1(X)$ et $k_2(X)$. Antoine Joux \cite{
 Ce système est même bilinéaire en $k_1(X)$ et $k_2(X)$ puisque chaque monôme qui apparaît dans le système contient au plus une inconnue provenant de $k_1(X)$ et une de $k_2(X)$.
 
 Plus précisément, considérons chaque coefficient de $k_1(X)$ et $k_2(X)$ comme une indéterminée appartenant au corps des coefficients $\gf{q^2}$. Si $x$ est une telle inconnue, nous l'écrivons $x_0 + zx_1$, où $(1,z)$ est une base de $\gf{q^2}$ sur $\gf{q}$, et $x_0$ et $x_1$ sont des inconnues appartenant à $\gf{q}$. Avec une telle convention: $$x^q = x_0 + z^qx_1.$$
-Le système a $\deg H(X)$ équations sur $\gf{q^2}$ et peut s'écrire comme un système à $2\deg H(X)$ équations sur $\gf{q}$. En supposant que $k_1(X)$ est unitaire, le nombre maximum d'inconnues est $2(\deg k_1(X) + \deg k_2(X) + 1)$. Cependant, à cause de l'action de $\operatorname{PGL}_2(\gf{q})$, plusieurs couples $(k_1(X),k_2(X))$ distincts donnent le même polynôme $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q)$. Pour éviter cela, il faut fixer au moins une inconnue dans $\gf{q^2} \setminus \gf{q}$, laissant ainsi $2(\deg k_1(X) + \deg k_2(X))$ inconnues dans $\gf{q}$. 
+Le système a $\deg H(X)$ équations sur $\gf{q^2}$ et peut s'écrire comme un système à $2\deg H(X)$ équations sur $\gf{q}$. En supposant que $k_1(X)$ est unitaire, le nombre maximum d'inconnues est $2(\deg k_1(X) + \deg k_2(X) + 1)$. Cependant, à cause de l'action de $\operatorname{PGL}_2(\gf{q})$, plusieurs couples $(k_1(X),k_2(X))$ distincts donnent le même polynôme $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q)$. Pour éviter cela, il faut fixer au moins une inconnue dans $\gf{q^2} \setminus \gf{q}$, laissant ainsi le choix de $2(\deg k_1(X) + \deg k_2(X))$ inconnues dans $\gf{q}$. 
 
-Antoine Joux \cite{joux2013} fait ensuite un raisonnement heuristique pour avoir une bonne probabilité que le système précédent admette une solution, à savoir: nous avons besoin que 
+Antoine Joux \cite{joux2013} fait ensuite un raisonnement heuristique cherchant à déterminer sous quelles conditions le système précédent admet une solution avec une bonne probabilité, à savoir: nous avons besoin que 
 $$\deg k_1(X) + \deg k_2(X) \geqslant \deg H(X) + 1.$$
-Enfin, il étudie la complexité de la descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donne que la complexité est exponentielle en $\min(\deg k_1(X), \deg k_2 (X))$.
+Enfin, il étudie la complexité de cette descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donne que la complexité est exponentielle en $\min(\deg k_1(X), \deg k_2 (X))$.
 Plus précisément, en posant $d = \deg k_2(X)$ et donc $\deg k_1(X) = \deg H(X) +1 - d$, la complexité est :
 $$\binom{2 (\deg H(X)) + 3}{2d+1}^\omega,$$
 où $2 \leqslant \omega \leqslant 3$ est une constante. 
@@ -1429,7 +1426,7 @@ Nous présentons succinctement l'analyse de la complexité faite par Antoine Jou
 
 Le changement de représentation et la phase de crible se font en temps polynomial. La phase d'algèbre linéaire s'effectue en $\O(q^7)$ opérations arithmétiques.
 
-Pour étudier la complexité de la phase de descente, écrivons $k = \alpha q$, pour une constante $\alpha \leqslant 1 + \deg(h_1(X)) / q$. Sois cette hypothèse, nous remarquons:
+Pour étudier la complexité de la phase de descente, écrivons $k = \alpha q$, pour une constante $\alpha \leqslant 1 + \deg(h_1(X)) / q$. Sous cette hypothèse, nous remarquons:
 $$L_{q^{2k}}(\beta, c) \approx \exp\left((c'+\o(1))q^\beta\log(q)\right),\quad\text{où } c' = c(2\alpha)^\beta.$$
 Comme le coût de la descente special-$\mathfrak{q}$ augmente quand le degré du polynôme diminue, on utilise cette méthode jusqu'à atteindre des polynômes de degré $\O(\sqrt{q})$, plus précisément de degré $c_c\sqrt{q/\log q}$, pour une constante $c_c$. Le coût dans ce cas est:
 $$\exp\left(\frac{1}{2\mu}\sqrt{\frac{\alpha}{c_c}}q^{1/4}(\log q)^{5/4}\right),$$
@@ -1437,276 +1434,14 @@ où $\mu < 1$. Pour ce qui est de la nouvelle descente, Joux fait en sorte de ch
 $$d = \ceil{\left(\frac{c_c}{6}\sqrt{q\log q}\right)^{1/2}}.$$
 Cela donne un coût de:
 $$\exp\left(\left( \frac{\sqrt{6c_c}}{4} + \o(1)\right)q^{1/4}(\log q)^{5/4}\right).$$
-Pour que les deux phases de descente se balancent, il prend:
+Pour que le coût des deux phases de descente s'équilibre, il prend:
 $$c_c = \frac{1}{\mu}\sqrt{\frac{2\alpha}{3}},$$
 ce qui atteint la complexité:
 $$\exp\left(\left(\frac{1}{2\sqrt{\mu}}{\left(\frac{3\alpha}{2}\right)}^{1/4}+\o(1)\right)q^{1/4}(\log q)^{5/4}\right),$$
-ce qui peut être réécrit comme $L(1/4+\o(1))$.
+qui peut être réécrit comme $L(1/4+\o(1))$.
 
 \section{Les conséquences pour le cryptosystème de Chor-Rivest}\label{sec:consequences}
 
-L'exposition du cryptosystème en section~\ref{sec:cryptosysteme}, la cryptanalyse de Serge Vaudenay en section~\ref{sec:cryptanalyse} et l'algorithme d'Antoine Joux en section~\ref{sec:DLPJoux}, nous incitent à prendre $p$ et $h$ deux nombres premiers et tels que $2 < h < p$, afin de ``réparer'' le cryptosystème.
-
-%Donner résultats précédents sur les tentatives d'amélioration (Madrid)
-
-\subsection{Idées théoriques}
-
-\paragraph{Prélude.} La confection de la clé publique du cryptosytème requière le calcul de logarithmes dans $\gf{p^h}$. Nous aimerions tirer avantage de la particularité de ces logarithmes, à savoir qu'on veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, si nous reprenons les notations de \ref{sec:cryptosysteme} et \ref{s-sec:algoJoux}, on souhaite grossièrement que $t = X \pmod{I_k(X)}$, avec $k = h$. En effet, grâce à cela, en ayant recourt à l'algorithme de Joux \cite{joux2013}, il suffirait de ne faire que la première partie du crible: la collecte de relation entre polynômes linéaires. Malheureusement, on s’aperçoit immédiatement qu'il y a a priori un problème, car dans le cryptosystème $t \in \gf{p^h}$, alors que $I_k(X)$ n'est pas un polynôme à coefficients dans $\gf{p}$. Nous nous proposons d'explorer cette idée, qui, si elle est féconde, permettrait de surmonter l'obstacle du calcul des logarithmes. 
-
-\paragraph{Adaptation.} Étant donné que $h < p$, nous pouvons imbriquer $\gf{p^h}$ dans $\gf{p^{2h}}$, et satisfaire à la toute première étape de l'algorithme de Joux \cite{joux2013}. Nous faisons donc une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant le polynôme $h_1(X)X^p - h_0(X)$, permettant de représenter l'extension de corps $\extension{\gf{p^{2h}}}{\gf{p^2}}$. Cela donne le diagramme de la figure \ref{fig:diag}.
-\begin{figure}[h]
-\begin{center}
-\begin{tikzpicture}
-\coordinate (Fp) at (0,0) ;
-\coordinate (Fph) at (-1.5,1.5) ;
-\coordinate (Fp2h) at (0,3) ;
-\coordinate (Fp2) at (1.5,1.5) ;
-\draw (Fp) node[below]{$\gf{p}$} node{$\bullet$} ;
-\draw (Fph) node[left]{$\gf{p^h}$} node{$\bullet$} ;
-\draw (Fp2h) node[above]{$\gf{p^{2h}}$} node{$\bullet$} ;
-\draw (Fp2) node[right]{$\gf{p^2}$} node{$\bullet$} ;
-\draw[thick, ->, >= latex] (Fp) -- (Fp2) ;
-\draw[thick, ->, >= latex] (Fp) -- (Fph) ;
-\draw[thick, ->, >= latex] (Fp2) -- (Fp2h) ;
-\draw[thick, ->, >= latex] (Fph) -- (Fp2h) ;
-\end{tikzpicture}
-\label{fig:diag}
-\caption{Diagramme de l'extension.}
-\end{center}
-\end{figure}
-
-Comme indiqué dans le prélude, nous aimerions pouvoir prendre $t = X \pmod{I_h(X)}$. Le seul écueil est que $I_h(X)$ est à coefficients dans $\gf{p^2}$. Cependant, le résultat suivant, qui est une conséquence du corollaire 3.47 de \cite{niederreiter1986}, permet d'obtenir satisfaction.
-\begin{prop}
-Un polynôme irréductible de degré $h$ sur $\gf{p}$ est irréductible sur $\gf{p^2}$ si, et seulement si, $h$ est impair.
-\end{prop}
-Cela permet donc de choisir $I_h(X)$ comme un facteur irréductible unitaire de degré $h$ du polynôme $h_1(X)X^p-h_0(X) \in \gf{p}[X]$. Si on pose $t = X \pmod{I_h(X)}$, la représentation de $\gf{p^{2h}}$ est $$\frac{\gf{p^2}[X]}{(I_h(X))} = \gf{p^2}[t].$$
-Donc $t \in \gf{p^{2h}}$ est algébrique de degré $h$ sur $\gf{p^2}$ et il est dans le sous-corps $\gf{p^h} \subseteq \gf{p^{2h}}$, car le polynôme $I_h(X)$ est irréductible unitaire de degré $h$, donc $I_h(X)$ divise le polynôme $X^{p^h} - X$ et $t$, racine de $I_h(X)$, est d'ordre divisant $p^h-1$.
-
-\subsection{Nouveau procédé de génération des clés}
-
-Pour rappel, la génération de la clé privée consiste à choisir aléatoirement:
-\begin{enumerate}
-\item un générateur $g$ du groupe cyclique $\gf{p^h}^\times$,
-\item un élément $t \in \gf{p^h}$ algébrique de degré $h$ sur $\gf{p}$,
-\item une permutation $\sigma$ de l'ensemble $\{0, \dots, p-1\}$,
-\item un entier $d$ tel que $0 \leqslant d \leqslant p^h-2$.
-\end{enumerate}
-et la clé publique est formée des:
-$$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
-Clairement, la façon de choisir la permutation $\sigma$ et l'entier $d$ restent inchangée. On note toujours $\alpha$ la numérotation du sous-corps premier: $$\gf{p} = \{\alpha_0, \dots, \alpha_{p-1}\}.$$
-
-Pour ce procédé de fabrication, nous allons d'abord calculer les logarithmes qui nous serviront pour la clé publique. Puis nous indiquerons comme on obtient les éléments $g$ et $t$ de la clé privée.
-
-\subsubsection{Calcul des logarithmes $\log_g\left(t + \alpha_{i}\right)$}
-
-Soient $h_0(X)$ et $h_1(X)$ deux polynômes de $\gf{p}[X]$ de bas degré tels que le polynôme $h_1(X)X^p-h_0(X)$ ait un facteur irréductible de degré $h$, que l'on note $I_h(X) \in \gf{p}[X]$. Les indications de d'Antoine Joux \cite{joux2013} et Cécile Pierrot \cite{pierrot2016} incitent à prendre $h_0(X)$ quadratique et $h_1(X)$ linéaire, pour qu'il soit dans la base de friabilité. Pour utiliser l'algorithme d'Antoine Joux \cite{joux2013}, on se place dans le corps:
-$$\gf{p^{2h}} \cong \frac{\gf{p^2}[X]}{(I_h(X))}.$$
-Après avoir effectué la phase de crible des polynômes linéaires ainsi que la phase d'algèbre linéaire, nous choisissons aléatoirement une élément primitif $\gamma$ de $\gf{p^{2h}}$ et nous obtenons les logarithmes en base $\gamma$ des éléments de la forme ${t_0} + \beta$, où ${t_0} = X \pmod{I_h(X)}$ et $\beta \in \gf{p^2}$. 
-
-Les logarithmes qui nous intéressent sont seulement ceux de la forme ${t_0} + \alpha$, avec $\alpha \in \gf{p}$. Notons-les alors:
-$$b_i := \log_\gamma\left({t_0} + \alpha_{i}\right) \pmod{p^{2h}-1}, \qquad 0 \leqslant i \leqslant p-1.$$
-Cependant, on souhaite que la base de logarithme soit un élément primitif de $\gf{p^h}$. La façon intuitive de fabriquer un élément $g_0$ primitif de $\gf{p^h}$ à partir de $\gamma$, est de poser 
-$$g_0 := \gamma^{(p^{2h}-1)/(p^h-1)}=\gamma^{p^h+1}.$$
-Nous remarquons que, puisque $\gamma$ a été choisi de façon aléatoire (sous-entendu uniforme), il en est de même pour $g_0$.
-Posons:
-$$a_i := \log_{g_0}\left({t_0} + \alpha_{i}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
-
-Soit $i$ tel que $0 \leqslant i \leqslant p-1$. Il nous reste à déterminer $a_i$ en fonction de $b_i$. Pour cela, rappelons que ${t_0}+\alpha_i \in \gf{p^h}$ et observons:
-$${g_0}^{b_i} = \gamma^{b_i(p^h+1)} = ({t_0}+\alpha_i)^{p^h+1} = ({t_0}+\alpha_i)^{p^h}({t_0}+\alpha_i) = ({t_0}+\alpha_i)^2$$
-Cela signifie donc que ${g_0}^{b_i/2} = {t_0}+\alpha_i$ ou ${g_0}^{b_i/2} = -({t_0}+\alpha_i)$. Dans le second cas, il suffit de multiplier l'égalité par $-1 = {g_0}^{(p^h-1)/2}$. 
-
-Ainsi, quel que soit $i$ tel que $0 \leqslant i \leqslant p-1$:
-$$a_i = \left\{\begin{array}{l}
-b_i / 2 \pmod{p^h-1}, \quad \text{si } {t_0} + {g_0}^{b_i/2} \not\in \gf{p}, \\
-(b_i + p^h - 1) / 2 \pmod{p^h-1}, \quad \text{si } {t_0} + {g_0}^{b_i/2} \in \gf{p}. \\
-\end{array}\right.$$
-
-\subsubsection{Production des clés}
-
-Dans la construction précédente, il n'est pas évident que l'élément algébrique ${t_0}$ est choisi aléatoirement. Et, de plus, il est absurde de prendre le polynôme $I_h(X)$ comme polynôme servant à représenter publiquement notre corps $\gf{p^h}$.
-
-Si on commence comme en section~\ref{sec:cryptosysteme}, disons que le corps $\gf{p^h}$ est représenté publiquement par un polynôme $P(X)\in\gf{p}[X]$ irréductible de degré $h$, et qu'on dénote la classe de $X$ modulo $P(X)$ par $a$, i.e. la représentation publique est $\gf{p}[a]$. Ensuite, nous faisons un raisonnement similaire à celui se trouvant au début de la section~\ref{sec:DLPJoux}: considérons le polynôme $I_h(X)$ comme étant à coefficients dans $\gf{p}[a]$. Ainsi, $I_h(X) \in \gf{p}[a][X]$ est scindé et nous pouvons exprimer ses racines comme des polynômes en $a$. Choisissons l'une d'entre elles que nous notons $t \in \gf{p}[a]$. Il est alors possible d'écrire $t = f(a)$, où $f(X) \in \gf{p}[X]$. Les éléments $t_0$ et $t$ sont intimement liés: la matrice de passage du $\gf{p}$-espace vectoriel $\gf{p}[t_0]$ muni de la base $(1,t_0,\dots,{t_0}^{h-1})$ vers $\gf{p}$-espace vectoriel $\gf{p}[a]$ muni de la base $(1,t,\dots,{t}^{h-1})$ est la matrice identité.
-
-Soit $G(X)$ un polynôme de $\gf{p}[X]$ tel que $g_0 = G(t_0) \in \gf{p}[t_0]$. Soient $g := G(f(a))$ et $\varphi: \gf{p}[t_0] \rightarrow \gf{p}[a], t_0 \mapsto t$, nous avons pour tout $0 \leqslant i \leqslant p-1$:
-\begin{align*}
-\log_{g}({t}+\alpha_i) &= \log_{G(f(a))}(t+\alpha_i)\\
-&= \log_{G(t)}(t+\alpha_i) \\
-&= \log_{G(\varphi(t_0))}(\varphi(t_0)+\alpha_i) \\
-&= \log_{\varphi(G(t_0))}(\varphi(t_0+\alpha_i)) \\
-&= \log_{\varphi(g_0)}(\varphi(t_0+\alpha_i)) \\
-&= a_i.
-\end{align*}
-
-Si $\sigma$ et $d$ sont définis, la clé publique est alors constituée des:
-$$c_i := d + a_{\sigma(i)} \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
-
-\subsection{Implantation}
-
-Pour fixer les idées, nous donnerons en SageMath les commandes\footnote{Elles sont toutes dans le fichier \textit{joux-algorithm.sage} sous forme de fonction.} utilisées pour effectuer les différents calculs. Il est cependant nécessaire de déclarer les variables \verb|p| et \verb|k|:
-\begin{verbatim}
-sage: p = 13 # peu importe les valeurs, il faut juste des nombres premiers
-sage: k = 5 # < p, joue le rôle du h, degré de l'extension
-\end{verbatim}
-
-Commençons par l'imbrication de corps. Dans SageMath cela donne:
-\begin{verbatim}
-sage: Fp2.<alpha> = GF(p ** 2)
-sage: FpY.<Y> = PolynomialRing(GF(p))
-sage: Fp2X.<X> = PolynomialRing(Fp2)
-\end{verbatim}
-On cherche deux polynômes $h_0(X)$ et $h_1(X)$ tels que $h_1(X)X^p - h_0(X)$ ait un facteur irréductible de degré $h$, ici on cherche même $h_1(X)$ affine pour qu'il soit dans la base de friabilité, comme suggéré par Cécile Pierrot \cite{pierrot2016}:
-\begin{verbatim}
-sage: while true :
-sage:     h0 = FpY.random_element(2)
-sage:     h0 = h0 - h0(0)
-sage:     h1 = FpY.random_element(1)
-sage:     fa = list((h1 * Y ** p - h0).factor())
-sage:     deg = [ poly.degree() for poly, mult in fa ]
-sage:     if k in deg :
-sage:         break
-sage: Ik = fa[deg.index(k)][0]
-\end{verbatim}
-La représentation en SageMath donne:
-\begin{verbatim}
-sage: Fp2k.<beta> = Fp2X.quotient_ring(Fp2X(Ik))
-\end{verbatim}
-
-\paragraph{Crible.}Dans son article \cite{joux2013}, Antoine Joux propose de garder des \textit{hashs} de nos relations pour ne pas avoir de duplicatas. C'est ce que nous faisons. Pour rappel de la méthode, nous choisissons $(a,b,c,d) \in \gf{p^2}$, et nous avons l'égalité modulo $I_h(X)$ entre, d'une part:
-\begin{equation}\label{eqn:exemAlgoJoux}
-(a^qc - ac^q)Xh_0(X) + (a^qd - bc^q)h_0(X) + (b^qc - ad^q)Xh_1(X) + (b^qd - bd^q)h_1(X)
-\end{equation}
-et d'autre part:
-$$h_1(X)(cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d))$$
-et nous ne gardons que les relations où le polynôme \ref{eqn:exemAlgoJoux} se factorise en polynômes linéaires. Et il nous faut approximativement $p^2$ telles relations.
-
-Voici d'abord un petit bout de code SageMath permettant de déterminer si un polynôme est scindé:
-\begin{verbatim}
-sage: def is_split (P) :
-sage:     fa = list(P.factor())
-sage:     deg = [ poly.degree() for poly, mult in fa ]
-sage:     deg = set(deg)
-sage:     if deg == {1} :
-sage:         return True
-sage:     else :
-sage:         return False
-\end{verbatim}
-Définissons les variables dans SageMath:
-\begin{verbatim}
-sage: sieveSize = 2 * p ** 2
-sage: nbIter = 0
-sage: hashTable = []
-sage: sieveTable = []
-\end{verbatim}
-Et commençons le crible\footnote{le \textit{print} final n'est pas obligatoire, il indique un pourcentage d'exécution.}:
-\begin{verbatim}
-sage: h0 = Fp2X(h0)
-sage: h1 = Fp2X(h1)
-sage: while nbIter < sieveSize :
-sage:     a = Fp2.random_element()
-sage:     b = Fp2.random_element()
-sage:     c = Fp2.random_element()
-sage:     d = Fp2.random_element()
-sage:     if a * d != b * c :
-sage:         P = Fp2X((c * a ** p - a * c ** p) * X * h0
-sage:                + (d * a ** p - b * c ** p) * h0
-sage:                + (c * b ** p - a * d ** p) * X * h1
-sage:                + (d * b ** p - b * d ** p) * h1)
-sage:         if is_split (P) :
-sage:             Q = Fp2X(c * X + d) * h1
-sage:             for gamma in range (p) :
-sage:                 Q *= ((a - gamma * c) * X + b - gamma * d)
-sage:             if [hash(P), hash(Q)] not in hashTable :
-sage:                 hashTable.append([hash(P), hash(Q)])
-sage:                 sieveTable.append([ [(P.lc(), 1)] + list(factor(P)) ]
-sage:                                 + [ [(Q.lc(), 1)] + list(factor(Q)) ])
-sage:                 nbIter += 1
-sage:                 print (nbIter * 100 / sieveSize).n(digits=3)
-\end{verbatim}
-
-\paragraph{Relations.}On souhaite avoir des relations seulement entre les polynômes linéaires unitaires, sans les coefficients de $\gf{p^2}$. Pour cela, nous déterminons leur logarithme. Nous allons fixer un élément primitif $g \in \gf{p^{2h}}$, où: $$\gf{p^{2h}} = \frac{\gf{p^2}[X]}{(I_h(X))}.$$
-Cependant, les éléments de \verb|Fp2k| ont certaines méthodes qui ne sont pas implémentées, comme par exemple \verb|.multiplicative_order()| ou \verb|.is_primitive()|. Nous les faisons:
-\begin{verbatim}
-sage: def multorder (x) :
-sage:     A = x.parent()
-sage:     card = A.cardinality()
-sage:     if card.parent() != ZZ :
-sage:         raise ArithmeticError("ring not finite")
-sage:     return recursive_multorder (x, card - 1, prime_factors (card - 1))
-
-sage: def recursive_multorder (x, order, prime_fa) :
-sage:     A = x.parent()
-sage:     for p in prime_fa :
-sage:         if x ** (order / p) == A.one() :
-sage:             return recursive_multorder (x, order / p, 
-sage:                    [ f for f in prime_fa if (order / p) % f == 0 ])
-sage:     return order
-
-sage: def is_primitive (x) :
-sage:     A = x.parent()
-sage:     card = A.cardinality()
-sage:     if card.parent() != ZZ :
-sage:         raise ArithmeticError("ring not finite")
-sage:     card = card - 1
-sage:     for p in prime_factors(card) :
-sage:         if x ** (card / p) == A.one() :
-sage:             return False
-sage:     return True
-\end{verbatim}
-Nous pouvons maintenant choisir un élément primitif $g \in \gf{p^{2h}}$:
-\begin{verbatim}
-sage: while True :
-sage:     g = Fp2k.random_element()
-sage:     if is_primitive(g) :
-sage:         break
-\end{verbatim}
-Pour nous débarrasser des facteurs de $\gf{p^2}$ dans notre système, nous déterminons les logarithmes en base $g$ de ceux-ci. Cela se fait à l'aide, par exemple, de l'algorithme de Pohlig-Hellman \cite{pohligHellman1978}, que nous n'écrivons pas ici. Après avoir attaché le fichier \textit{joux-algorithm.sage} à SageMath, écrire la commande:
-\begin{verbatim}
-sage: baseFieldLogs = get_base_field_logs (g)
-\end{verbatim}
-Maintenant, nous pouvons reformuler le système obtenu par le crible. Nous en faisons un semblable à celui de l'algorithme de Hellman-Reyneri \cite{hellman1982}:
-\begin{verbatim}
-sage: unknownsSide = []
-sage: solutionSide = []
-sage: for left, right in sieveTable :
-sage:     linear_poly = []
-sage:     sol = 0
-sage:     for poly, mult in left :
-sage:         if poly in baseFieldLogs[0] :
-sage:             sol = Integer(mod (sol - mult * baseFieldLogs[1]
-sage:                   [baseFieldLogs[0].index(poly)], p ** (2 * k) - 1))
-sage:         else :
-sage:             linear_poly += [ (poly, mult) ]
-sage:     for poly, mult in right :
-sage:         if poly in baseFieldLogs[0] :
-sage:             sol = Integer(mod (sol + mult * baseFieldLogs[1]
-sage:                   [baseFieldLogs[0].index(poly)], p ** (2 * k) - 1))
-sage:         else :
-sage:             linear_poly += [ (poly, -mult) ]
-sage:     unknownsSide += [linear_poly]
-sage:     solutionSide += [sol]
-\end{verbatim}
-
-\paragraph{Algèbre linéaire.}Il est possible de composer la base de friabilité et la matrice du système:
-\begin{verbatim}
-sage: basis = []
-sage: for line in unknownsSide :
-sage:    for poly, mult in line :
-sage:        basis.append(poly)
-sage: basis = list(set(basis))
-
-sage: M = zero_matrix(IntegerModRing(p ** (2 * k) - 1), 
-sage:            len(unknownsSide), len(basis))
-sage: i = 0
-sage: for line in unknownsSide :
-sage:      for poly, mult in line :
-sage:          M[i, basis.index(poly)] += mult
-sage:      i += 1
-\end{verbatim}
-Et enfin, nous résolvons le système:
-\begin{verbatim}
-sage: B = vector (IntegerModRing(p ** (2 * k) - 1), solutionSide)
-sage: basisLogs = M.solve_right(B)
-\end{verbatim}
 
 \section*{Conclusion}
 
