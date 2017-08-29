@@ -1,4 +1,4 @@
-def pohlig_hellman (g, h, fa) :
+def pohlig_hellman (h, g, fa) :
     n = 1
     for p, i in fa :
         n = n * p ** i
@@ -17,7 +17,7 @@ def pohlig_hellman (g, h, fa) :
     res = CRT (a, moduli)
     return res
 
-def baby_step_giant_step (g, h, n) :
+def baby_step_giant_step (h, g, n) :
     m = int(ceil (sqrt (n)))
     L = [ g ** i for i in range (m + 1) ]
     u = g ** (-m)

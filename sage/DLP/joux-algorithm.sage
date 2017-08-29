@@ -42,9 +42,10 @@ def sieving_linear_poly (q, h0, h1) :
     while nbIter < sieveSize :
         while True :
             [a, b, c, d] = next_tuple ([a, b, c, d])
+            print str((nbIter * 100 / sieveSize).n(digits=3)) + "\t" + str([a, b, c, d])
             if is_valid_quadruplet (a, b, c, d, q) :
                 break
-        print a, b, c, d
+        #print a, b, c, d
         P = Fq2X((c * a ** q - a * c ** q) * X * h0
                + (d * a ** q - b * c ** q) * h0
                + (c * b ** q - a * d ** q) * X * h1
@@ -55,10 +56,10 @@ def sieving_linear_poly (q, h0, h1) :
                 Q *= ((a - gamma * c) * X + b - gamma * d)
             indEqn = [ [linear_poly.index(poly), mult] for poly, mult in list(factor(P)) ] + [ [linear_poly.index(poly), -mult] for poly, mult in list(factor(Q)) ]
             indEqn.sort()
-            print indEqn
-            print list(factor(P)), list(factor(Q))
-            if [hash(P), hash(Q)] not in hashTable :
-                hashTable.append([hash(P), hash(Q)])
+            #print indEqn
+            #print list(factor(P)), list(factor(Q))
+            if indEqn not in hashTable :
+                hashTable.append(indEqn)
                 sieveTable.append([ [(P.lc(), 1)] + list(factor(P)) ] + [ [(Q.lc(), 1)] + list(factor(Q)) ])
                 nbIter += 1
                 print (nbIter * 100 / sieveSize).n(digits=3)
