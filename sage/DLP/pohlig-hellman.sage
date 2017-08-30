@@ -5,12 +5,11 @@ def pohlig_hellman (h, g, fa) :
     a = [0 for i in range (len (fa))]
     index = 0
     for p, i in fa :
+        g0 = g ** (n / p)
         for j in range (1, i + 1) :
-            g0 = g ** (n / (p ** j))
-            h0 = (g0 ** (-a[index])) * (h ** (n / (p ** j)))
-            if h0 != 1 :
-                g0 = g ** (n / p)
-                lg = baby_step_giant_step (g0, h0, p ** j)
+            h0 = (  g ** ((n  / (p ** j)) * (-a[index])) * h ** (n / (p ** j))  )
+            if h0 != h0.parent().one() :
+                lg = baby_step_giant_step (g0, h0, p)
                 a[index] = a[index] + lg * p ** (j - 1)
         index += 1
     moduli = [ p ** i for p, i in fa ]
@@ -19,11 +18,14 @@ def pohlig_hellman (h, g, fa) :
 
 def baby_step_giant_step (h, g, n) :
     m = int(ceil (sqrt (n)))
-    L = [ g ** i for i in range (m + 1) ]
-    u = g ** (-m)
+    L = []
+    for i in range (m + 1) :
+        u = g ** i
+        L += [ hash(u) ]
+    u = u ** (-1)
     y = h
     j = 0
-    while y not in L :
+    while hash(y) not in L :
         y = y * u
         j = j + 1
-    return L.index(y) + m * j
+    return L.index(hash(y)) + m * j
