@@ -120,7 +120,7 @@ Le cryptosystème de Chor-Rivest est un cryptosytème asymétrique qui base sa s
 
 Nous retrouvons donc avec deux choix: l'un facilitant le calcul de logarithmes pour fabriquer les clés et l'autre rendant le cryptosystème résistant à la meilleure cryptanalyse existante à ce jour. Il est clair qu'avoir un cryptosystème cassé est inutile. C'est pour cela que nous nous intéressons à l'algorithme de Joux, en espérant qu'il nous permette de franchir l’obstacle du calcul de logarithmes.
 
-Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet Grace, et faisons un bref descriptif des attentes du stage. Nous évoquons les méthodes classiques de calcul de logarithme dans des groupes cycliques en section~\ref{sec:DLPgroupe}. Les sections~\ref{sec:cryptosysteme} et~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers résultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous déduirons, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
+Le rapport est organisé comme suit: en section~\ref{sec:presInria}, nous présentons Inria, ainsi que l'équipe-projet Grace, et faisons un bref descriptif des attentes du stage. Nous évoquons les méthodes classiques de calcul de logarithme dans des groupes cycliques en section~\ref{sec:DLPgroupe}. Les sections~\ref{sec:cryptosysteme} et~\ref{sec:cryptanalyse} exposent les travaux déjà effectués sur le cryptosysème de Chor-Rivest et la cryptanalyse de Vaudenay. La section~\ref{sec:DLPJoux} donne divers résultats sur le calcul de logarithmes discrets dans des corps finis et aborde le papier de Joux, dont nous espérons en déduire, en section~\ref{sec:consequences}, des améliorations possibles pour le cryptosystème de Chor-Rivest.
 
 \paragraph{GitHub.} Des fichiers comportant les divers algorithmes sont présents sur GitHub pour agrémenter la lecture du rapport. Il y a une implantation élémentaire en \verb|C| de l'algorithme rho de Pollard \cite{pollard1978} dans un corps $\gf{p}$, où $p$ est un nombre premier inférieur à $2^{32}$, ainsi que d'autres fichiers en SageMath implantant le cryptosystème de Chor-Rivest \cite{chorRivest1988}, l'attaque de Serge Vaudenay \cite{vaudenay2000} et une variante de l'algorithme d'Antoine Joux \cite{joux2013}, exposés en section \ref{sec:cryptosysteme}, \ref{sec:cryptanalyse} et \ref{sec:DLPJoux} respectivement. Il est laissé au lecteur l'initiative d'explorer le dépôt.
 \paragraph{URL.}\url{https://github.com/Remi-Clarisse/chor-rivest-cryptosystem.git}
@@ -1471,6 +1471,8 @@ $$\O\left(\log(p^h-1)^2 + \frac{\sqrt{B}\log(p^h-1)}{\log(B)}\right),$$
 où $B$ est le plus grand facteur premier de $p^h-1$.
 
 \subsection{Comparaison des deux algorithmes}
+
+
 
 \section*{Conclusion}
 

@@ -1,17 +1,14 @@
-def pohlig_hellman (h, g, fa) :
-    n = 1
-    for p, i in fa :
-        n = n * p ** i
+def pohlig_hellman (h, g) :
+    n = g.multiplicative_order()
+    fa = list(factor (n))
     a = [0 for i in range (len (fa))]
-    index = 0
     for p, i in fa :
         g0 = g ** (n / p)
+        ind = fa.index((p, i))
         for j in range (1, i + 1) :
-            h0 = (  g ** ((n  / (p ** j)) * (-a[index])) * h ** (n / (p ** j))  )
-            if h0 != h0.parent().one() :
-                lg = baby_step_giant_step (g0, h0, p)
-                a[index] = a[index] + lg * p ** (j - 1)
-        index += 1
+            h0 = (  h * g ** (-a[ind])  ) ** (n / (p ** j))
+            b = baby_step_giant_step (h0, g0, p)
+            a[ind] = a[ind] + b * p ** (j - 1)
     moduli = [ p ** i for p, i in fa ]
     res = CRT (a, moduli)
     return res
