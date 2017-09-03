@@ -186,9 +186,9 @@ Soient $G$ un groupe, $g\in G$ et $h \in \gen{g}$. La façon la plus simple de r
 \ENSURE{$a$ tel que $g^a = h$ et $1 \leqslant a \leqslant n$}
 \STATE{$a\gets 1$}
 \STATE{$t\gets g$}
-\WHILE{$t \neq h$} 
+\WHILE{$t \neq h$}
 	\STATE{$a\gets a + 1$}
-	\STATE{$t\gets tg$} 
+	\STATE{$t\gets tg$}
 \ENDWHILE
 \RETURN{$a$}
 \end{algorithmic}
@@ -287,7 +287,7 @@ Soit $G$ d'ordre $p$. Si les éléments du groupe sont représentables en mémoi
 
 \subsection{La méthode rho de Pollard}\label{s-sec:rho}
 
-Après une introduction, nous expliquons le fonctionnement de la méthode rho de Pollard, qui a été conçue en 1978 par John Michael Pollard \cite{pollard1978}. 
+Après une introduction, nous expliquons le fonctionnement de la méthode rho de Pollard, qui a été conçue en 1978 par John Michael Pollard \cite{pollard1978}.
 L'exposé suivant suit, le plus simplement possible, celui fait par Galbraith~\cite[section 14, p. 264]{galbraith2012}\footnote{\`A consulter pour les démonstrations et pour plus de détails.}.
 
 La méthode de Pollard se sert du théorème suivant, plus connu sous le nom du paradoxe des anniversaires:
@@ -299,15 +299,15 @@ Soit $\mathcal S$ un ensemble à $n$ éléments. Si les éléments sont tirés d
 
 \paragraph{Introduction.}La méthode rho permet, avec une forte probabilité, de résoudre le problème du logarithme discret dans un groupe abélien. Elle se base sur des marches aléatoires : elle définit donc un algorithme non-déterministe, i.e. sur une même entrée, chaque exécution de l'algorithme peut être différente, l'issue étant la même.
 
- Soient $G := \gen{g}$ d'ordre un nombre premier $p$ et $h = g^a$ pour un certain $0 \leqslant a < p$. 
+ Soient $G := \gen{g}$ d'ordre un nombre premier $p$ et $h = g^a$ pour un certain $0 \leqslant a < p$.
 
 \paragraph{Idée.} Observons que si nous trouvons $a_i$, $b_i$, $a_j$ et $b_j$ dans $\Z/p\Z$ tels que :
 $$ g^{a_i}h^{b_i} = g^{a_j}h^{b_j},$$
 et $b_i \not\equiv b_j \pmod{p}$, alors nous pouvons résoudre le problème du logarithme discret comme suit : $$h = g^{(a_i-a_j)(b_j-b_i)^{-1}\bmod{p}}.$$
 
-\paragraph{Marche pseudo-aléatoire.} Pollard \cite{pollard1978} s'est inspiré de la théorie des marches aléatoires et a pensé à construire une suite pseudo-aléatoire $x_i = g^{a_i}h^{b_i}$ d'éléments de $G$ par itération d'une fonction convenable $f:G \rightarrow  G$, appelée \textit{fonction d'itération}. En d'autres termes, il choisit une valeur de départ $x_1$ et définit le reste de la suite par $x_{i+1}=f({x_i})$, pour $i \geqslant 1$. Une telle suite $x_1, x_2, \dots$ est appelée une \textit{marche pseudo-aléatoire déterministe}. 
+\paragraph{Marche pseudo-aléatoire.} Pollard \cite{pollard1978} s'est inspiré de la théorie des marches aléatoires et a pensé à construire une suite pseudo-aléatoire $x_i = g^{a_i}h^{b_i}$ d'éléments de $G$ par itération d'une fonction convenable $f:G \rightarrow  G$, appelée \textit{fonction d'itération}. En d'autres termes, il choisit une valeur de départ $x_1$ et définit le reste de la suite par $x_{i+1}=f({x_i})$, pour $i \geqslant 1$. Une telle suite $x_1, x_2, \dots$ est appelée une \textit{marche pseudo-aléatoire déterministe}.
 
-\paragraph{Pré-période et période.}Comme $G$ est fini, cette suite est \textit{ultimement périodique} : il existe deux entiers $\lambda \geqslant 1$ et $\mu \geqslant 0$ tels que les éléments $x_1, x_2, \dots, x_{\lambda + \mu -1}$ soient distincts deux à deux et $x_{k} = x_{\lambda + k}$ pour tout $k\geqslant \mu$. Nous appelons $\mu$ la \textit{pré-période de la suite} et $\lambda$ la \textit{période de la suite}. Sous l'hypothèse que $x_1$ soit choisi dans $G$ aléatoirement selon la distribution uniforme, et que $f$ est une fonction aléatoire, la valeur attendue de $\lambda$ et $\mu$ est proche de: 
+\paragraph{Pré-période et période.}Comme $G$ est fini, cette suite est \textit{ultimement périodique} : il existe deux entiers $\lambda \geqslant 1$ et $\mu \geqslant 0$ tels que les éléments $x_1, x_2, \dots, x_{\lambda + \mu -1}$ soient distincts deux à deux et $x_{k} = x_{\lambda + k}$ pour tout $k\geqslant \mu$. Nous appelons $\mu$ la \textit{pré-période de la suite} et $\lambda$ la \textit{période de la suite}. Sous l'hypothèse que $x_1$ soit choisi dans $G$ aléatoirement selon la distribution uniforme, et que $f$ est une fonction aléatoire, la valeur attendue de $\lambda$ et $\mu$ est proche de:
 $$\sqrt{\frac{\pi p}{8}} \approx 0.627 \sqrt{p}.$$
 
 \paragraph{Collision.} Une paire $(x_i, x_j)$ est appelée \textit{collision} si $x_i = x_j$ et $1 \leqslant i < j$. Si les éléments dans la marche sont choisis uniformément et indépendants dans $G$, alors par le paradoxe des anniversaires (théorème~\ref{paradoxeAnniversaire}), la valeur attendue pour $j$ est:
@@ -356,7 +356,7 @@ $$\sqrt{\frac{\pi p}{2}} \approx 1.253 \sqrt{p}.$$
 \end{center}
 \end{figure}
 
-\paragraph{Partition.} Pour simuler une fonction aléatoire, i.e. la fonction d'itération, de $G$ dans lui-même, il est pratique de commencer par partitionner $G$ en $n$ ensembles (d’à peu près la même taille), de sorte que $G = \mathcal{S}_0 \cup  \mathcal{S}_1 \cup \dots \cup \mathcal{S}_{n-1}$. Les ensembles $\mathcal{S}_i$ sont définis en utilisant une \textit{fonction de sélection}: $$s : G \rightarrow \{0, \dots, n-1 \},$$ par $\mathcal{S}_i = \{\alpha \in G : s(\alpha) = i\}$. 
+\paragraph{Partition.} Pour simuler une fonction aléatoire, i.e. la fonction d'itération, de $G$ dans lui-même, il est pratique de commencer par partitionner $G$ en $n$ ensembles (d’à peu près la même taille), de sorte que $G = \mathcal{S}_0 \cup  \mathcal{S}_1 \cup \dots \cup \mathcal{S}_{n-1}$. Les ensembles $\mathcal{S}_i$ sont définis en utilisant une \textit{fonction de sélection}: $$s : G \rightarrow \{0, \dots, n-1 \},$$ par $\mathcal{S}_i = \{\alpha \in G : s(\alpha) = i\}$.
 
 \paragraph{Résumé.} Les trois ingrédients principaux d'une méthode rho sont : une partition de $G$ grâce à une fonction de sélection, une suite ${(x_i)}_{i\geqslant 1}$ à l'aspect aléatoire construite grâce à une fonction d'itération et à la partition précédente\footnote{La fonction d'itération a autant de règles que le cardinal de la partition.}, et un algorithme pour chercher la collision dans la suite ${(x_i)}_{i\geqslant 1}$.
 
@@ -399,7 +399,7 @@ $$b_{i+1} = b_i + v_{s(x_i)} \pmod{p}.$$
 \subsubsection{Recherche de collision: algorithme de Floyd}
 
 Pour trouver une collision dans la suite ${(x_i)}_{i\geqslant 1}$, Pollard utilise l'\textit{algorithme de recherche de cycle de Floyd}, aussi appelé l'\textit{algorithme du lièvre et de la tortue}.
-Cet algorithme compare $x_i$ et $x_{2i}$, et donne une collision $(x_i, x_{2i})$, pour $i \geqslant 1$. Le plus petit $i$ tel que $x_i = x_{2i}$ est appelé l'\textit{épacte}. 
+Cet algorithme compare $x_i$ et $x_{2i}$, et donne une collision $(x_i, x_{2i})$, pour $i \geqslant 1$. Le plus petit $i$ tel que $x_i = x_{2i}$ est appelé l'\textit{épacte}.
 Notons $\mu$ la pré-période de la suite et $\lambda$ la période de la suite.
 
 \begin{prop}\label{prop:floyd}
@@ -487,7 +487,7 @@ $$\sum_{i=0}^{p-1} x_ia_i \neq \sum_{i=0}^{p-1} y_ia_i.$$
 \begin{proof}
 Dans l'extension de corps finis $\extension{\gf{p^h}}{\gf{p}}$, notons $\gf{p} = \{\alpha_0, \dots, \alpha_{p-1} \}$. Soient $t$ un élément de $\gf{p^h}$ algébrique de degré $h$ sur $\gf{p}$ et $g$ un élément primitif de $\gf{p^h}$. Considérons l'ensemble des translatés de $t$ par un élément de $\gf{p}$, à savoir $\{ t + \alpha_i : \alpha_i \in \gf{p} \}$.
 
-Soit $a_i := \log_g(t + \alpha_i)$, où $\alpha_i \in \gf{p}$, le logarithme de $t+\alpha_i$ en base $g$ dans $\gf{p^h}$. Alors les $a_i$ sont tous des entiers de l'intervalle $\ldbrack1, p^h -1\rdbrack$ et, montrons par l'absurde que, toutes les sommes de $h$ termes de la suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ sont deux à deux distinctes. 
+Soit $a_i := \log_g(t + \alpha_i)$, où $\alpha_i \in \gf{p}$, le logarithme de $t+\alpha_i$ en base $g$ dans $\gf{p^h}$. Alors les $a_i$ sont tous des entiers de l'intervalle $\ldbrack1, p^h -1\rdbrack$ et, montrons par l'absurde que, toutes les sommes de $h$ termes de la suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ sont deux à deux distinctes.
 
 Soient deux vecteurs d'entiers naturels $(x_0, \dots, x_{p-1})$ et $(y_0, \dots, y_{p-1})$ distincts et de poids au plus $h$ tels que :
 $$\sum_{i=0}^{p-1}x_ia_i = \sum_{i=0}^{p-1}y_ia_i.$$
@@ -588,7 +588,7 @@ sage: sig = Permutations([i for i in range (p)]).random_element()
 \end{verbatim}
 sélectionne une permutation $\sigma$ de l'ensemble $\{0, \dots, 16\}$ valant :
 $$\sigma := (10, 6, 3, 9, 12, 1, 14, 15, 5, 16, 8, 11, 7, 2, 0, 4, 13).$$
-Enfin : 
+Enfin :
 \begin{verbatim}
 sage: d = randint (0, q - 2)
 \end{verbatim}
@@ -834,7 +834,7 @@ b_i - b_0 &= \log_{\gamma}\left(\frac{t +\alpha_{\sigma(i)}}{t +\alpha_{\sigma(0
 &= L\log_{g}\left(\frac{t +\alpha_{\sigma(i)}}{t +\alpha_{\sigma(i)}}\right),\\
 &= L(c_i - c_0).\\
 \end{align*}
-Par conséquence, s'il existe un $i$ tel que $(c_i - c_0)$ est inversible modulo $p^h - 1$, nous retrouvons la valeur de $L$ par: 
+Par conséquence, s'il existe un $i$ tel que $(c_i - c_0)$ est inversible modulo $p^h - 1$, nous retrouvons la valeur de $L$ par:
 $$L = (b_i - b_0)(c_i - c_0)^{-1} \pmod{p^h-1},$$
 ce qui permet de déterminer $g$ et $d$.
 L'attaque de Goldreich simplifiée est dépeinte par l'algorithme~\ref{algo:attaqueGoldreichsimplifiee}.
@@ -865,7 +865,7 @@ L'attaque de Goldreich simplifiée est dépeinte par l'algorithme~\ref{algo:atta
 
 \subsection{Comment trouver $\sigma$ sachant $g_{p^r}$: l'approche avancée}
 
-Quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\sigma$. Selon Vaudenay~\cite{vaudenay2000}, si $r \geqslant h/r$, alors la famille $\left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$ est $\gf{p}$-libre. 
+Quand $r$ est suffisamment grand, il existe un meilleur algorithme pour trouver $\sigma$. Selon Vaudenay~\cite{vaudenay2000}, si $r \geqslant h/r$, alors la famille $\left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$ est $\gf{p}$-libre.
 Cela signifie que les coefficients dans l'équation (\ref{eqn:interpolation}) sont les seuls coefficients dans $\gf{p}$ de l'écriture du vecteur $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{1}} - (g_{p^r})^{c_{0}},\quad \dots,\quad (g_{p^r})^{c_{{h/r}}} - (g_{p^r})^{c_{0}}.$$
 Cela est résumé dans la proposition suivante :
 
@@ -1226,8 +1226,8 @@ Une fois que les logarithmes de la base $\mathcal{F}$ sont connus, nous cherchon
 Normalement, les éléments de $\gf{q^k}$ dont l'ordre est un petit diviseur de $q^k-1$, comme les éléments de $\gf{q}$, sont écartés lors du crible : ils augmentent la possibilité d'apparition d'éléments non inversibles pour déterminer le logarithme des éléments de la base de friabilité, et des algorithmes tels que Pohlig-Hellman \cite{pohligHellman1978} et rho de Pollard \cite{pollard1978}, sous-sections~\ref{s-sec:pohligHellman} et~\ref{s-sec:rho} respectivement, permettent déjà de les calculer facilement.
 \end{rema}
 
-Puisque ici la phase de calcul de logarithme discret individuel est négligeable comparée aux pré-calculs, il suffit, pour analyser la complexité asymptotique d'un tel algorithme, d'exprimer le coût de la collecte des relations et de l'algèbre linéaire en fonction du paramètre $d$. En majorant par $q^{d+1}$ le cardinal de $\mathcal{F}$ et en désignant par $\mathbb{P}$ la probabilité qu'un polynôme aléatoire $G_r(X)$ soit $d$-friable, le coût de l'exécution de la phase de collecte des relations est alors majoré par $q^{d+1}/\mathbb{P}$, en négligeant le coût de la factorisation des polynômes. 
-En ce qui concerne l'algèbre linéaire, on remarque que le nombre d'éléments de la base de friabilité apparaissant dans n'importe laquelle des relations formées est majorée par $k$. Ceci provient du fait que le nombre de polynômes irréductibles qui apparaissent lorsque l'on factorise un polynôme est toujours inférieur à son degré. Aussi, l’algèbre linéaire que l'on exécute s'attache toujours à une matrice très creuse qui contient au plus $k$ termes non nuls par ligne. Le coût d'une telle méthode est alors quadratique en la taille de $\mathcal{F}$, si on utilise des techniques de calculs sur matrices creuses, comme par exemple la méthode du gradient conjugué. Plus précisément, le temps de calcul est majoré par $kq^{2d+2}$. 
+Puisque ici la phase de calcul de logarithme discret individuel est négligeable comparée aux pré-calculs, il suffit, pour analyser la complexité asymptotique d'un tel algorithme, d'exprimer le coût de la collecte des relations et de l'algèbre linéaire en fonction du paramètre $d$. En majorant par $q^{d+1}$ le cardinal de $\mathcal{F}$ et en désignant par $\mathbb{P}$ la probabilité qu'un polynôme aléatoire $G_r(X)$ soit $d$-friable, le coût de l'exécution de la phase de collecte des relations est alors majoré par $q^{d+1}/\mathbb{P}$, en négligeant le coût de la factorisation des polynômes.
+En ce qui concerne l'algèbre linéaire, on remarque que le nombre d'éléments de la base de friabilité apparaissant dans n'importe laquelle des relations formées est majorée par $k$. Ceci provient du fait que le nombre de polynômes irréductibles qui apparaissent lorsque l'on factorise un polynôme est toujours inférieur à son degré. Aussi, l’algèbre linéaire que l'on exécute s'attache toujours à une matrice très creuse qui contient au plus $k$ termes non nuls par ligne. Le coût d'une telle méthode est alors quadratique en la taille de $\mathcal{F}$, si on utilise des techniques de calculs sur matrices creuses, comme par exemple la méthode du gradient conjugué. Plus précisément, le temps de calcul est majoré par $kq^{2d+2}$.
 De l'estimation de Panario-Gourdon-Flajolet \cite{PGF98}, on écrit :
 $$-\log_q(\mathbb{P}) \leqslant\frac{k}{d}\log_q(k/d).$$
 Par conséquent, si on choisit le paramètre :
@@ -1296,11 +1296,11 @@ $$L_{q^k}(1/3, (32/9)^{1/3}).$$
 \subsection{Descente special-$\mathfrak{q}$}\label{s-sec:special-q}
 
 La phase de descente décrite par Antoine Joux et Reynald Lercier \cite{joux2006, joux2002} nous servira dans la section suivante. Elle est donnée dans le cadre, et avec les notations, de l'algorithme précédent: le crible par corps de fonctions. Pour rappel, phases de collecte de relations et d'algèbre linéaire sont finies et on souhaite maintenant déterminer le logarithme d'un élément arbitraire $h\in\gf{q^k}$, en l'exprimant à l'aide des éléments de la base de friabilité, que l'on note :
-$$\mathcal{F} =  \{F(\gamma) : F(X) \in \gf{q}[X] \text{ irréductible unitaire de degré au plus } d \text{ et } \gamma \in \{\alpha, \beta\}\}.$$ 
+$$\mathcal{F} =  \{F(\gamma) : F(X) \in \gf{q}[X] \text{ irréductible unitaire de degré au plus } d \text{ et } \gamma \in \{\alpha, \beta\}\}.$$
 
 Soient $H(X)\in\gf{q}[X]$ le polynôme tel que $H(\alpha) = h$. Considérons l'ensemble des monômes :
 $$\mathcal S_H = \{X^iY^j : 0 \leqslant i \leqslant D_\alpha(H), 0 \leqslant j \leqslant D_\beta(H)\},$$
-où $D_\alpha(H)$ et $D_\beta(H)$ sont des paramètres que nous déterminerons plus tard. Chaque monôme dans $\mathcal S_H$ peut être exprimé comme un polynôme univarié en $X$ en substituant $Y$ par $f(X)$. Pour $m(X,Y)$ un monôme de $\mathcal S_H$, notons $V_H(m)(X)$ la valeur modulo $H(X)$ du polynôme univarié correspondant à $m(X,Y)$, i.e. 
+où $D_\alpha(H)$ et $D_\beta(H)$ sont des paramètres que nous déterminerons plus tard. Chaque monôme dans $\mathcal S_H$ peut être exprimé comme un polynôme univarié en $X$ en substituant $Y$ par $f(X)$. Pour $m(X,Y)$ un monôme de $\mathcal S_H$, notons $V_H(m)(X)$ la valeur modulo $H(X)$ du polynôme univarié correspondant à $m(X,Y)$, i.e.
 $$V_H(m)(X) := m(X,f(X)) \pmod{H(X)}.$$
 Clairement, $V_H(m)(X)$ peut être représenté par un vecteur $V_H(m)$ à $\deg H(X)$ coefficients dans le corps fini $\gf{q}$. Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)$ pour $m(X,Y) \in \mathcal S_H$. Concrètement, la matrice $M_H$ contient en colonnes des restes de divisions euclidiennes par le polynôme $H(X)$. N'importe quel vecteur du noyau de $M_H$ peut être alors interprété comme combinaison linéaire de ces restes modulo $H(X)$. Ainsi, à chaque vecteur du noyau de $M_H$, on peut associer une combinaison linéaire d'éléments de $\mathcal S_H$, qui est un polynôme $U(X,Y)$, tel que $U(X,f(X))$ est divisible par $H(X)$. Si, à la fois, les polynômes $U(X,f(X))/H(X)$ et $U(g(Y),Y)$ se factorisent en polynômes de degré suffisamment petit, on peut itérer le procédé sur les polynômes de la relation dont le degré est supérieur à $d$.
 
@@ -1368,7 +1368,7 @@ Pour générer de telles relations, partons de l'identité polynomiale:
 \end{equation}
 et appliquons la transformation homographique $X \mapsto (aX+b)/(cX+d)$, où $(a,b,c,d)\in\gf{q^2}^4$ satisfait à $ad\neq bc$, puis multiplions par $(cX+d)^{q+1}$, ce qui donne d'une part, en prenant seulement le membre de gauche de l'équation~\ref{eqn:identitySplit} :
 \begin{align*}
-(cX+d)^{q+1} \prod_{\gamma\in\gf{q}} \left(\frac{aX+b}{cX+d}-\gamma\right) &= (cX+d) \prod_{\gamma\in\gf{q}} (aX+b-\gamma(cX+d)), \\ 
+(cX+d)^{q+1} \prod_{\gamma\in\gf{q}} \left(\frac{aX+b}{cX+d}-\gamma\right) &= (cX+d) \prod_{\gamma\in\gf{q}} (aX+b-\gamma(cX+d)), \\
 &= (cX+d) \prod_{\gamma\in\gf{q}} ((a-\gamma c)X+b-\gamma d),\\
 \end{align*}
 et d'autre part, en considérant uniquement le membre de droite :
@@ -1388,7 +1388,7 @@ Par conséquence, nous obtenons une égalité dans $\gf{q^2}[X]/(I_k(X)) \cong \
 
 \paragraph{Comptage des relations.}Le procédé ci-dessus génère une relation candidate pour chaque quadruplet $(a,b,c,d) \in \gf{q^2}^4$. Cependant, certaines de ces relations sont générées plusieurs fois, avec des $(a,b,c,d)\in\gf{q^2}^4$ distincts. Par exemple, si $(a,b,c,d)\in\gf{q}^4$, nous obtenons une équation triviale.
 
-Pour cette raison, Joux \cite{joux2013} préconise de prendre les coefficients $a,b,c,d$ dans $\gf{q^2}$. En étudiant l'action de $\operatorname{PGL}_2(\gf{q^2})$ sur la droite projective $\mathbb{P}_1(\gf{q})$ et du fait que $\operatorname{PGL}_2(\gf{q})$ laisse $\mathbb{P}_1(\gf{q})$ globalement invariant, Joux déduit le nombre d'équations candidates : 
+Pour cette raison, Joux \cite{joux2013} préconise de prendre les coefficients $a,b,c,d$ dans $\gf{q^2}$. En étudiant l'action de $\operatorname{PGL}_2(\gf{q^2})$ sur la droite projective $\mathbb{P}_1(\gf{q})$ et du fait que $\operatorname{PGL}_2(\gf{q})$ laisse $\mathbb{P}_1(\gf{q})$ globalement invariant, Joux déduit le nombre d'équations candidates :
 $$\frac{q^6 - q^2}{q^3 - q} = q^3 + q.$$
 Après un argument heuristique, Joux \cite{joux2013} explique qu'il suffit de considérer $\O(q^2)$ quadruplets, en évitant ceux donnant des duplicatas, pour pouvoir passer à la phase d'algèbre linéaire sur les logarithmes des polynômes linéaires.
 
@@ -1414,18 +1414,18 @@ Comme cette méthode est coûteuse si nous souhaitons atteindre les éléments d
 $$(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \equiv (k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \quad (\operatorname{rem}I_k(X)).$$
 a un facteur égal à $H(X)$ dans le membre de droite et le membre de gauche se factorise en polynômes de degré au plus $D$,. Comme le degré total du membre de droite est majoré par un petit multiple de $D$ (lié au degré de $h_0$ et $h_1$), avec un bonne probabilité, nous obtenons une relation polynomiale entre $H(X)$ et des polynômes de degré au plus $D$.
 
-Reste à construire de tels polynômes $k_1(X)$ et $k_2(X)$. Antoine Joux \cite{joux2013} remarque que la condition $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$ s'annule modulo $H(X)$ se réécrit comme un système d'équations multivariées sur $\gf{q}$, qui peut être efficacement résolue par des méthodes de résolutions à l'aide de bases de Gröbner. 
+Reste à construire de tels polynômes $k_1(X)$ et $k_2(X)$. Antoine Joux \cite{joux2013} remarque que la condition $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$ s'annule modulo $H(X)$ se réécrit comme un système d'équations multivariées sur $\gf{q}$, qui peut être efficacement résolue par des méthodes de résolutions à l'aide de bases de Gröbner.
 Ce système est même bilinéaire en $k_1(X)$ et $k_2(X)$ puisque chaque monôme qui apparaît dans le système contient au plus une inconnue provenant de $k_1(X)$ et une de $k_2(X)$.
 
 Plus précisément, considérons chaque coefficient de $k_1(X)$ et $k_2(X)$ comme une indéterminée appartenant au corps des coefficients $\gf{q^2}$. Si $x$ est une telle inconnue, nous l'écrivons $x_0 + zx_1$, où $(1,z)$ est une base de $\gf{q^2}$ sur $\gf{q}$, et $x_0$ et $x_1$ sont des inconnues appartenant à $\gf{q}$. Avec une telle convention: $$x^q = x_0 + z^qx_1.$$
-Le système a $\deg H(X)$ équations sur $\gf{q^2}$ et peut s'écrire comme un système à $2\deg H(X)$ équations sur $\gf{q}$. En supposant que $k_1(X)$ est unitaire, le nombre maximum d'inconnues est $2(\deg k_1(X) + \deg k_2(X) + 1)$. Cependant, à cause de l'action de $\operatorname{PGL}_2(\gf{q})$, plusieurs couples $(k_1(X),k_2(X))$ distincts donnent le même polynôme $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q)$. Pour éviter cela, il faut fixer au moins une inconnue dans $\gf{q^2} \setminus \gf{q}$, laissant ainsi le choix de $2(\deg k_1(X) + \deg k_2(X))$ inconnues dans $\gf{q}$. 
+Le système a $\deg H(X)$ équations sur $\gf{q^2}$ et peut s'écrire comme un système à $2\deg H(X)$ équations sur $\gf{q}$. En supposant que $k_1(X)$ est unitaire, le nombre maximum d'inconnues est $2(\deg k_1(X) + \deg k_2(X) + 1)$. Cependant, à cause de l'action de $\operatorname{PGL}_2(\gf{q})$, plusieurs couples $(k_1(X),k_2(X))$ distincts donnent le même polynôme $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q)$. Pour éviter cela, il faut fixer au moins une inconnue dans $\gf{q^2} \setminus \gf{q}$, laissant ainsi le choix de $2(\deg k_1(X) + \deg k_2(X))$ inconnues dans $\gf{q}$.
 
-Antoine Joux \cite{joux2013} fait ensuite un raisonnement heuristique cherchant à déterminer sous quelles conditions le système précédent admet une solution avec une bonne probabilité, à savoir: nous avons besoin que 
+Antoine Joux \cite{joux2013} fait ensuite un raisonnement heuristique cherchant à déterminer sous quelles conditions le système précédent admet une solution avec une bonne probabilité, à savoir: nous avons besoin que
 $$\deg k_1(X) + \deg k_2(X) \geqslant \deg H(X) + 1.$$
 Enfin, il étudie la complexité de cette descente. Pour cela, il s'appuie sur les travaux de Jean-Charles Faugère, Mohab Safey El Din et Pierre-Jean Spaenlehauer, dont le résultat principal dans \cite{faugere2011, spaenlehauer2012} donne que la complexité est exponentielle en $\min(\deg k_1(X), \deg k_2 (X))$.
 Plus précisément, en posant $d = \deg k_2(X)$ et donc $\deg k_1(X) = \deg H(X) +1 - d$, la complexité est :
 $$\binom{2 (\deg H(X)) + 3}{2d+1}^\omega,$$
-où $2 \leqslant \omega \leqslant 3$ est l'exposant de l'algèbre linéaire. 
+où $2 \leqslant \omega \leqslant 3$ est l'exposant de l'algèbre linéaire.
 Le choix de $d$ est donné dans la section suivante.
 
 \subsubsection{Analyse de la complexité}
@@ -1438,7 +1438,7 @@ Pour étudier la complexité de la phase de descente, écrivons $k = \alpha q$, 
 $$L_{q^{2k}}(\beta, c) \approx \exp\left((c'+\o(1))q^\beta\log(q)\right),\quad\text{où } c' = c(2\alpha)^\beta.$$
 Comme le coût de la descente special-$\mathfrak{q}$ augmente quand le degré du polynôme cible diminue, on utilise cette méthode jusqu'à atteindre des polynômes de degré $\O(\sqrt{q})$, plus précisément de degré $c_c\sqrt{q/\log q}$, pour une constante $c_c$. Le coût de cette descente dans ce cas est:
 $$\exp\left(\frac{1}{2\mu}\sqrt{\frac{\alpha}{c_c}}q^{1/4}(\log q)^{5/4}\right),$$
-où $\mu < 1$. Pour ce qui est de la nouvelle descente, Joux fait en sorte de choisir le paramètre $d$ pour que le coût soit dominé par les polynômes de degré $c_c\sqrt{q/\log q}$. Ce qui l'amène à choisir 
+où $\mu < 1$. Pour ce qui est de la nouvelle descente, Joux fait en sorte de choisir le paramètre $d$ pour que le coût soit dominé par les polynômes de degré $c_c\sqrt{q/\log q}$. Ce qui l'amène à choisir
 $$d = \ceil{\left(\frac{c_c}{6}\sqrt{q\log q}\right)^{1/2}}.$$
 Cela donne, pour cette phase, un coût de:
 $$\exp\left(\left( \frac{\sqrt{6c_c}}{4} + \o(1)\right)q^{1/4}(\log q)^{5/4}\right).$$
@@ -1453,8 +1453,8 @@ qui peut être réécrit comme $L(1/4+\o(1))$.
 Après avoir pris connaissance du fonctionnement du cryptosystème de Chor-Rivest~\cite{chorRivest1988} en section~\ref{sec:cryptosysteme} et de la cryptanalyse de Serge Vaudenay~\cite{vaudenay2000} en section~\ref{sec:cryptanalyse}, nous souhaitons appliquer ses recommandations, i.e. prendre $p$ et $h$ premiers et ne pas diffuser tous les éléments de la clé publique.
 
 \subsection{Résultats de chercheurs de Madrid et Salamanque}
-Une étude a été faite par Luis Hern\'andez Encinas, Jaime Mu\~noz Masqué et Araceli Queiruga Dios en 2008~\cite{HEMMQD2008}, puis en 2009~\cite{HEMMQD2009}. 
-Dans l'article~\cite{HEMMQD2008}, les auteurs donnent un seul jeu de paramètres $(p,h)$ qu'ils jugent utilisable: $(409,17)$. Mais ils indiquent que se limiter à l'unique corps $\gf{409^{17}}$ est trop restrictif et menace la sécurité du système. 
+Une étude a été faite par Luis Hern\'andez Encinas, Jaime Mu\~noz Masqué et Araceli Queiruga Dios en 2008~\cite{HEMMQD2008}, puis en 2009~\cite{HEMMQD2009}.
+Dans l'article~\cite{HEMMQD2008}, les auteurs donnent un seul jeu de paramètres $(p,h)$ qu'ils jugent utilisable: $(409,17)$. Mais ils indiquent que se limiter à l'unique corps $\gf{409^{17}}$ est trop restrictif et menace la sécurité du système.
 Dans leur second article~\cite{HEMMQD2009}, ils traitent aussi le cas où $h$ est un carré de nombre premier, puisque, si $h$ est un nombre premier ou un carré de nombre premier, alors il ne possède pas de diviseur $r$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, et c'est une condition qui rend possible la cryptanalyse de Vaudenay. Ils arrivent donc à divers jeux de paramètres $(p,h)$, qu'ils trient en fonction de la friabilité de $p^h-1$, de la taille de la clé produite et de la densité du cryptosystème. Ils se restreignent ensuite à une dizaine de jeux de paramètres pour lesquels la clé publique est obtenue en moins d'une journée de calculs. Enfin, pour ces paramètres, ils finissent en étudiant les temps de chiffrement et de déchiffrement en fonction du pourcentage de clé publique diffusée: 50\%, 25\% et 10\%.
 
 \paragraph{Taille de la clé publique.}Étant donné que la clé publique est constituée de $p$ entiers compris entre $0$ et $p^h -1$, la taille de la clé publique est:
@@ -1472,9 +1472,31 @@ où $B$ est le plus grand facteur premier de $p^h-1$.
 
 \subsection{Comparaison des deux algorithmes}
 
+Nous avons implanté l'algorithme de Pohlig-Hellman\footnote{Consulter le fichier \textit{pohlig-hellman.sage}}, avec l'algorithme pas de bébé--pas de géant.
+Il fonctionne aussi avec les extensions explicites de corps, i.e. lorsque l'on utilise la méthode \verb|.quotient_ring()| en SageMath.
 
+D'autre part, nous avons aussi implanté certaines étapes de l'algorithme d'Antoine Joux: les phases de collecte de relations entre polynômes linéaires et d'algèbre linéaire.
+Le choix de la méthode pour résoudre le système linéaire est laissé à SageMath, qui a priori connaît des méthodes de calculs sur les matrices creuses, via l'argument \verb|sparse=True|.
+
+Nous avons comparé nos algorithmes sur des petits corps, comme $\gf{5^3}$. Là où l'algorithme de Pohlig-Hellman calcule relativement rapidement, de l'ordre de la demi seconde, un logarithme discret,
+l'algorithme de Joux prend du temps à changer de représentation, à collecter les relations, puis à résoudre le système linéaire, le tout mettant environ une vingtaine de minutes pour avoir les logarithmes de la base de friabilitré. De plus, le système linéaire obtenu n'a pas tout le temps eu
+un noyau trivial.
+
+Nous pensons que l'échec de l'algorithme Joux est dû au fait que le corps choisi est très petit, et nous n'avons pas eu le temps de conduire d'autres expériences, bien que nous pensons que pour nos logarithmes, on peut se contenter de l'algorithme de Pohlig-Hellman.
 
 \section*{Conclusion}
+
+Nous avons presenté dans ce rapport le cryptosystème de Chor-Rivest, ainsi que la meilleure
+attaque connue à ce jour sur celui-ci: la cryptanalyse de Serge Vaudenay.
+Les conclusions de Vaudenay préconisent de choisir de $p$ et $h$ premiers, ce qui rend le calcul de logarithme
+discret dans $\gf{p^h}$ difficile. Pour cela, nous avons pensé utiliser l'algorithme d'Antoine Joux.
+Cependant, les logarithmes que nous cherchons à déterminer ne sont pas aussi ardus que ceux de Joux, et il semble que, dans notre cas, nous pouvons nous contenter
+d'algorithmes tels que Pohlig-Hellman et rho de Pollard.
+
+En revanche, on peut se demander s'il existe une façon de n'avoir recours qu'aux phases de collecte de relations et d'algèbre linéaire de l'algorithme d'Antoine Joux,
+sans que cela ne menace la sécurité du système. Ou encore, est-il possible de combiner Pohlig-Hellman avec l'algorithme de Joux? Cela paraît peu probable, même si nous ne pouvons l'affirmer.
+Enfin, on peut se poser la question de la resistance du cryptosystème si on se place dans un corps comme $\gf{p^h}$ avec $h$ premier et $p$ une puissance première de $2$, ainsi que
+de l'efficacité de l'algorithme de Joux dans ce cas particulier.
 
 \newpage
 \thispagestyle{empty}
