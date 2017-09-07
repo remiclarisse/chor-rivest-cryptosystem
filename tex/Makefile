@@ -3,7 +3,7 @@ LOGBOOK=brouillon
 RAPPORT=rapport-stage
 
 # Special rules and targets
-.PHONY: all clean help open
+.PHONY: all clean help open beamer
 
 # Rules and targets
 all: $(RAPPORT)
@@ -20,12 +20,16 @@ $(RAPPORT): clean
 	pdflatex $(RAPPORT).tex
 	pdflatex $(RAPPORT).tex
 
+beamer: clean
+	pdflatex beamer.tex
+	pdflatex beamer.tex
+
 open: $(RAPPORT)
 	@evince $(RAPPORT).pdf&
 
 clean:
 	@echo "./tex/ : Cleaning..."
-	@rm -f *~ *.aux *.bbl *.blg *.toc *.log *.gz *.out *.pdf *.gz\(busy\)
+	@rm -f *~ *.aux *.bbl *.blg *.toc *.log *.gz *.out *.pdf *.gz\(busy\) *.nav *.snm
 
 help:
 	@echo "all:\tRun the whole build to make the PDF file '$(RAPPORT).pdf'."

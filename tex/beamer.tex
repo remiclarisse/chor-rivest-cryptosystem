@@ -1,0 +1,152 @@
+\documentclass{beamer}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage{amsmath, amsthm, amssymb, mathabx}
+\usepackage{tikz}
+\usepackage{algorithm, algorithmic}
+\usepackage{array, booktabs}
+\usepackage{cite}
+\usepackage{tikz}
+\usepackage{hyperref}
+
+\newtheorem{theo}{Théorème}[section]
+\newtheorem{lemm}[theo]{Lemme}
+\newtheorem{prop}[theo]{Proposition}
+\newtheorem{coro}[theo]{Corollaire}
+\theoremstyle{definition}
+\newtheorem{defi}[theo]{Déinition}
+\theoremstyle{remark}
+\newtheorem{rema}[theo]{Remarque}
+\newtheorem{exem}[theo]{Exemple}
+\newtheorem{appl}[theo]{Application}
+\newtheorem{heur}[theo]{Heuristique}
+
+
+\def\N{\mathbb N}
+\def\A{\mathbb A}
+\def\Z{\mathbb Z}
+\def\Q{\mathbb Q}
+\def\R{\mathbb R}
+\def\C{\mathbb C}
+\def\K{\mathbb K}
+\def\F{\mathbb F}
+\def\O{O}
+\def\o{o}
+\def\gf #1{\mathbb{F}_{#1}}
+\def\frob{\operatorname{Frob}}
+\def\card{\operatorname{Card}}
+\def\car{\operatorname{car}}
+\def\pgcd{\operatorname{pgcd}}
+\def\ppcm{\operatorname{ppcm}}
+\def\id{\operatorname{id}}
+\def\aut{\operatorname{Aut}}
+\def\hom{\operatorname{Hom}}
+\def\isom{\operatorname{Isom}}
+\def\gal{\operatorname{Gal}}
+\def\mbf #1{\mathbf{#1}}
+\def\NP{\mathbb{NP}}
+\def\gen #1{\left\langle#1\right\rangle}
+\def\ceil #1{\left\lceil#1\right\rceil}
+\def\floor #1{\left\lfloor#1\right\rfloor}
+
+\newcommand{\extension}[2]{{#1} / {#2}} % #1 grand corps et #2 petit corps
+
+\floatname{algorithm}{Algorithme}
+\renewcommand{\algorithmicrequire}{\textbf{Entrée :}}
+\renewcommand{\algorithmicensure}{\textbf{Sortie :}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{si}}
+\renewcommand{\algorithmicthen}{\textbf{alors}}
+\renewcommand{\algorithmicelse}{\textbf{sinon}}
+\renewcommand{\algorithmicfor}{\textbf{pour}}
+\renewcommand{\algorithmicforall}{\textbf{pour tout}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{tant que}}
+\renewcommand{\algorithmicloop}{\textbf{boucle}}
+\renewcommand{\algorithmicrepeat}{\textbf{repéter}}
+\renewcommand{\algorithmicuntil}{\textbf{jusqu'à}}
+\renewcommand{\algorithmicprint}{\textbf{afficher}}
+\renewcommand{\algorithmicreturn}{\textbf{retourner}}
+\renewcommand{\algorithmictrue}{\textbf{vrai}}
+\renewcommand{\algorithmicfalse}{\textbf{faux}}
+\usetheme{Warsaw}
+
+\title{Étude du cryptosystème de Chor-Rivest}
+\author{Rémi {Clarisse} \\ Tuteurs: Daniel {Augot} et Luca {De Feo}}
+\institute{ INRIA Saclay--Île-de-France \\ Université de Bordeaux}
+\date{Mercredi 13 Septembre 2017}
+\subject{Oral de Stage}
+
+\beamertemplatenavigationsymbolsempty
+\begin{document}
+
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+\begin{frame}
+	\frametitle{Sommaire}
+  	\tableofcontents
+\end{frame} 
+
+\section{Le problème du calcul de logarithme discret}
+\subsection{La recherche exhaustive}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame} 
+
+\subsection{L'algorithme de Pohlig-Hellman}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame} 
+
+\subsection{L'algorithme des pas de bébé -- pas de géant}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame} 
+
+\subsection{L'algorithme rho de Pollard}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame}
+
+\section{Le cryptosystème de Chor-Rivest}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame} 
+
+\section{La cryptanalyse de Serge Vaudenay}
+\subsection{L'équivalence entre les clés privées}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame} 
+
+\subsection{Les étapes de la cryptanalyse}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame} 
+
+\section{Le calcul de logarithme discret selon Antoine Joux}
+\subsection{La méthode de calcul d'indice}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame} 
+
+\subsection{Les idées d'Antoine Joux}
+\begin{frame}
+	\frametitle{}
+  	
+\end{frame}
+
+\end{document}
