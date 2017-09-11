@@ -20,7 +20,7 @@ $(RAPPORT): clean
 	pdflatex $(RAPPORT).tex
 	pdflatex $(RAPPORT).tex
 
-beamer: clean
+beamer: 
 	pdflatex beamer.tex
 	pdflatex beamer.tex
 

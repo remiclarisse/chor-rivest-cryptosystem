@@ -5,12 +5,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[francais]{babel}
 \usepackage{amsmath, amsthm, amssymb, mathabx}
-\usepackage{tikz}
 \usepackage{algorithm, algorithmic}
-\usepackage{array, booktabs}
-\usepackage{cite}
-\usepackage{tikz}
-\usepackage{hyperref}
 
 \newtheorem{theo}{Théorème}[section]
 \newtheorem{lemm}[theo]{Lemme}
@@ -72,13 +67,22 @@
 \renewcommand{\algorithmicreturn}{\textbf{retourner}}
 \renewcommand{\algorithmictrue}{\textbf{vrai}}
 \renewcommand{\algorithmicfalse}{\textbf{faux}}
-\usetheme{Warsaw}
+
+\usetheme{Antibes}
 
 \title{Étude du cryptosystème de Chor-Rivest}
 \author{Rémi {Clarisse} \\ Tuteurs: Daniel {Augot} et Luca {De Feo}}
 \institute{ INRIA Saclay--Île-de-France \\ Université de Bordeaux}
 \date{Mercredi 13 Septembre 2017}
 \subject{Oral de Stage}
+
+\setbeamertemplate{footline}[frame number]
+
+\AtBeginSection[]{
+  \begin{frame}{Sommaire}
+  \small \tableofcontents[currentsection, hideothersubsections]
+  \end{frame} 
+}
 
 \beamertemplatenavigationsymbolsempty
 \begin{document}
@@ -89,64 +93,208 @@
 
 \begin{frame}
 	\frametitle{Sommaire}
-  	\tableofcontents
-\end{frame} 
+  	\tableofcontents[hidesubsections]
+\end{frame}
 
 \section{Le problème du calcul de logarithme discret}
+\begin{frame}
+	\frametitle{Le problème du logarithme discret dans un groupe}
+        Soit $G$ un groupe noté multiplicativement.
+
+        Le \textit{problème du logarithme discret} est : étant donné $g\in G$ et $h \in \gen{g}$, le sous-groupe engendré par $g$, trouver l'entier $a$, tel que $$h=g^a.$$
+
+        Nous notons alors $a=\log_g(h)$, et $g$ est appelé la \textit{base} du logarithme $a$.
+\end{frame}
+
 \subsection{La recherche exhaustive}
 \begin{frame}
-	\frametitle{}
-  	
-\end{frame} 
+  \frametitle{La recherche exhaustive}
+        \begin{algorithm}[H]
+          \caption{Algorithme de recherche exhaustive}
+          \label{algo:logDiscretNaif}
+          \begin{algorithmic}[1]
+            \REQUIRE{$g$ d'ordre $n$ et $h \in \gen{g}$}
+            \ENSURE{$a$ tel que $g^a = h$ et $1 \leqslant a \leqslant n$}
+            \STATE{$a\gets 1$}
+            \STATE{$t\gets g$}
+            \WHILE{$t \neq h$}
+	    \STATE{$a\gets a + 1$}
+	    \STATE{$t\gets tg$}
+            \ENDWHILE
+            \RETURN{$a$}
+          \end{algorithmic}
+        \end{algorithm}
+\end{frame}
 
 \subsection{L'algorithme de Pohlig-Hellman}
 \begin{frame}
-	\frametitle{}
-  	
-\end{frame} 
+	\frametitle{L'algorithme de Pohlig-Hellman}
+        Soient $g\in G$ et $h \in \gen{g}$. Supposons que $g$ est d'ordre $n$. \'Ecrivons $$n = \prod_{i=1}^r p_i^{\alpha_i},$$ où les $p_i$ sont premiers et les $\alpha_i$ sont tels que $p_i$ ne divise pas $n/p_i^{\alpha_i}$.
 
-\subsection{L'algorithme des pas de bébé -- pas de géant}
-\begin{frame}
-	\frametitle{}
-  	
-\end{frame} 
+        L'idée de la méthode de Stephen Pohlig et Martin Hellman (1978) est de calculer $a$ modulo les puissances de nombre premier $p_i^{\alpha_i}$ et de recouvrer le logarithme en utilisant le théorème des restes chinois.
+\end{frame}
 
-\subsection{L'algorithme rho de Pollard}
 \begin{frame}
-	\frametitle{}
-  	
+  \frametitle{L'algorithme de Pohlig-Hellman}
+    \begin{center}
+    \scalebox{0.8}{
+    \begin{minipage}{1\linewidth}
+        \begin{algorithm}[H]
+          \caption{Algorithme de Pohlig-Hellman}
+          \begin{algorithmic}[1]
+            \REQUIRE{$g$ d'ordre $n$, $h \in \gen{g}$ et ${(p_i,\alpha_i)}_{1\leqslant i \leqslant r}$ tel que $n = \prod p_i^{\alpha_i}$}
+            \ENSURE{$a$ tel que $g^a = h$}
+            \FOR{$i$ allant de $1$ à $r$}
+	    \STATE{$a_i \gets 0$}
+	    \STATE{$g_0 \gets g^{n/p_i}$}
+	    \FOR{$j$ allant de $1$ à $\alpha_i$}
+	    \STATE{$h_0 \gets g^{-a_in/p_i^j}h^{n/p_i^j}$}
+	    \STATE{$b \gets \log(h_0,g_0)$}
+	    \STATE{$a_i \gets a_i + b p_i^{j-1}$}
+	    \ENDFOR
+            \ENDFOR
+            \STATE{calculer $a \equiv a_i \pmod{p_i^{\alpha_i}}$, pour $1\leqslant i \leqslant r$, grâce au théorème des restes chinois}
+            \RETURN{$a$}
+          \end{algorithmic}
+        \end{algorithm}
+        \end{minipage}}
+        \end{center}
+\end{frame}
+
+\subsection{L'algorithme pas de bébé -- pas de géant}
+\begin{frame}
+	\frametitle{L'algorithme pas de bébé -- pas de géant}
+        Cet algorithme, souvent attribué à Daniel Shanks, est un incarnation du principe de \textit{time/memory tradeoff}, i.e. faire un compromis entre l'espace utilisé en mémoire et le temps d'exécution.
+
+        Supposons $g$ d'ordre un nombre premier $p$ et $h = g^a$ pour un certain $0 \leqslant a < p$. Soit $m := \ceil{\sqrt{p}}$. Il existe alors deux entiers $a_0$ et $a_1$ tels que $a = a_0 + a_1m$ et $0 \leqslant a_0, a_1 < m$. Il s'en suit :
+$$g^{a_0} = h\cdot{(g^{-m})}^{a_1}.$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{L'algorithme pas de bébé -- pas de géant}
+  \begin{center}
+    \scalebox{0.65}{
+      \begin{minipage}{1.3\linewidth}
+        \begin{algorithm}[H]
+          \caption{Algorithme pas de bébé -- pas de géant}
+          \begin{algorithmic}[1]
+            \REQUIRE $g$ d'ordre $p$ et $h \in \gen{g}$
+            \ENSURE $a$ tel que $g^a = h$
+            \STATE{$m \gets \ceil{\sqrt{p}}$}
+            \STATE{$L$ une liste vide}
+            \STATE{$x \gets 1$}
+            \FOR[Calcul et stockage des pas de bébé]{$i$ allant de $0$ à $m$}
+	    \STATE{$L \gets L + [x, i]$}
+	    \STATE{$x \gets xg$}
+            \ENDFOR
+            \STATE{$u \gets g^{-m}$}
+            \STATE{$y \gets h$}
+            \STATE{$j \gets 0$}
+            \WHILE[Calcul des pas de géant]{$[y, \ast] \not \in L$}
+	    \STATE{$y\gets yu$}
+	    \STATE{$j\gets j+1$}
+            \ENDWHILE
+            \STATE{trouver $[x,i] \in L$ tel que $x=y$}
+            \RETURN{$i+mj$}
+          \end{algorithmic}
+        \end{algorithm}
+    \end{minipage}}
+  \end{center}
 \end{frame}
 
 \section{Le cryptosystème de Chor-Rivest}
 \begin{frame}
-	\frametitle{}
-  	
-\end{frame} 
+	\frametitle{Le théorème de Bose-Chowla}
+En 1988, Benny Chor et Ronald Rivest introduisent un nouveau cryptosystème de chiffrement à clé publique. Ils se sont inspirés du théorème de Bose-Chowla pour créer un cryptosystème reposant sur un problème de sac à dos et résistant à l'attaque de Jeffrey Lagarias et Andrew Odlyzko.
+
+\begin{theo}[Théorème de Bose-Chowla]
+Soient $p$ un nombre premier et $h \geqslant 2$ un entier. Il existe une suite ${(a_i)}_{0\leqslant i \leqslant p-1}$ d'entiers telle que: \begin{enumerate}
+\item pour tout $0 \leqslant i \leqslant p-1$, on a $1 \leqslant a_i \leqslant p^h-1$,
+\item si $(x_0, \dots, x_{p-1})$ et $(y_0, \dots, y_{p-1})$ sont deux vecteurs distincts d'entiers naturels de poids inférieur à $h$, alors $\sum_{i=0}^{p-1} x_ia_i \neq \sum_{i=0}^{p-1} y_ia_i$.
+\end{enumerate}
+\end{theo}
+\end{frame}
+
+\subsection{Génération des clés}
+\begin{frame}
+  \frametitle{Génération des clés}
+  Soient $p$ une puissance non-nulle de nombre premier et $h \geqslant 2$ un entier naturel. Considérons le corps fini à $p^h$ élément, noté $\gf{p^h}$, ainsi qu'une numérotation $\alpha$ du sous-corps de base $\gf{p}$, à savoir $$\{\alpha_0,\dots, \alpha_{p-1}\} = \gf{p} \subset \gf{p^h}.$$
+
+  \begin{itemize}
+  \item Les éléments de la clé privée consistent en :
+    \begin{enumerate}
+    \item un générateur $g$ du groupe cyclique $\gf{p^h}^\times$,
+    \item un élément $t \in \gf{p^h}$ algébrique de degré $h$ sur $\gf{p}$, dont on note $\mu(X) \in \gf{p}[X]$ le polynôme minimal,
+    \item une permutation $\sigma$ de l'ensemble $\{0, \dots, p-1\}$,
+    \item un entier $d$ tel que $0 \leqslant d \leqslant p^h-2$.
+    \end{enumerate}
+  \item La clé publique est alors composée des :
+    $$c_i := d + \log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}, \qquad 0 \leqslant i \leqslant p-1.$$
+  \end{itemize}
+\end{frame}
+
+\subsection{Chiffrement et déchiffrement}
+\begin{frame}
+  \frametitle{Chiffrement}
+  L'espace des chiffrés est $\Z/(p^h-1)\Z$ et le chiffré d'un message $m$ est :
+$$E(m) := \sum_{i=0}^{p-1} m_ic_i \pmod{p^h-1}.$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{Déchiffrement}
+  Pour déchiffrer, nous calculons :
+$$G(t) := g^{E(m) - hd},$$
+vu comme un polynôme en $t$ à coefficients dans $\gf{p}$ et de degré au plus $h-1$. Comme $g$ est primitif dans $\gf{p^h}$, i.e. l'ordre de $g$ est $p^h-1$, l'exposant $E(m) - hd$ est à déterminer modulo $p^h-1$ :
+$$E(m) - hd \equiv  \sum_{i=0}^{p-1} m_i\log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}.$$
+\end{frame}
+\begin{frame}
+  \frametitle{Déchiffrement}
+D'où, l'égalité dans $\gf{p^h}$ :
+$$G(t) = g^{E(m) - hd} = \prod_{i=0}^{p-1} \left(t+\alpha_{\sigma(i)}\right)^{m_i} = \prod_{m_i = 1} \left(t+\alpha_{\sigma(i)}\right).$$
+Cela donne l'expression de l'élément $G(t)$ dans la base $(1,t,t^2, \dots, t^{h-1})$ du $\gf{p}$-espace vectoriel $\gf{p^h}$, où $t = X \pmod{\mu(X)}$. Ainsi :
+$$G(X) \equiv \prod_{m_i = 1} \left(X+\alpha_{\sigma(i)}\right) \pmod{\mu(X)}.$$
+Il existe donc un polynôme $\lambda(X) \in \gf{p}[X]$ tel que : $$G(X) = \lambda(X) \mu(X) + \prod_{m_i = 1} \left(X+\alpha_{\sigma(i)}\right).$$
+\end{frame}
+\begin{frame}
+  \frametitle{Déchiffrement}
+En raisonnant sur les degrés, et comme $\mu(X)$ et $\prod \left(X+\alpha_{\sigma(i)}\right)^{m_i}$ sont unitaires, nous déduisons  $\lambda(X) = -1$, dont il découle l'égalité de polynômes :
+$$G(X) + \mu(X) = \prod_{m_i = 1} \left(X+\alpha_{\sigma(i)}\right).$$
+Ainsi, la factorisation de $G(X)+\mu(X)$ permet de recouvrer le message $m$.
+\end{frame}
 
 \section{La cryptanalyse de Serge Vaudenay}
 \subsection{L'équivalence entre les clés privées}
 \begin{frame}
-	\frametitle{}
-  	
-\end{frame} 
+	\frametitle{L'équivalence entre les clés privées}
+Nous pouvons remplacer $t$ et $g$ par leur puissance $p$-ième, la clé publique reste inchangée car :
+$$\log_{g^p}\left(t^p + \alpha_{\sigma(i)}\right) = \frac{1}{p}\log_{g}\left(\left(t + \alpha_{\sigma(i)}\right)^p\right) = \log_{g}\left(t + \alpha_{\sigma(i)}\right).$$
+Nous pouvons aussi remplacer $(t, \alpha_{\sigma})$ par $(t + v, \alpha_{\sigma} - v)$, pour tout $v \in \gf{p}$. Et enfin, nous pouvons remplacer $(t,d,\alpha_\sigma)$ par $(ut, d - \log_g(u), u\alpha_\sigma)$, quel que soit $u \in \gf{p}^\times$.
+Cela donne donc, en général, au moins $hp(p-1)$ clés privées équivalentes.
+\end{frame}
 
 \subsection{Les étapes de la cryptanalyse}
 \begin{frame}
-	\frametitle{}
-  	
-\end{frame} 
+	\frametitle{Le polynôme de la cryptanalyse}
+        Serge Vaudenay définit le polynôme suivant pour sa cryptanalyse:
+
+$$Q(X) = (g_{p^r})^{d} \prod_{i=0}^{h/r-1} \left(X+t^{p^{ri}}\right), \quad \text{ où } g_{p^r} := \prod_{i=0}^{h/r-1} g^{p^{ri}}.$$
+        \begin{prop}
+Pour tout facteur $r$ de $h$, l'élément $g_{p^r}$ est générateur du groupe multiplicatif du sous-corps $\gf{p^r}$ de $\gf{p^h}$ et $Q(X) \in \gf{p^r}[X]$ est de degré $h/r$, tel que $-t$ en est une racine, et tel que:
+$$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i},\qquad \forall i : 0\leqslant i \leqslant p-1.$$
+\end{prop}
+\end{frame}
 
 \section{Le calcul de logarithme discret selon Antoine Joux}
 \subsection{La méthode de calcul d'indice}
 \begin{frame}
 	\frametitle{}
-  	
-\end{frame} 
+
+\end{frame}
 
 \subsection{Les idées d'Antoine Joux}
 \begin{frame}
 	\frametitle{}
-  	
+
 \end{frame}
 
 \end{document}
