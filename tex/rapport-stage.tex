@@ -730,7 +730,7 @@ $$Q(X) = (g_{p^r})^{d} \prod_{i=0}^{h/r-1} \left(X+t^{p^{ri}}\right),
 \quad \text{ où } g_{p^r} := \prod_{i=0}^{h/r-1} g^{p^{ri}}.$$
 
 \begin{prop}\label{prop:vaudenay}
-Pour tout facteur $r$ de $h$, l'élément $g_{p^r}$ est générateur du groupe multiplicatif du sous-corps $\gf{p^r}$ de $\gf{p^h}$ et $Q(X) \in \gf{p^r}[X]$ est de degré $h/r$, tel que $-t$ en est une racine, et tel que:
+Pour tout facteur $r$ de $h$, l'élément $g_{p^r}$ est générateur du groupe multiplicatif du sous-corps $\gf{p^r}$ de $\gf{p^h}$ et $Q(X) \in \gf{p^r}[X]$ est de degré $h/r$, tel que $-t$ en est une racine, et:
 $$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i},\qquad \forall i : 0\leqslant i \leqslant p-1.$$
 \end{prop}
 
@@ -1188,7 +1188,7 @@ Il s'ensuit la résolution dudit système linéaire donné par les équations pr
 
 Enfin, comme nous cherchons à déterminer le logarithme d'un élément arbitraire du corps, on passe à la \textit{phase de logarithme individuel}. L'essence de l'idée est ici d'exprimer l'élément arbitraire en fonction des éléments de la base de friabilité, pour en déduire son logarithme.
 
-En résumé, un algorithme implémentant la méthode du calcul d'indice peut se diviser en quatre étapes : \begin{enumerate}
+En résumé, un algorithme implémentant la méthode du calcul d'indice peut se diviser en quatre étapes: \begin{enumerate}
 \item le changement de représentation du corps et le choix de la base de friabilité,
 \item la phase de collecte de relations entre les éléments de la base de friabilité,
 \item la phase d'algèbre linéaire pour déterminer le logarithme de chaque élément de la base de friabilité,
@@ -1403,7 +1403,7 @@ pour $\theta \in \gf{q^2}$ et $(a,b,c,d) \in \gf{q^2}^4$. Ce que Joux \cite{joux
 
 Notons $p$ la caractéristique du corps fini, soit $\ell$ tel que $q = p^\ell$ et posons $r := \floor{\ell/2}$. Si $Y = X^{p^{r}}$ alors, par définition de notre corps:
 $$Y^{qp^{-r}} = X^q = \frac{h_0(X)}{h_1(X)}.$$
-Si $h_0(X)$ ou $h_1(X)$ est de degré $2$ ou plus, il faut recourir à un légère variation par rapport à la descente special-$\mathfrak{q}$. À	savoir, là où dans \ref{s-sec:special-q} on considérait une relation de la forme $U(X,f(X)) = U(g(Y),Y)$, on considère ici la relation:
+Si $h_0(X)$ ou $h_1(X)$ est de degré $2$ ou plus, il faut recourir à un légère variation par rapport à la descente special-$\mathfrak{q}$. À savoir, là où dans \ref{s-sec:special-q} on considérait une relation de la forme $U(X,f(X)) = U(g(Y),Y)$, on considère ici la relation:
 $${\left({U(X,X^{p^r})}\right)}^{qp^{-r}} = U'\left( X^{qp^{-r}},\frac{h_0(X)}{h_1(X)}\right),$$
 où $U'(X,Y) \in \gf{q^2}[X,Y]$ est obtenu à partir de $U(X,Y)\in \gf{q^2}[X,Y]$ en élevant ses coefficients à la puissance $qp^{-r}$.
 
@@ -1411,7 +1411,7 @@ Comme cette méthode est coûteuse si nous souhaitons atteindre les éléments d
 
 \paragraph{Phase 2: descente basée sur un système bilinéaire.}L'idée de cette descente qui vient compléter la descente classique précédente est: étant donné un polynôme $H(X)$, nous cherchons une paire de polynômes de bas degré, $k_1(X)$ et $k_2(X)$, de $\gf{q^2}[X]$, tels que $H(X)$ divise la différence $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$. Ainsi, la relation:
 $$(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \equiv (k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \quad (\operatorname{rem}I_k(X)).$$
-a un facteur égal à $H(X)$ dans le membre de droite et le membre de gauche se factorise en polynômes de degré au plus $D$,. Comme le degré total du membre de droite est majoré par un petit multiple de $D$ (lié au degré de $h_0$ et $h_1$), avec un bonne probabilité, nous obtenons une relation polynomiale entre $H(X)$ et des polynômes de degré au plus $D$.
+a un facteur égal à $H(X)$ dans le membre de droite et le membre de gauche se factorise en polynômes de degré au plus $D$. Comme le degré total du membre de droite est majoré par un petit multiple de $D$ (lié au degré de $h_0$ et $h_1$), avec un bonne probabilité, nous obtenons une relation polynomiale entre $H(X)$ et des polynômes de degré au plus $D$.
 
 Reste à construire de tels polynômes $k_1(X)$ et $k_2(X)$. Antoine Joux \cite{joux2013} remarque que la condition $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$ s'annule modulo $H(X)$ se réécrit comme un système d'équations multivariées sur $\gf{q}$, qui peut être efficacement résolue par des méthodes de résolutions à l'aide de bases de Gröbner.
 Ce système est même bilinéaire en $k_1(X)$ et $k_2(X)$ puisque chaque monôme qui apparaît dans le système contient au plus une inconnue provenant de $k_1(X)$ et une de $k_2(X)$.

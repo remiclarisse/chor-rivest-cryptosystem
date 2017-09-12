@@ -91,6 +91,7 @@
 	\titlepage
 \end{frame}
 
+\section*{Le sommaire}
 \begin{frame}
 	\frametitle{Sommaire}
   	\tableofcontents[hidesubsections]
@@ -215,9 +216,9 @@ Soient $p$ un nombre premier et $h \geqslant 2$ un entier. Il existe une suite $
 \end{theo}
 \end{frame}
 
-\subsection{Génération des clés}
+\subsection{La génération des clés}
 \begin{frame}
-  \frametitle{Génération des clés}
+  \frametitle{La génération des clés}
   Soient $p$ une puissance non-nulle de nombre premier et $h \geqslant 2$ un entier naturel. Considérons le corps fini à $p^h$ élément, noté $\gf{p^h}$, ainsi qu'une numérotation $\alpha$ du sous-corps de base $\gf{p}$, à savoir $$\{\alpha_0,\dots, \alpha_{p-1}\} = \gf{p} \subset \gf{p^h}.$$
 
   \begin{itemize}
@@ -233,30 +234,30 @@ Soient $p$ un nombre premier et $h \geqslant 2$ un entier. Il existe une suite $
   \end{itemize}
 \end{frame}
 
-\subsection{Chiffrement et déchiffrement}
+\subsection{Le chiffrement et le déchiffrement}
 \begin{frame}
-  \frametitle{Chiffrement}
+  \frametitle{Le chiffrement}
   L'espace des chiffrés est $\Z/(p^h-1)\Z$ et le chiffré d'un message $m$ est :
 $$E(m) := \sum_{i=0}^{p-1} m_ic_i \pmod{p^h-1}.$$
 \end{frame}
 
 \begin{frame}
-  \frametitle{Déchiffrement}
+  \frametitle{Le déchiffrement}
   Pour déchiffrer, nous calculons :
 $$G(t) := g^{E(m) - hd},$$
 vu comme un polynôme en $t$ à coefficients dans $\gf{p}$ et de degré au plus $h-1$. Comme $g$ est primitif dans $\gf{p^h}$, i.e. l'ordre de $g$ est $p^h-1$, l'exposant $E(m) - hd$ est à déterminer modulo $p^h-1$ :
 $$E(m) - hd \equiv  \sum_{i=0}^{p-1} m_i\log_g\left(t + \alpha_{\sigma(i)}\right) \pmod{p^h-1}.$$
 \end{frame}
 \begin{frame}
-  \frametitle{Déchiffrement}
+  \frametitle{Le déchiffrement}
 D'où, l'égalité dans $\gf{p^h}$ :
 $$G(t) = g^{E(m) - hd} = \prod_{i=0}^{p-1} \left(t+\alpha_{\sigma(i)}\right)^{m_i} = \prod_{m_i = 1} \left(t+\alpha_{\sigma(i)}\right).$$
-Cela donne l'expression de l'élément $G(t)$ dans la base $(1,t,t^2, \dots, t^{h-1})$ du $\gf{p}$-espace vectoriel $\gf{p^h}$, où $t = X \pmod{\mu(X)}$. Ainsi :
+Cela donne l'expression de l'élément $G(t)$ dans la base $(1,t,t^2, \dots, t^{h-1})$, où $t = X \pmod{\mu(X)}$. Ainsi :
 $$G(X) \equiv \prod_{m_i = 1} \left(X+\alpha_{\sigma(i)}\right) \pmod{\mu(X)}.$$
 Il existe donc un polynôme $\lambda(X) \in \gf{p}[X]$ tel que : $$G(X) = \lambda(X) \mu(X) + \prod_{m_i = 1} \left(X+\alpha_{\sigma(i)}\right).$$
 \end{frame}
 \begin{frame}
-  \frametitle{Déchiffrement}
+  \frametitle{Le déchiffrement}
 En raisonnant sur les degrés, et comme $\mu(X)$ et $\prod \left(X+\alpha_{\sigma(i)}\right)^{m_i}$ sont unitaires, nous déduisons  $\lambda(X) = -1$, dont il découle l'égalité de polynômes :
 $$G(X) + \mu(X) = \prod_{m_i = 1} \left(X+\alpha_{\sigma(i)}\right).$$
 Ainsi, la factorisation de $G(X)+\mu(X)$ permet de recouvrer le message $m$.
@@ -279,22 +280,313 @@ Cela donne donc, en général, au moins $hp(p-1)$ clés privées équivalentes.
 
 $$Q(X) = (g_{p^r})^{d} \prod_{i=0}^{h/r-1} \left(X+t^{p^{ri}}\right), \quad \text{ où } g_{p^r} := \prod_{i=0}^{h/r-1} g^{p^{ri}}.$$
         \begin{prop}
-Pour tout facteur $r$ de $h$, l'élément $g_{p^r}$ est générateur du groupe multiplicatif du sous-corps $\gf{p^r}$ de $\gf{p^h}$ et $Q(X) \in \gf{p^r}[X]$ est de degré $h/r$, tel que $-t$ en est une racine, et tel que:
+Pour tout facteur $r$ de $h$, l'élément $g_{p^r}$ est générateur du groupe multiplicatif du sous-corps $\gf{p^r}$ de $\gf{p^h}$ et $Q(X) \in \gf{p^r}[X]$ est de degré $h/r$, tel que $-t$ en est une racine, et:
 $$Q\left(\alpha_{\sigma(i)}\right) = (g_{p^r})^{c_i},\qquad \forall i : 0\leqslant i \leqslant p-1.$$
 \end{prop}
 \end{frame}
 
+\begin{frame}
+  \frametitle{La recherche du $g_{p^r}$}
+  \begin{prop}
+Soit $Q(X)$ un polynôme de $\gf{p^r}[X]$ de degré $d$ et soit $e$ un entier tel que $1 \leqslant e < (p-1)/d$. Alors : $$\sum_{a \in \gf{p}} Q(a)^e = 0.$$
+\end{prop}
+Cette proposition permet de donner un critère de selection pour $g_{p^r}$, à savoir pour tout $1 \leqslant e < (p-1)r/h$ :
+$$\sum_{i=0}^{p-1} (g_{p^r})^{ec_i} = 0.$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{La recherche du $g_{p^r}$}
+   Par exemple, on peut considérer $r=1$ et trouver les seuls $g_p$ tels que pour tout $1 \leqslant e < (p-1)/h$ :
+   $$\sum_{i=0}^{p-1} (g_p)^{ec_i} = 0.$$
+   La complexité moyenne pour vérifier un candidat est $\O(p)$ $\gf{p}$-opérations, et il est peu probable qu'un mauvais candidat ne soit pas détecté par le cas $e = 1$.
+   Si on a calculé des $g_{p^{r_i}}$ dans des petits sous-corps $\gf{p^{r_i}}$, on peut s'aider de ceux-ci pour calculer un $g_{p^r}$ dans un plus grand sous-corps.
+\end{frame}
+
+\begin{frame}
+  \frametitle{La recherche du $g_{p^r}$}
+  \begin{center}
+    \scalebox{0.65}{
+      \begin{minipage}{1.3\linewidth}
+        \begin{algorithm}[H]
+          \caption{Algorithme pour récupérer $g_{p^r}$ à partir des $g_{p^{r_i}}$}
+          \label{algo:gprFromgpri}
+          \begin{algorithmic}[1]
+            \REQUIRE $(c_0,\dots, c_{p-1})$, $r$ divisant $h$, ${\{r_i\}}_{1\leqslant i\leqslant k}$ diviseurs de $r$ et $g_{p^{r_i}}$
+            \ENSURE l'ensemble des $g_{p^r}$ possibles
+            \STATE{choisir $\gamma$ un élément primitif de $\gf{p^r}$}
+            \FORALL{$i$ allant de $1$ à $k$}
+	    \STATE{résoudre l'équation: $$x_i = \frac{\log(g_{p^{r_i}})}{1+p^{r_i}+p^{2r_i}+p^{3r_i}+\cdots+p^{r-r_i}} \pmod{p^{r_i}-1}$$}
+            \ENDFOR
+            \STATE{$\ell \gets \ppcm \left\{p^{r_1} - 1, p^{r_2}-1, \dots, p^{r_k} -1\right\}$}
+            \STATE{résoudre $x \equiv x_i \pmod{p^{r_i}-1}$, pour $1 \leqslant i \leqslant k$ et où $x$ est unique modulo $\ell$ (CRT)}
+            \FOR{$y$ allant de $0$ à $(p^r-1)/\ell - 1$}\label{boucle:algogprFromgpri}
+	    \FOR{$e$ allant de $1$ à $(p-1)r/h - 1$}
+	    \IF{$\sum_{i=0}^{p-1} \gamma^{ec_i(x+\ell y)} \neq 0$}
+	    \STATE{continuer la boucle ligne~\ref{boucle:algogprFromgpri}}
+	    \ENDIF
+	    \ENDFOR
+	    \STATE{ajouter $\gamma^{x+\ell y}$ à la liste des $ g_{p^r}$ possibles}
+            \ENDFOR
+          \end{algorithmic}
+        \end{algorithm}
+    \end{minipage}}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{L'interpolation du polynôme $Q(X)$}
+  On interpole le polynôme $Q(X)$ en les éléments $\alpha_{\sigma(j)}$ pour $j$ tel que $0 \leqslant j \leqslant h/r$.
+  Pour $j$ tel que $0\leqslant j \leqslant h/r$, on note $\mathcal L_{j,\sigma}(X)$ le \textit{$j$-ème polynôme interpolateur de Lagrange} :
+$$\mathcal L_{j,\sigma}(X) := \prod_{\substack{0\leqslant k\leqslant h/r \\ k \neq j}}\frac{X-\alpha_{\sigma(k)}}{\alpha_{\sigma(j)}-\alpha_{\sigma(k)}}.$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{L'interpolation du polynôme $Q(X)$}
+   L'interpolation du polynôme $Q(X)$ en les $\alpha_{\sigma(j)}$, pour $0 \leqslant j \leqslant h/r$, donne:
+$$ Q(X) = \sum_{j=0}^{h/r} Q\left(\alpha_{\sigma(j)}\right) \mathcal L_{j,\sigma}(X) = \sum_{j=0}^{h/r} (g_{p^r})^{c_{j}} \mathcal L_{j,\sigma}(X),$$
+ce qui donne:
+\begin{equation}\label{eqn:interpolation}
+(g_{p^r})^{c_i} = \sum_{j=0}^{h/r} (g_{p^r})^{c_{j}} \mathcal L_{j,\sigma}(\alpha_{\sigma(i)}),\qquad \forall i : 0\leqslant i \leqslant p-1.
+\end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{La recherche du $\sigma$}
+  Selon Serge Vaudenay, si $r \geqslant h/r$, alors la famille $\left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$ est $\gf{p}$-libre.
+
+  Cela signifie que les coefficients dans l'équation (\ref{eqn:interpolation}) sont les seuls coefficients dans $\gf{p}$ de l'écriture du vecteur $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$, pour $1\leqslant i \leqslant p-1$, comme combinaison linéaire des vecteurs : $$(g_{p^r})^{c_{1}} - (g_{p^r})^{c_{0}},\quad \dots,\quad (g_{p^r})^{c_{{h/r}}} - (g_{p^r})^{c_{0}}.$$
+
+  Notons $a_j^i$ le coefficient de $(g_{p^r})^{c_{{j}}} - (g_{p^r})^{c_{0}}$ pour $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$, où $i , j\geqslant 1$. Il existe $\nu$ dans $\gf{p}$, indépendant de $i$, tel que :
+\begin{equation}\label{eqn:coeff}
+\frac{a_2^i}{a_1^i} = \nu \frac{\alpha_{\sigma(i)}-\alpha_{\sigma(1)}}{\alpha_{\sigma(i)}-\alpha_{\sigma(2)}}\quad\Leftrightarrow\quad
+\alpha_{\sigma(i)} = \frac{a_2^i\alpha_{\sigma(2)}-\nu a_1^i\alpha_{\sigma(1)}}{a_2^i-\nu a_1^i}.
+\end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{La recherche du $\sigma$}
+  \begin{center}
+    \scalebox{0.75}{
+      \begin{minipage}{1.3\linewidth}
+        \begin{algorithm}[H]
+          \caption{Algorithme pour trouver $\sigma$ sachant $g_{p^r}$ lorsque $r\geqslant \sqrt h$}
+          \begin{algorithmic}[1]
+            \REQUIRE $(c_0,\dots, c_{p-1})$, $r$ divisant $h$ tel que $r\geqslant \sqrt h$ et $g_{p^r}$
+            \ENSURE une permutation $\sigma$
+            \STATE{choisir arbitrairement $\sigma(1)$ et $\sigma(2)$ distincts dans $\{0, \dots, p-1\}$}
+            \FORALL{$\nu$ dans $\gf{p}$}
+	    \FOR{$i$ allant de $h/r+1$ à $p-1$}
+	    \STATE{écrire $(g_{p^r})^{c_{i}} - (g_{p^r})^{c_{0}}$ dans la base $\left((g_{p^r})^{c_{j}} - (g_{p^r})^{c_{0}} \right)_{1\leqslant j \leqslant h/r}$}
+	    \STATE{récupérer les coefficients $a_1^i$ et $a_2^i$}
+	    \STATE{trouver la valeur de $\sigma(i)$ grâce à l'équation (\ref{eqn:coeff})}
+	    \ENDFOR
+	    \STATE{compléter $\sigma$ en cherchant exhaustivement $\sigma(0)$ et $\sigma(j)$ pour $3 \leqslant j \leqslant h/r$}
+	    \IF{$\sigma$ vérifie les équations (\ref{eqn:interpolation})}
+	    \RETURN{$\sigma$}
+	    \ENDIF
+            \ENDFOR
+          \end{algorithmic}
+        \end{algorithm}
+    \end{minipage}}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{La recherche du $t$}
+   Le polynôme $Q(X)$ est interpolé sur les $h/r +1$ paires ${(\alpha_{\sigma(i)}, ( g_{p^r})^{c_i})}$. Cela donne un polynôme de degré $h/r$ dont les racines sont les conjugués de $- t$.  Par équivalence entre clés privées, nous pouvons sélectionner l'opposé de n'importe quelle racine du polynôme $Q(X)$.
+    \begin{center}
+      \scalebox{0.75}{
+        \begin{minipage}{1.3\linewidth}
+          \begin{algorithm}[H]
+            \caption{Algorithme pour trouver $t$ sachant $g_{p^r}$ et $\sigma$}
+            \begin{algorithmic}[1]
+              \REQUIRE $(c_0,\dots, c_{p-1})$, $\sigma$, $r$ divisant $h$ et $g_{p^r}$
+              \ENSURE $t, t^{p^r}, t^{p^{2r}}, \dots, t^{p^{h - r}}$
+              \STATE{$Q(X) \in \gf{p^r}[X]$ : initialiser $Q(X) \gets 0$}
+              \FOR{$j$ allant de $0$ à $h/r$}
+              \STATE{$Q(X) \gets Q(X) + (g_{p^r})^{c_j} \mathcal L_{j,\sigma}(X)$}
+              \ENDFOR
+            \RETURN{$[-x \in \gf{p^h}$ pour $x$ racine du polynôme $Q(X) ]$}
+            \end{algorithmic}
+          \end{algorithm}
+      \end{minipage}}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{La recherche du $t$}
+  Par équivalence entre clés privées, nous avons calculé les éléments $t$ et $\sigma$ d'une clé privée permettant de produire la clé publique ${(c_i)}_{0 \leqslant i \leqslant p-1}$. Pour compléter cette clé, il nous faut construire $g$ et $d$ satisfaisant à:
+  $$c_i = d + \log_g(t+\alpha_{\sigma(i)}) \pmod{p^h -1},\qquad \forall i : 0\leqslant i \leqslant p-1.$$
+  Ainsi, prenons $\gamma$ un élément primitif de $\gf{p^h}$ et posons $b_i := \log_{\gamma}\left(t +\alpha_{\sigma(i)}\right)$. Notons $L := \log_\gamma(g)$, de sorte que $g = \gamma^L$. Alors, pour tout $i$ tel que $0 \leqslant i \leqslant p-1$:
+$$ b_i - b_0 = L(c_i - c_0).$$
+  Par conséquence, s'il existe un $i$ tel que $(c_i - c_0)$ est inversible modulo $p^h - 1$, nous retrouvons la valeur de $L$ par:
+  $$L = (b_i - b_0)(c_i - c_0)^{-1} \pmod{p^h-1}.$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{La recherche de $g$ et $d$}
+  \begin{center}
+    \scalebox{0.75}{
+      \begin{minipage}{1.3\linewidth}
+        \begin{algorithm}[H]
+          \caption{Attaque de Goldreich}
+          \begin{algorithmic}[1]
+            \REQUIRE $(c_0,\dots, c_{p-1})$, $t$ et $\sigma$
+            \ENSURE $g$ et $d$
+            \STATE{choisir $\gamma$ un élément primitif arbitraire de $\gf{p^h}$}
+            \STATE{calculer les $b_i := \log_{\gamma}(t+\alpha_{\sigma(i)})$}
+            \STATE{$B \gets [ b_i - b_0 \pmod{p^h-1}$ pour $i$ allant de $0$ à $p-1 ] $}
+            \STATE{$C \gets [ c_i - c_0 \pmod{p^h-1}$ pour $i$ allant de $0$ à $p-1 ] $}
+            \FOR{$i$ allant de $0$ à $p-1$}
+            \IF{$\pgcd(C[i], p^h-1) = 1$}
+            \STATE{$L \gets C[i]^{-1}B[i] \pmod{p^h-1}$}
+            \STATE{$D \gets [L\cdot C[j]$ pour $j$ allant de $0$ à $p-1 ]$}
+            \IF{$D = B$}
+            \STATE{$g \gets \gamma^L$}
+            \STATE{$d \gets c_0 - \log_g(t+\alpha_{\sigma(0)}) \pmod{p^h -1}$}
+            \RETURN{$g, d$}
+            \ENDIF
+            \ENDIF
+            \ENDFOR
+          \end{algorithmic}
+        \end{algorithm}
+    \end{minipage}}
+  \end{center}
+\end{frame}
+
 \section{Le calcul de logarithme discret selon Antoine Joux}
+\begin{frame}
+  \frametitle{Remarques liminaires}
+  Soient $q$ une puissance non-nulle de nombre premier et $Q := q^k$ une puissance de $q$. On souhaite dans la suite résoudre le problème du logarithme discret dans $\gf{Q}$, un corps fini à $Q$ éléments. On adopte la notation suivante pour donner la \textit{complexité d'un algorithme} :
+  $$L_{Q}(\alpha, c) := \exp\left({(c+\o(1))(\log Q)^\alpha(\log\log Q)^{1 - \alpha}}\right),$$
+  où $0 \leqslant \alpha\leqslant 1$ et $c > 0$.
+
+  \begin{defi}
+Un polynôme $P(X) \in \gf{q}[X]$ est dit \textit{$d$-friable} s'il se factorise en produit de polynômes de $\gf{q}[X]$ de degré au plus $d$.
+\end{defi}
+\end{frame}
+
 \subsection{La méthode de calcul d'indice}
 \begin{frame}
-	\frametitle{}
-
+  \frametitle{La méthode de calcul d'indice}
+   Un algorithme implémentant la méthode du calcul d'indice peut se diviser en quatre étapes:
+   \begin{enumerate}
+\item le changement de représentation du corps et le choix de la base de friabilité,
+\item la phase de collecte de relations entre les éléments de la base de friabilité,
+\item la phase d'algèbre linéaire pour déterminer le logarithme de chaque élément de la base de friabilité,
+\item la phase de logarithme individuel qui permet de d'obtenir le logarithme de n’importe quel élément du corps.
+\end{enumerate}
 \end{frame}
 
 \subsection{Les idées d'Antoine Joux}
 \begin{frame}
-	\frametitle{}
+  \frametitle{Utiliser des homographies}
+  Si on a un polynôme qui se factorise, on souhaite lui appliquer une transformation afin d'obtenir d'autres polynômes qui se factorisent eux aussi. Pour cela, on considère la transformation induite par les homographies, à savoir :
+$$X \mapsto \frac{aX+b}{cX+d}.$$
 
+  Cependant, faire ce changement de variable ne donne pas un polynôme : si $f(X) \in\gf{q}[X]$ est un polynôme, ce n'est pas forcement le cas de $f((aX+b)/(cX+d))$. Ainsi, nous considérons plutôt l'évaluation homogène d'un polynôme, i.e. pour un polynôme $f(X)$ de $\gf{q}[X]$, dont on note $\deg f$ le degré, on considère le polynôme :
+  $$F_{a,b,c,d}(X) := (cX+d)^{\deg f} f \left(\frac{aX+b}{cX+d}\right).$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{Utiliser un polynôme toujours scindé}
+  La seconde idée découle directement de la première. Comme on sait faire plusieurs \og{}copies\fg{} d'un polynôme, on souhaite considérer un polynôme qui se factorise agréablement. Sur $\gf{q}$, un candidat naturel est : $$X^q -X = \prod_{\gamma\in\gf{q}} X-\gamma.$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{Utiliser une bonne représentation du corps}
+  L'image de $X^q-X$ par une homographie est un polynôme combinaison linéaire des monômes $X^{q+1}$, $X^q$, $X$ et $1$. Pour obtenir une relation multiplicative, on désire donc trouver une représentation du corps fini qui transforme le polynôme $X^q$ en un polynôme de bas degré. Une façon de faire est de demander la satisfaction dans $\gf{q^k}$ de la relation :
+  $$x^q = \frac{h_0(x)}{h_1(x)}.$$
+  Cela défini le corps $\gf{q^k}$ si, et seulement si, le polynôme $h_1(X)X^q - h_0(X)$ admet un facteur irréductible $I_k(X)$ de degré $k$, et alors $x = X \pmod{I_k(X)}$ vérifie bien la relation demandée.
+\end{frame}
+
+\subsection{Les étapes de l'algorithme}
+\begin{frame}
+  \frametitle{Changer la représentation du corps}
+  Étant donné un corps $\gf{p^n}$ de petite caractéristique, nous commençons par l'imbriquer dans un corps de la forme $\gf{q^{2k}}$, avec $k \leqslant q$. Cela se fait, par exemple, en prenant une extension de degré $e$ de $\gf{p^n}$, où $e \leqslant 2 \ceil{\log_p n}$.
+
+  Ensuite, le corps fini $\gf{q^{2k}}$ est construit comme une extension de degré $k$ de $\gf{q^2}$. Plus précisément, nous appliquons la troisième idée du paragraphe: on choisit deux polynômes $h_0(X)$ et $h_1(X)$ de $\gf{q^2}[X]$ de bas degré de sorte que $h_1(X)X^q - h_0(X)$ ait un facteur irréductible $I_k(X)$ de degré $k$.
+
+Et en fait, Antoine Joux indique que nous pouvons même nous limiter aux polynômes de degré 2, et espérer malgré tout avoir une bonne représentation de notre corps.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Déterminer les logarithmes des polynômes linéaires}
+  Pour générer les relations, partons de l'identité polynomiale:
+  \begin{equation}\label{eqn:identitySplit}
+  \prod_{\gamma\in\gf{q}} (X-\gamma) = X^q-X,
+  \end{equation}
+  et appliquons la transformation homographique $X \mapsto (aX+b)/(cX+d)$, où $(a,b,c,d)\in\gf{q^2}^4$ satisfait à $ad\neq bc$, puis multiplions par $(cX+d)^{q+1}$, ce qui donne d'une part, en prenant seulement le membre de gauche de l'équation~\ref{eqn:identitySplit}:
+  $$(cX+d) \prod_{\gamma\in\gf{q}} ((a-\gamma c)X+b-\gamma d),$$
+  et d'autre part, en considérant uniquement le membre de droite :
+  $$(aX+b)^q(cX+d) - (aX+b)(cX+d)^q$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{Déterminer les logarithmes des polynômes linéaires}
+  D'où, en développant le membre de droite et en réduisant modulo $I_k(X)$:
+  $$(a^qc - ac^q)Xh_0(X) + (a^qd - bc^q)h_0(X) + (b^qc - ad^q)Xh_1(X)$$
+  $$\qquad\qquad\qquad\qquad\qquad\qquad + (b^qd - bd^q)h_1(X)$$
+  $$= h_1(X)(cX+d) \prod_{\gamma\in\gf{q}}((a-\gamma c)X + (b-\gamma d)).$$
+  Par conséquence, nous obtenons une égalité dans $\gf{q^2}[X]/(I_k(X)) \cong \gf{q^{2k}}$ entre un produit de polynômes linéaires et $h_1(X)$ d'une part et un polynôme de bas degré d'autre part. En ajoutant $h_1(X)$ à la base de friabilité, nous obtenons une relation satisfaisante dès que le membre de gauche se factorise en polynômes linéaires
+\end{frame}
+
+\begin{frame}
+  \frametitle{Compter les relations obtenues}
+  Le procédé ci-dessus génère une relation candidate pour chaque quadruplet $(a,b,c,d) \in \gf{q^2}^4$. Cependant, certaines de ces relations sont générées plusieurs fois, avec des $(a,b,c,d)\in\gf{q^2}^4$ distincts. Pour cette raison, Antoine Joux préconise de prendre les coefficients $a,b,c,d$ dans $\gf{q^2}$. En étudiant l'action de $\operatorname{PGL}_2(\gf{q^2})$ sur la droite projective $\mathbb{P}_1(\gf{q})$ et du fait que $\operatorname{PGL}_2(\gf{q})$ laisse $\mathbb{P}_1(\gf{q})$ globalement invariant, Antoine Joux déduit le nombre d'équations candidates: $$\frac{q^6 - q^2}{q^3 - q} = q^3 + q.$$
+  Après un argument heuristique, Antoine Joux explique qu'il suffit de considérer $\O(q^2)$ quadruplets, en évitant ceux donnant des duplicatas, pour pouvoir passer à la phase d'algèbre linéaire sur les logarithmes des polynômes linéaires.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Phase 1 de la descente: descente special-$\mathfrak{q}$}
+  Notons $p$ la caractéristique du corps fini, soit $\ell$ tel que $q = p^\ell$ et posons $r := \floor{\ell/2}$. Si $Y = X^{p^{r}}$ alors, par définition de notre corps:
+  $$Y^{qp^{-r}} = X^q = \frac{h_0(X)}{h_1(X)}.$$
+   Soient $H(X)\in\gf{q}[X]$ le polynôme cible. Considérons l'ensemble des monômes :
+   $$\mathcal S_H = \{X^iY^j : 0 \leqslant i \leqslant D_\alpha(H), 0 \leqslant j \leqslant D_\beta(H)\}.$$
+   Chaque monôme dans $\mathcal S_H$ peut être exprimé comme un polynôme univarié en $X$ en substituant $Y$ par $f(X)$. Pour $m(X,Y)$ un monôme de $\mathcal S_H$, notons $V_H(m)(X)$ la valeur modulo $H(X)$ du polynôme univarié correspondant à $m(X,Y)$, qui peut être représenté par un vecteur $V_H(m)$ à $\deg H(X)$ coefficients dans le corps fini $\gf{q}$.
+\end{frame}
+   
+\begin{frame}
+  \frametitle{Phase 1 de la descente: descente special-$\mathfrak{q}$}
+   Construisons une matrice $M_H$ dont les colonnes sont les vecteurs $V_H(m)$ pour $m(X,Y) \in \mathcal S_H$. À chaque vecteur du noyau de $M_H$, on peut associer une combinaison linéaire d'éléments de $\mathcal S_H$, qui est un polynôme $U(X,Y)$, tel que $U(X,f(X))$ est divisible par $H(X)$. Si, à la fois, $U(X,f(X))/H(X)$ et $U(g(Y),Y)$ se factorisent en polynômes de degré petit, on obtient une relation.
+
+  Au lieu de considérer une relation de la forme $U(X,f(X)) = U(g(Y),Y)$, on considère ici la relation:
+$${\left({U(X,X^{p^r})}\right)}^{qp^{-r}} = U'\left( X^{qp^{-r}},\frac{h_0(X)}{h_1(X)}\right),$$
+où $U'(X,Y) \in \gf{q^2}[X,Y]$ est obtenu à partir de $U(X,Y)\in \gf{q^2}[X,Y]$ en élevant ses coefficients à la puissance $qp^{-r}$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Phase 2 de la descente: descente système bilinéaire}
+  Étant donné un polynôme $H(X)$, nous cherchons une paire de polynômes de bas degré, $k_1(X)$ et $k_2(X)$, de $\gf{q^2}[X]$, tels que $H(X)$ divise la différence $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$.
+  Reste à construire de tels polynômes $k_1(X)$ et $k_2(X)$. Antoine Joux remarque que la condition $(k_1(X)^qk_2(X)-k_1(X)k_2(X)^q) \pmod{I_k(X)}$ s'annule modulo $H(X)$ se réécrit comme un système d'équations multivariées sur $\gf{q}$, qui peut être résolue par des méthodes de résolutions à l'aide de bases de Gröbner.
+
+  La condition déterminée par Antoine Joux pour que le système précédent admette une solution avec une bonne probabilité est:
+$$\deg k_1(X) + \deg k_2(X) \geqslant \deg H(X) + 1.$$
+\end{frame}
+
+\subsection{La compléxité de l'algorithme}
+\begin{frame}
+  \frametitle{La compléxité de l'algorithme}
+  La complexité atteint par cet algorithme est $L_{p^n}(1/4+\o(1))$, cependant l'algorithme de Razvan Barbulescu, Pierrick Gaudry, Antoine Joux et Emmanuel Thomé, publié aussi en 2013, atteint une complexité théorique qui est quasi-polynomiale.
+\end{frame}
+
+\section*{La conclusion}
+\begin{frame}
+  \frametitle{La conclusion}
+  En 2009, Luis Hern\'andez Encinas, Jaime Mu\~noz Masqué et Araceli Queiruga Dios donnent suite au papier de Serge Vaudenay en proposant des paramètres $(p,h)$ empêchant sa cryptanalyse, tout en s'assurant de la faisabilité du calcul du logarithme discret et de la résistance à l'attaque de Lagarias-Odlyzko. Ils calculent les logarithmes à l'aide de l'algorithme de Pohlig-Hellman.
+
+  Il semblerait que l'algorithme d'Antoine Joux ne soit pas compétitif, comparé à l'algorithme de Pohlig-Hellman, dans les corps où les logarithmes sont calculés pour le cryptosystème de Chor-Rivest.
+\end{frame}
+
+\section*{La conclusion}
+\begin{frame}
+  \frametitle{La conclusion}
+  En revanche, on peut se demander s'il existe une façon de n'avoir recours qu'aux phases de collecte de relations et d'algèbre linéaire de l'algorithme d'Antoine Joux, sans que cela ne menace la sécurité du système.
+
+  Ou encore, est-il possible de combiner Pohlig-Hellman avec l'algorithme de Joux? Cela paraît peu probable, même si nous ne pouvons l'affirmer.
+  
+  Enfin, on peut se poser la question de la resistance du cryptosystème si on se place dans un corps comme $\gf{p^h}$ avec $h$ premier et $p$ une puissance première de $2$, ainsi que
+de l'efficacité de l'algorithme de Joux dans ce cas particulier.
 \end{frame}
 
 \end{document}
