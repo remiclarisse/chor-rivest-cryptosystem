@@ -203,6 +203,16 @@ $$g^{a_0} = h\cdot{(g^{-m})}^{a_1}.$$
   \end{center}
 \end{frame}
 
+\subsection{Les complexités}
+\begin{frame}
+  \frametitle{Les complexités}
+  Supposons que $g$ est d'ordre $n$ et notons $B$ son plus grand diviseur premier (on dit que $n$ est $B$-friable).
+
+  La recherche exhaustive a une complexité en $\O(n)$.
+
+  L'algorithme de Pohlig-Hellman en a une en $$\O(\log(n)^2 + B\log(n))$$ avec la recherche exhaustive dans les sous-groupes et en $$\O(\log(n)^2 + \sqrt{B}\log(n)/\log(B))$$ avec l'algorithme pas de bébé -- pas de géant.
+\end{frame}
+
 \section{Le cryptosystème de Chor-Rivest}
 \begin{frame}
 	\frametitle{Le théorème de Bose-Chowla}
@@ -414,7 +424,7 @@ ce qui donne:
 \end{frame}
 
 \begin{frame}
-  \frametitle{La recherche du $t$}
+  \frametitle{La recherche de $g$ et $d$}
   Par équivalence entre clés privées, nous avons calculé les éléments $t$ et $\sigma$ d'une clé privée permettant de produire la clé publique ${(c_i)}_{0 \leqslant i \leqslant p-1}$. Pour compléter cette clé, il nous faut construire $g$ et $d$ satisfaisant à:
   $$c_i = d + \log_g(t+\alpha_{\sigma(i)}) \pmod{p^h -1},\qquad \forall i : 0\leqslant i \leqslant p-1.$$
   Ainsi, prenons $\gamma$ un élément primitif de $\gf{p^h}$ et posons $b_i := \log_{\gamma}\left(t +\alpha_{\sigma(i)}\right)$. Notons $L := \log_\gamma(g)$, de sorte que $g = \gamma^L$. Alors, pour tout $i$ tel que $0 \leqslant i \leqslant p-1$:
@@ -440,18 +450,28 @@ $$ b_i - b_0 = L(c_i - c_0).$$
             \FOR{$i$ allant de $0$ à $p-1$}
             \IF{$\pgcd(C[i], p^h-1) = 1$}
             \STATE{$L \gets C[i]^{-1}B[i] \pmod{p^h-1}$}
-            \STATE{$D \gets [L\cdot C[j]$ pour $j$ allant de $0$ à $p-1 ]$}
-            \IF{$D = B$}
             \STATE{$g \gets \gamma^L$}
             \STATE{$d \gets c_0 - \log_g(t+\alpha_{\sigma(0)}) \pmod{p^h -1}$}
             \RETURN{$g, d$}
-            \ENDIF
             \ENDIF
             \ENDFOR
           \end{algorithmic}
         \end{algorithm}
     \end{minipage}}
   \end{center}
+\end{frame}
+
+\subsection{La complexité de la cryptanalyse}
+\begin{frame}
+  \frametitle{La complexité de la cryptanalyse}
+  Serge Vaudenay a décrit une attaque du cryptosystème, lorsque $h$ admet un facteur $r$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, ayant pour complexité $\O(h^3p^r/r^2)$.
+  
+  Nous avons implémenté l'attaque en SageMath, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 1 heure et demie en moyenne contre 15 minutes, pour les corps $\gf{197^{24}}$ et $\gf{211^{24}}$.
+  
+  Les préconisations de Serge Vaudenay pour réparer le cryptosystème de Chor-Rivest sont les suivantes : \begin{itemize}
+  \item choisir un corps fini $\gf{p^h}$ avec $p$ et $h$ tous les deux premiers,
+  \item ne pas divulguer tous les $c_i$ dans la clé publique.
+  \end{itemize}
 \end{frame}
 
 \section{Le calcul de logarithme discret selon Antoine Joux}
@@ -568,6 +588,49 @@ $$\deg k_1(X) + \deg k_2(X) \geqslant \deg H(X) + 1.$$
 \begin{frame}
   \frametitle{La compléxité de l'algorithme}
   La complexité atteint par cet algorithme est $L_{p^n}(1/4+\o(1))$, cependant l'algorithme de Razvan Barbulescu, Pierrick Gaudry, Antoine Joux et Emmanuel Thomé, publié aussi en 2013, atteint une complexité théorique qui est quasi-polynomiale.
+\end{frame}
+
+\section{La tentative d'adaptation}
+\begin{frame}
+  \frametitle{La tentative d'adaptation}
+   On veut déterminer le logarithme d'éléments de la forme $t + \alpha$, où $t$ est tel que $\gf{p^h} = \gf{p}[t]$ et où $\alpha \in \gf{p}$. Essentiellement, on souhaiterait que $t = X \pmod{I_k(X)}$, avec $k = h$.
+
+ Prenons $2 < h < p$ et $h$ et $p$ premiers. Nous faisons une extension quadratique de $\gf{p^h}$, puis on cherche un polynôme irréductible convenable $I_h(X)\in\gf{p^2}[X]$, divisant le polynôme $h_1(X)X^p - h_0(X)$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{La tentative d'adaptation}
+  \begin{prop}
+    Un polynôme irréductible de degré $h$ sur $\gf{p}$ est irréductible sur $\gf{p^2}$ si, et seulement si, $h$ est impair.
+  \end{prop}
+  Cela permet donc de choisir $I_h(X)$ comme un facteur irréductible unitaire de degré $h$ du polynôme $h_1(X)X^p-h_0(X) \in \gf{p}[X]$. Si on pose $t = X \pmod{I_h(X)}$, la représentation de $\gf{p^{2h}}$ est $$\frac{\gf{p^2}[X]}{(I_h(X))} = \gf{p^2}[t].$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{La tentative d'adaptation}
+  De l'algorithme d'Antoine Joux, nous obtenons le logarithme en base $\gamma$, primitif de $\gf{p^{2h}}$, des éléments de la forme ${t_0} + \beta$, où ${t_0} = X \pmod{I_h(X)}$ et $\beta \in \gf{p^2}$. 
+  
+  Notons les logarithmes qui nous interessent:
+  $$b_i := \log_\gamma\left({t_0} + \alpha_{i}\right) \pmod{p^{2h}-1}, \qquad 0 \leqslant i \leqslant p-1.$$
+\end{frame}
+
+\begin{frame}
+  \frametitle{La tentative d'adaptation}
+  Prenons pour élément primitif de $\gf{p^{h}}$ l'élément suivant:
+  $$g_0 := \gamma^{(p^{2h}-1)/(p^h-1)}=\gamma^{p^h+1},$$
+  et posons, quel que soit $i$ tel que $0 \leqslant i \leqslant p-1$:
+ $$a_i = \left\{\begin{array}{l}
+ b_i / 2 \pmod{p^h-1}, \quad \text{si } {t_0} + {g_0}^{b_i/2} \not\in \gf{p}, \\
+ (b_i + p^h - 1) / 2 \pmod{p^h-1}, \quad \text{si } {t_0} + {g_0}^{b_i/2} \in \gf{p}. \\
+  \end{array}\right.$$
+  Ainsi: ${g_0}^{a_i} = t_0 + \alpha_i.$
+\end{frame}
+
+\begin{frame}
+  \frametitle{La tentative d'adaptation}
+  $g_0$ est bien choisi aléatoirement dans $\gf{p^{h}}$, mais pas $t_0$!
+
+  Comment faire ?
 \end{frame}
 
 \section*{La conclusion}

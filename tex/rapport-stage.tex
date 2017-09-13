@@ -1104,7 +1104,7 @@ L'algorithme~\ref{algo:attaqueGenerale} illustre l'attaque complète de Serge Va
 Serge Vaudenay a décrit une attaque du cryptosystème, lorsque $h$ admet un facteur $r$ tel que $r \geqslant \sqrt{h + 1/4} + 1/2$, ayant pour complexité $\O(h^3p^r/r^2)$.
 La figure~\ref{fig:tabVaudenay} rassemble dans un tableau les diverses attaques exposées dans cette section.
 
-Nous avons implémentée\footnote{Consulter le fichier \textit{vaudenay-attack.sage}} l'attaque en SageMath, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 1 heure et demie en moyenne contre 15 minutes, pour les corps $\gf{197^{24}}$ et $\gf{211^{24}}$.
+Nous avons implémenté\footnote{Consulter le fichier \textit{vaudenay-attack.sage}} l'attaque en SageMath, bien que les résultats ne soient pas aussi bons que ceux de Serge Vaudenay : 1 heure et demie en moyenne contre 15 minutes, pour les corps $\gf{197^{24}}$ et $\gf{211^{24}}$.
 
 Les préconisations de Serge Vaudenay pour réparer le cryptosystème de Chor-Rivest sont les suivantes : \begin{itemize}
 \item choisir un corps fini $\gf{p^h}$ avec $p$ et $h$ tous les deux premiers,
