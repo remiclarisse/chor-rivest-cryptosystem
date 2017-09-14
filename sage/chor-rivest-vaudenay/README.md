@@ -2,7 +2,7 @@
 
 ## How does it work?
 
-Launch `sage` in your favorite shell and attach or load the files `chor-rivest-prime-number.sage` and `vaudenay-attack.sage`, like so:
+Launch SageMath in your favorite shell and attach or load the files `chor-rivest-prime-number.sage` and `vaudenay-attack.sage`, like so:
 
     sage: load("chor-rivest-prime-number.sage")
     sage: load("vaudenay-attack.sage")

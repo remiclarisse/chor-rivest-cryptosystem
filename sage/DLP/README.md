@@ -4,30 +4,32 @@ Because Chor-Rivest cryptosystem uses discrete logarithms in finite fields, we h
 
 ## Pohlig-Hellman's Algorithm
 
-The file `pohlig-hellman.sage` contains an implementation of *Pohlig-Hellman's Algorithm* : Given a field Z/pZ and **knowing the factorisation of p-1** (strong assumption), solve the DLP for each maximal sub-r-group of (Z/pZ)\*, where r is a divisor of p-1, and reconstruct the original logarithm.
+The file `pohlig-hellman.sage` contains an implementation of *Pohlig-Hellman's Algorithm*: Given a field GF(q) and **knowing the factorisation of q-1** (strong assumption), solve the DLP for each maximal sub-r-group of GF(q)\*, where r is a prime divisor of q-1, and reconstruct the original logarithm.
 
-Here, the implementation uses an exhaustive seach in the cyclic sub-r-groups (which can be improved with baby-step giant-step algorithm).
+Here, the implementation uses the baby-step giant-step algorithm in the cyclic sub-r-groups.
 
 ### Example
 
-In `sage`, after attaching or loading the file `pohlig-hellman.sage`, try :
+In SageMath, after attaching or loading the file `pohlig-hellman.sage`, try:
 
-    sage: p = 2^15 * 3^6 * 5^4 + 1 # p is a prime number
-    sage: g = GF(p)(4107883536) # g is primitive modulo p
-    sage: h = GF(p)(572067100)
-    sage: Fa = [[2,15],[3,6],[5,4]]
-    sage: log (h,g) # is equal to 2074276358
-    sage: %time pohlig_hellman (g, h, Fa) # must equal the value above
+    sage: K.<a> = GF(23 ** 7)
+    sage: g = K.primitive_element()
+    sage: h = K.random_element()
+    sage: %time a = pohlig_hellman(h, g)
+    sage: g ** a == h
+
+The SageMath function computing discrete logarithms is `discrete_log(h, g)`. However, the function we implemented
+can be used for an extension of an extension of a finite field (see below).
 
 ## Hellman-Reyneri's Algorithm
 
-The file `hellman-reyneri.sage` contains an implementation of *Hellman-Reyneri's Algorithm* : Given a finite field GF(q^k), a generator `g` and a list of elements `h`, solve the DLP for each element in `h`.
+The file `hellman-reyneri.sage` contains an implementation of *Hellman-Reyneri's Algorithm*: Given a finite field GF(q^k), a generator `g` and a list of elements `h`, solve the DLP for each element in `h`.
 
-In `sage`, the construction of the finite field GF(q^k) is tricky because `GF(q^k)` is viewed as GF(p)[X]/(P) where P is an irreducible polynomial of degree n (if q = p^m then n = m*k). I believe that this construction makes the computations remarquably slow, but it works.
+In SageMath, the construction of the finite field GF(q^k) is tricky because `GF(q^k)` is viewed as GF(q)[X]/(P) where P is an irreducible polynomial of degree n (if q = p^m then n = m*k). We believe that this construction makes the computations remarkably slow, but it works.
 
 ### Example
 
-In `sage`, after attaching or loading the file `hellman-reyneri.sage`, try :
+In SageMath, after attaching or loading the file `hellman-reyneri.sage`, try:
 
     sage: q = 2 ** 3
     sage: k = 5
@@ -44,13 +46,17 @@ In `sage`, after attaching or loading the file `hellman-reyneri.sage`, try :
 
 ### Remark
 
-After the sieving phase, the system might not have a solution, depending on how many relevant equations where collected ! That is something to improve !! Besides, the change of representation is surely too greedy and not be to demand an irreducible polynomial of the form X^k - S(X) (see Coppersmith's Algorithm).
+After the sieving phase, the system might not have a solution, depending on how many relevant equations where collected! That is something to be improved!!
 
 ## Joux's Algorithm
 
 > Have a look at *Coppersmith's Algorithm* and the *Function Field Sieve* (FFS).
 
->> Will come in the near future.
+The file `joux-algorithm.sage` contains the begin of an implementation of *Antoine Joux's Algorithm*: it implements only what is necessary to determine the logarithm of linear polynomials.
+
+### Example
+
+To this date, the implementation we have made does not work...
 
 ---
 ## Bibliography

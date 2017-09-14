@@ -3,8 +3,6 @@ EXE=rho-pollard
 FILE=rapport-stage
 DLP=computing-dlp
 IMPLEMCHORRIVEST=implementation-chor-rivest
-VAUDENAY=with-vaudenay-attack
-JOUX=with-joux-algorithm
 
 # Special rules and targets
 .PHONY: all clean help info open
@@ -13,22 +11,21 @@ JOUX=with-joux-algorithm
 all: clean
 	@mkdir $(FILE)
 	@cd tex && $(MAKE)
-	@cp -f tex/$(FILE).pdf ./$(FILE)/
+	@cp -f tex/$(FILE).pdf $(FILE)/
+	@cp -f tex/beamer.pdf $(FILE)/
 	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)
-	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/$(VAUDENAY)
-	@cp -f sage/chor-rivest-vaudenay/* ./$(FILE)/$(IMPLEMCHORRIVEST)/$(VAUDENAY)
-	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)/$(JOUX)
-	@cp -f sage/chor-rivest-joux/* ./$(FILE)/$(IMPLEMCHORRIVEST)/$(JOUX)
+	@cp -f sage/chor-rivest-vaudenay/* $(FILE)/$(IMPLEMCHORRIVEST)/
+	@rm -f $(FILE)/$(IMPLEMCHORRIVEST)/draft.sage
 	@mkdir $(FILE)/$(DLP)
-	@cp -f sage/DLP/hellman-reyneri.sage ./$(FILE)/$(DLP)/
-	@cp -f sage/DLP/pohlig-hellman.sage ./$(FILE)/$(DLP)/
-	@cp -f sage/DLP/joux-algorithm.sage ./$(FILE)/$(DLP)/
-	@cp -f sage/DLP/README.md ./$(FILE)/$(DLP)/
+	@cp -f sage/DLP/hellman-reyneri.sage $(FILE)/$(DLP)/
+	@cp -f sage/DLP/pohlig-hellman.sage $(FILE)/$(DLP)/
+	@cp -f sage/DLP/joux-algorithm.sage $(FILE)/$(DLP)/
+	@cp -f sage/DLP/README.md $(FILE)/$(DLP)/
 	@cd c && $(MAKE) nodebug
 	@mkdir $(FILE)/$(EXE)
-	@cp -f c/$(EXE) ./$(FILE)/$(EXE)/
-	@cp -f c/README.md ./$(FILE)/$(EXE)/
-	@cp -f c/test/primes ./$(FILE)/$(EXE)/
+	@cp -f c/$(EXE) $(FILE)/$(EXE)/
+	@cp -f c/README.md $(FILE)/$(EXE)/
+	@cp -f c/test/primes $(FILE)/$(EXE)/
 
 $(EXE):
 	@cd c && $(MAKE) nodebug

@@ -3,26 +3,18 @@ def hellman_reyneri (g, h) :
     R = K.base()
     F = R.base_ring()
     q = F.cardinality()
-    k = log (K.cardinality(), q)
-    b = min (k, 10)
-    card = q ** k - 1
-    # changement de représentation
-    print "Changement de représentation"
-    Ik = find_good_irreducible_poly_S (q, k, b, F, R)
-    newK = R.quotient_ring(Ik, 'v')
-    M = make_change_basis_matrix (q, k, F, R, K.gen(), Ik) # matrice de v à u (exprime v dans la base 1, u, u^2, ..., u^{k-1})
-    M = M.inverse()
-    M = Matrix.identity(k)
-    G = newK(list(M * vector(list(g))))
-    H = [ newK(list(M * vector(list(elem)))) for elem in h ]
+    card = K.cardinality()
+    k = log (card, q)
+    card -= 1
     # collecte de relations
     print "Collecte de relations"
     d = int(ceil (sqrt (0.5 * k * log (k, q))))
-    rs, rel_liste = make_pool_relations (G, d, q ** (d + 1), card)
+    rs, rel_liste = make_relations (g, d, q ** (d + 1), card)
+    print "Phase d'algèbre linéaire"
     basis, logs_basis = make_smoothness_basis (rel_liste, rs, card)
     # descente individuelle
     print "Descente individuelle"
-    logs = [ mod (descent_log (elem_h, G, basis, logs_basis, card), card) for elem_h in H ]
+    logs = [ mod (descent_log (elem_h, g, basis, logs_basis, card), card) for elem_h in h ]
     return logs
 
 def descent_log (elem_target, gen, basis, logs_basis, card) :
@@ -32,8 +24,8 @@ def descent_log (elem_target, gen, basis, logs_basis, card) :
         r = randint (1, card - 1)
         P = (elem_target * gen ** r).lift()
     lo = 0
-    if P.lc() != P.parent().one() :
-        lo += logs_basis[basis.index(P.lc())]
+    if P.leading_coefficient() != P.parent().one() :
+        lo += logs_basis[basis.index(P.leading_coefficient())]
     for poly, mult in list(P.factor()) :
         lo += mult * logs_basis[basis.index(poly)]
     return lo - r
@@ -68,7 +60,7 @@ def make_matrix_relation_n_get_basis (liste, modulus) :
     M = Matrix(IntegerModRing(modulus), M, sparse=True)
     return M, unknowns
 
-def make_pool_relations (gen, threshold, numb, card) :
+def make_relations (gen, threshold, numb, card) :
     sol = []
     rel_liste = []
     tirage = 0
@@ -121,17 +113,6 @@ def mult_order (x) :
     for d in divisors(card) :
         if x ** d == A.one() :
             return d
-
-def find_good_irreducible_poly_S (q, k, b, F, R) :
-    x = R.gen()
-    P = [ F(0), F(0), F.gen() ] + [ F(0) for i in range (b - 3) ]
-    found = False
-    while not found :
-        P = next_poly (P)
-        Q = R(x ** k + R(P))
-        if Q.is_irreducible() :
-            return Q
-    return None
 
 def next_poly (P) :
     F = P[0].parent()

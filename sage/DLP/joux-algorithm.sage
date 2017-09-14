@@ -33,7 +33,7 @@ def sieving_linear_poly (q, h0, h1) :
     X = h0.parent().gen()
     Fq2X = X.parent()
     Fq2 = Fq2X.base()
-    sieveSize = 4 * q ** 2
+    sieveSize = 3 * q ** 2 #the 3 is a magic number
     nbIter = 0
     sieveTable = []
     constantsTable = []
@@ -62,7 +62,7 @@ def sieving_linear_poly (q, h0, h1) :
             nicen (indEqn)
             if indEqn not in sieveTable :
                 sieveTable.append(indEqn)
-                constantsTable.append(Q.lc() * P.lc() ** (-1))
+                constantsTable.append(Q.leading_coefficient() * P.leading_coefficient() ** (-1))
                 nbIter += 1
     return linear_poly, sieveTable, constantsTable
 

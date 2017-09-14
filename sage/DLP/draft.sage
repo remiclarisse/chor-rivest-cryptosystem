@@ -38,7 +38,6 @@
 # #         t = K.next(t)
 # g = K(lift(g0)(t))
 
-
 def pick_representation_polynome (p, h, X) :
     A = X.parent()
     while true :

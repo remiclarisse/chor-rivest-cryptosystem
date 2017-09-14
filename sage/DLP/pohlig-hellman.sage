@@ -18,11 +18,11 @@ def baby_step_giant_step (h, g, n) :
     L = []
     for i in range (m + 1) :
         u = g ** i
-        L += [ hash(u) ]
+        L += [ u ]
     u = u ** (-1)
     y = h
     j = 0
-    while hash(y) not in L :
+    while y not in L :
         y = y * u
         j = j + 1
-    return L.index(hash(y)) + m * j
+    return L.index(y) + m * j
