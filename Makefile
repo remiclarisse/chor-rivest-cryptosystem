@@ -12,7 +12,6 @@ all: clean
 	@mkdir $(FILE)
 	@cd tex && $(MAKE)
 	@cp -f tex/$(FILE).pdf $(FILE)/
-	@cp -f tex/beamer.pdf $(FILE)/
 	@mkdir $(FILE)/$(IMPLEMCHORRIVEST)
 	@cp -f sage/chor-rivest-vaudenay/* $(FILE)/$(IMPLEMCHORRIVEST)/
 	@rm -f $(FILE)/$(IMPLEMCHORRIVEST)/draft.sage

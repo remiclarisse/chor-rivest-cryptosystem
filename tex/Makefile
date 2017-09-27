@@ -6,7 +6,7 @@ RAPPORT=rapport-stage
 .PHONY: all clean help open beamer
 
 # Rules and targets
-all: clean $(RAPPORT) beamer
+all: clean $(RAPPORT)
 
 $(LOGBOOK):
 	pdflatex $(LOGBOOK).tex
